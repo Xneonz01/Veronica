@@ -16,6 +16,8 @@ const ASKING: Record<string, string> = {
   memory_recall: 'Look through my memory',
   memory_correct: 'Correct something I remember',
   memory_forget: 'Forget something',
+  web_search: 'Search the web',
+  web_read: 'Read a web page',
 }
 
 const DONE: Record<string, string> = {
@@ -28,6 +30,8 @@ const DONE: Record<string, string> = {
   memory_recall: 'Checked my memory',
   memory_correct: 'Corrected what I remember',
   memory_forget: 'Forgot something',
+  web_search: 'Searched the web',
+  web_read: 'Read a web page',
 }
 
 const TRIED: Record<string, string> = {
@@ -40,6 +44,8 @@ const TRIED: Record<string, string> = {
   memory_recall: "Couldn't check my memory",
   memory_correct: "Couldn't correct that",
   memory_forget: "Couldn't forget that",
+  web_search: "Couldn't search the web",
+  web_read: "Couldn't read the page",
 }
 
 function wire(name: string): string {

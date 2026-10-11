@@ -1,0 +1,14 @@
+/* The key field and its button side by side; the blocked-sites editor in its card,
+   whose sides the card already pads. */
+
+.inline {
+  display: flex;
+  gap: var(--space-xs);
+  align-items: flex-start;
+}
+
+.sites {
+  display: grid;
+  gap: var(--space-xs);
+  padding-block: var(--space-sm);
+}

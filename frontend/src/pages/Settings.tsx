@@ -1,4 +1,4 @@
-// Settings: how the app looks, who she is, how calls start, the desktop app, how her
+// Settings: how the app looks, who she is, how calls start, the desktop app, the web, how her
 // data is kept, and which version this is. Every change applies at once, everywhere, with no restart.
 //
 // The open section is in the address (#/settings?section=calls), so the palette
@@ -14,6 +14,7 @@ import { GeneralSettings } from '../settings/GeneralSettings'
 import { PersonalitySettings } from '../settings/PersonalitySettings'
 import { PrivacySettings } from '../settings/PrivacySettings'
 import { SETTINGS_SECTIONS, type SettingsSection } from '../settings/sections'
+import { WebSettings } from '../settings/WebSettings'
 import { panelProps } from '../ui/tabPanel'
 import { Tabs } from '../ui/Tabs'
 import styles from './Settings.module.css'
@@ -23,6 +24,7 @@ const PANEL: Record<SettingsSection, ComponentType> = {
   personality: PersonalitySettings,
   calls: CallSettings,
   desktop: DesktopSettings,
+  web: WebSettings,
   privacy: PrivacySettings,
   about: AboutSettings,
 }

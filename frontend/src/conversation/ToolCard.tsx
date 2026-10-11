@@ -2,19 +2,7 @@
 // more to it (what a recall found), the rest on opening. A failure says what she
 // couldn't do and why, in her words.
 
-import {
-  AppWindow,
-  BookmarkMinus,
-  BookmarkPlus,
-  Brain,
-  ChevronDown,
-  FilePen,
-  FileSearch,
-  FileText,
-  FolderOpen,
-  PenLine,
-  Wrench,
-} from 'lucide-react'
+import { AppWindow, BookmarkMinus, BookmarkPlus, Brain, ChevronDown, FilePen, FileSearch, FileText, FolderOpen, Globe, PenLine, Search, Wrench } from 'lucide-react'
 import type { ToolRun } from '../chat/types'
 import { toolRunTitle } from '../lib/capabilities'
 import { cx } from '../ui/cx'
@@ -31,6 +19,8 @@ const ICONS: Record<string, typeof Wrench> = {
   memory_recall: Brain,
   memory_correct: PenLine,
   memory_forget: BookmarkMinus,
+  web_search: Search,
+  web_read: Globe,
 }
 
 export function ToolCard({ run }: { run: ToolRun }) {
