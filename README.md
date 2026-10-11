@@ -99,7 +99,17 @@ should read [AGENTS.md](AGENTS.md) first.
   cancellation.
 - Images can be attached but not read yet.
 
+## Credits
+
+Created by [Xneonz01](https://github.com/Xneonz01), co-developed with
+[LobooHD](https://github.com/LobooHD).
+
 ## License
 
-MIT. The models have their own licenses, listed in
+[PolyForm Noncommercial 1.0.0](LICENSE). You're free to use, modify, share and
+contribute to Veronica for any noncommercial purpose. Keep the credit lines at the top
+of `LICENSE` in any copy or fork. Selling it, or using it to make money, isn't allowed
+without permission.
+
+The models have their own licenses, listed in
 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).

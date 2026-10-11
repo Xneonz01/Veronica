@@ -1,6 +1,6 @@
 # Third-party notices
 
-The MIT licence in `LICENSE` covers this repository's own source code only.
+The PolyForm Noncommercial licence in `LICENSE` covers this repository's own source code only.
 
 Veronica does not bundle model weights. They are downloaded on first use, or served by a
 locally installed Ollama, and each carries its own licence, which governs what you may do
