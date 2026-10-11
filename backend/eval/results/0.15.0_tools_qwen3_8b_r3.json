@@ -1,0 +1,484 @@
+{
+  "version": "0.15.0",
+  "family": "tools",
+  "model": "qwen3:8b",
+  "run": 3,
+  "cases_hash": "ebb41264f7779e14",
+  "selection": 0.8462,
+  "wrong_tool": 0.0385,
+  "silent": 0.1154,
+  "false_call": 0.0,
+  "args_valid": 0.9545,
+  "first_ms_median": 495.6,
+  "first_ms_p90": 856.1,
+  "cases": [
+    {
+      "id": "t01",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 569.5156999936444,
+      "args_ok": true,
+      "args_seen": {
+        "content": "The user takes their coffee black.",
+        "kind": "fact"
+      }
+    },
+    {
+      "id": "t02",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 612.3528000025544,
+      "args_ok": true,
+      "args_seen": {
+        "content": "Morgan's birthday is on 12 October.",
+        "kind": "fact"
+      }
+    },
+    {
+      "id": "t03",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 629.7097000060603,
+      "args_ok": true,
+      "args_seen": {
+        "kind": "preference",
+        "content": "The user has requested not to be called by their name."
+      }
+    },
+    {
+      "id": "t04",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [],
+      "first_ms": 276.3822000051732,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "t05",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 569.6023999989848,
+      "args_ok": true,
+      "args_seen": {
+        "content": "I work from home on Fridays.",
+        "kind": "fact"
+      }
+    },
+    {
+      "id": "t06",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 519.2490999979782,
+      "args_ok": true,
+      "args_seen": {
+        "query": "What do you remember about me?"
+      }
+    },
+    {
+      "id": "t07",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [],
+      "first_ms": 277.5422999984585,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "t08",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 482.4073999989196,
+      "args_ok": true,
+      "args_seen": {
+        "query": "allergies"
+      }
+    },
+    {
+      "id": "t09",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 475.1352000021143,
+      "args_ok": true,
+      "args_seen": {
+        "query": "work schedule"
+      }
+    },
+    {
+      "id": "t10",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [],
+      "first_ms": 275.9710000027553,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "t11",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 747.288300000946,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/shopping.md"
+      }
+    },
+    {
+      "id": "t12",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 713.3659000028274,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/projects/garden-plan.txt"
+      }
+    },
+    {
+      "id": "t13",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 704.0062999949441,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "t14",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 723.1262999994215,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/letters/landlord.txt"
+      }
+    },
+    {
+      "id": "t15",
+      "kind": "tool",
+      "expected": "files_list",
+      "called": [
+        "files_list"
+      ],
+      "first_ms": 684.7981000028085,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes"
+      }
+    },
+    {
+      "id": "t16",
+      "kind": "tool",
+      "expected": "files_list",
+      "called": [
+        "files_list"
+      ],
+      "first_ms": 674.3657999977586,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/projects"
+      }
+    },
+    {
+      "id": "t17",
+      "kind": "tool",
+      "expected": "files_list",
+      "called": [
+        "files_list"
+      ],
+      "first_ms": 731.721700001799,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/letters"
+      }
+    },
+    {
+      "id": "t18",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 856.0757000013837,
+      "args_ok": true,
+      "args_seen": {
+        "in_content": false,
+        "path": "{root}",
+        "query": "boiler"
+      }
+    },
+    {
+      "id": "t19",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 826.3950000036857,
+      "args_ok": true,
+      "args_seen": {
+        "in_content": true,
+        "path": "{root}",
+        "query": "invoice"
+      }
+    },
+    {
+      "id": "t20",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 854.217799998878,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}",
+        "query": "dentist",
+        "in_content": false
+      }
+    },
+    {
+      "id": "t21",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 867.7211999965948,
+      "args_ok": true,
+      "args_seen": {
+        "in_content": true,
+        "path": "{root}/notes",
+        "query": "carrots"
+      }
+    },
+    {
+      "id": "t22",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 909.2834999974002,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/ideas.md",
+        "content": "Paint the shed",
+        "overwrite": true
+      }
+    },
+    {
+      "id": "t23",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 920.8500999957323,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/reminders.txt",
+        "content": "Call the plumber on Monday",
+        "overwrite": true
+      }
+    },
+    {
+      "id": "t24",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 923.7666000044555,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/gift.md",
+        "content": "buy a scarf for Morgan",
+        "overwrite": true
+      }
+    },
+    {
+      "id": "t25",
+      "kind": "tool",
+      "expected": "apps_open",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 493.66819999704603,
+      "args_ok": true,
+      "args_seen": {
+        "name": "Notepad"
+      }
+    },
+    {
+      "id": "t26",
+      "kind": "tool",
+      "expected": "apps_open",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 497.58229999861214,
+      "args_ok": false,
+      "args_seen": {
+        "name": "File Explorer"
+      }
+    },
+    {
+      "id": "n01",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 263.393699999142,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n02",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 277.8515000027255,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n03",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 276.2380000058329,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n04",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 277.0682000045781,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n05",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 277.47069999895757,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n06",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 278.39469999889843,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n07",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 277.60330000455724,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n08",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 277.07640000153333,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n09",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 277.2661999988486,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n10",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 279.22879999823635,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n11",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 281.26760000304785,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n12",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 278.59560000069905,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n13",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 278.189000004204,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n14",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 277.94539999740664,
+      "args_ok": null,
+      "args_seen": {}
+    }
+  ]
+}

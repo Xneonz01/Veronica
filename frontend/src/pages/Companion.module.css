@@ -1,0 +1,146 @@
+/* The companion window is frameless and opaque; the operating system draws its
+   corners and shadow. The panel is the whole window. */
+.panel {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--surface);
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+.bar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-xs);
+  height: 44px;
+  padding-inline: var(--space-md) var(--space-xs);
+  border-bottom: 1px solid var(--border);
+  user-select: none;
+}
+
+.mark,
+.markBusy {
+  display: inline-grid;
+}
+
+.markBusy :global(svg) {
+  animation: var(--anim-breathe);
+}
+
+.name {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.offline {
+  font-size: var(--text-sm);
+  color: var(--warning);
+}
+
+.barActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-inline-start: auto;
+}
+
+.esc {
+  display: inline-grid;
+  place-items: center;
+  height: 30px;
+  padding-inline: 4px;
+  border-radius: var(--radius-sm);
+}
+
+.answers {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  padding: var(--space-md) var(--space-md) var(--space-xs);
+}
+
+.empty {
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  height: 100%;
+  text-align: center;
+  font-size: var(--text-md);
+  color: var(--subtle-foreground);
+}
+
+.empty p {
+  margin: 0;
+}
+
+.turn {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.turn + .turn {
+  margin-top: var(--space-lg);
+}
+
+.question {
+  font-size: var(--text-base);
+  letter-spacing: var(--tracking-ui);
+}
+
+.foot {
+  flex: none;
+  display: grid;
+  gap: 6px;
+  padding: var(--space-sm) var(--space-md) var(--space-sm);
+  border-top: 1px solid var(--border);
+}
+
+.field {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--input);
+  background: var(--surface-elevated);
+  resize: none;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  outline: none;
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard);
+}
+
+.field:focus-visible {
+  border-color: color-mix(in oklab, var(--assistant) 55%, var(--border-strong));
+  box-shadow: 0 0 0 3px var(--assistant-soft);
+}
+
+.field::placeholder {
+  color: var(--subtle-foreground);
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  min-height: 30px;
+}
+
+.hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-inline-end: auto;
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.problem {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--destructive);
+}

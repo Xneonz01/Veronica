@@ -1,0 +1,74 @@
+.menu {
+  display: grid;
+  gap: 1px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: 8px 10px;
+  /* Concentric with the popover: its radius less its padding. */
+  border-radius: calc(var(--radius-xl) - 6px);
+  text-align: start;
+  color: var(--foreground);
+  transition: background-color var(--motion-fast) var(--ease-standard);
+}
+
+/* In a menu the focused item IS the highlighted one: the pointer moves focus
+   (Menu.tsx), so a mouse and a keyboard never leave two rows lit. The ring still
+   shows for the keyboard, from base.css. */
+.item:focus {
+  background: var(--muted-strong);
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  background: var(--muted);
+  color: var(--muted-foreground);
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+
+.item:focus .icon {
+  background: var(--surface-elevated);
+  color: var(--foreground);
+}
+
+.text {
+  display: grid;
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+}
+
+.hint {
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.danger,
+.danger .icon {
+  color: var(--destructive);
+}
+
+.danger:focus {
+  background: var(--destructive-soft);
+}
+
+.danger:focus .icon {
+  color: var(--destructive);
+}

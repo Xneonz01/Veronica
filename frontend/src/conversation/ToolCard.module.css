@@ -1,0 +1,98 @@
+/* An action she took: a quiet line in the answer, not a panel. It opens only when
+   there is more to it than the line says. */
+.card {
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
+  box-shadow: inset 0 0 0 1px var(--border);
+  overflow: hidden;
+  animation: var(--anim-unfold);
+}
+
+/* The icon box and its gap put the title on the same edge as the result below:
+   space-xs + 28px + space-sm = space-2xl. */
+.head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: 100%;
+  min-height: var(--tap-min);
+  padding: var(--space-2xs) var(--space-sm) var(--space-2xs) var(--space-xs);
+  text-align: start;
+}
+
+.opens {
+  cursor: pointer;
+  list-style: none;
+  transition: background-color var(--motion-fast) var(--ease-standard);
+}
+
+.opens::-webkit-details-marker {
+  display: none;
+}
+
+@media (hover: hover) {
+  .opens:hover {
+    background: var(--muted);
+  }
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  color: var(--assistant);
+  background: var(--assistant-soft);
+}
+
+.failed .icon {
+  color: var(--warning);
+  background: var(--warning-soft);
+}
+
+.title {
+  flex: none;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+}
+
+.peek {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-md);
+  color: var(--subtle-foreground);
+}
+
+/* Open, the whole result is below: the line would only repeat its start. */
+.card[open] .peek {
+  visibility: hidden;
+}
+
+.chevron {
+  flex: none;
+  margin-inline-start: auto;
+  color: var(--subtle-foreground);
+  transition: rotate var(--motion-default) var(--ease-standard);
+}
+
+.card[open] .chevron {
+  rotate: 180deg;
+}
+
+.result {
+  padding: var(--space-sm) var(--space-md) var(--space-md) var(--space-2xl);
+  border-top: 1px solid var(--border);
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  color: var(--muted-foreground);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 320px;
+  overflow-y: auto;
+  animation: var(--anim-fade-in);
+}

@@ -1,0 +1,116 @@
+/* A list on one flat surface, rows parted by hairlines: easier to scan than a
+   grid of cards, and each memory reads as the sentence it is. */
+.list {
+  display: grid;
+  margin: 0;
+  padding: var(--space-2xs);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--border);
+  list-style: none;
+}
+
+.row {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
+  border-radius: calc(var(--radius-xl) - var(--space-2xs));
+  transition: background-color var(--motion-fast) var(--ease-standard);
+}
+
+/* A straight rule between rows, inset from the edges; a shadow here would follow
+   the rows' rounded corners and make each one look like its own card. */
+.row + .row::after {
+  content: '';
+  position: absolute;
+  inset: 0 var(--space-md) auto;
+  height: 1px;
+  background: var(--border);
+}
+
+@media (hover: hover) {
+  .row:hover {
+    background: var(--muted);
+  }
+}
+
+/* Pinned: a thin line in her colour at the start of the row. */
+.pinned::before {
+  content: '';
+  position: absolute;
+  inset: var(--space-sm) auto var(--space-sm) var(--space-2xs);
+  width: 3px;
+  border-radius: 2px;
+  background: var(--assistant);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.content {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Something she inferred rather than something you said: a step quieter. */
+.inferred {
+  color: var(--muted-foreground);
+}
+
+.slot {
+  font-weight: var(--weight-medium);
+  color: var(--muted-foreground);
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs) 6px;
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.pinBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-inline-start: var(--space-2xs);
+  color: var(--assistant-on-soft);
+}
+
+.more {
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-standard);
+}
+
+.row:hover .more,
+.row:focus-within .more,
+.more[aria-expanded='true'] {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .more {
+    opacity: 1;
+  }
+}
+
+.edit {
+  flex: 1;
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.editActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2xs);
+}

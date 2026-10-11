@@ -1,0 +1,7 @@
+# Example hardware profile: a desktop with a 16 GB NVIDIA graphics card.
+# Selected with VERONICA_PROFILE=gpu_16gb. Copy it to add your own, named by the
+# card's memory rather than its model.
+app:
+  env: desktop
+gpu:
+  vram_budget_gb: 16

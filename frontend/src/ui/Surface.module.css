@@ -1,0 +1,156 @@
+.surface {
+  position: relative;
+  border-radius: var(--radius-lg);
+}
+
+.rsm {
+  border-radius: var(--radius-sm);
+}
+
+.rmd {
+  border-radius: var(--radius-md);
+}
+
+.rlg {
+  border-radius: var(--radius-lg);
+}
+
+.rxl {
+  border-radius: var(--radius-xl);
+}
+
+.r2xl {
+  border-radius: var(--radius-2xl);
+}
+
+/* ————————————————————————————— flat: the default, and most of the product */
+.flat {
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+/* ————————————————————————————— glass levels */
+.subtle,
+.glass,
+.elevated,
+.interactive,
+.emissive {
+  -webkit-backdrop-filter: blur(var(--blur-md)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--blur-md)) saturate(var(--glass-saturate));
+}
+
+.subtle {
+  background: var(--glass-subtle-bg);
+  -webkit-backdrop-filter: blur(var(--blur-sm)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--blur-sm)) saturate(var(--glass-saturate));
+  box-shadow: inset 0 0 0 1px var(--glass-edge);
+}
+
+.glass {
+  background: var(--glass-bg);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-subtle);
+}
+
+.elevated {
+  background: var(--glass-elevated-bg);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-glass);
+}
+
+/* ————————————————————————————— interactive: glass you can press */
+.interactive {
+  background: var(--glass-bg);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-subtle);
+  transition:
+    transform var(--motion-default) var(--ease-standard),
+    box-shadow var(--motion-default) var(--ease-standard);
+}
+
+/* Veronica present: once per screen at most. */
+.emissive {
+  background: var(--glass-elevated-bg);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  box-shadow:
+    inset 0 0 0 1px var(--assistant-soft-2),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-glass),
+    var(--glow-assistant);
+  transition:
+    transform var(--motion-default) var(--ease-standard),
+    box-shadow var(--motion-default) var(--ease-standard);
+}
+
+/* The refraction: a soft highlight where the pointer is, on glass only, and
+   only while the pointer is actually over it. */
+.interactive::after,
+.emissive::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(
+    200px circle at var(--sheen-x, 50%) var(--sheen-y, 0%),
+    var(--glass-top),
+    transparent 62%
+  );
+  transition: opacity var(--motion-default) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .interactive:hover,
+  .emissive:hover {
+    transform: translateY(-2px);
+  }
+
+  .interactive:hover {
+    box-shadow:
+      inset 0 0 0 1px var(--glass-edge),
+      inset 0 1px 0 0 var(--glass-top),
+      var(--shadow-glass);
+  }
+
+  /* It lifts, so it has to cast further; otherwise it rises off a shadow that
+     stayed where it was and reads as peeling, not lifting. */
+  .emissive:hover {
+    box-shadow:
+      inset 0 0 0 1px var(--assistant-soft-2),
+      inset 0 1px 0 0 var(--glass-top),
+      var(--shadow-elevated),
+      var(--glow-assistant);
+  }
+
+  .interactive:hover::after,
+  .emissive:hover::after {
+    opacity: 1;
+  }
+}
+
+.interactive:active,
+.emissive:active {
+  transform: translateY(0) scale(0.995);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interactive:hover,
+  .emissive:hover {
+    transform: none;
+  }
+
+  .interactive::after,
+  .emissive::after {
+    display: none;
+  }
+}

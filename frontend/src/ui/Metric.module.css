@@ -1,0 +1,88 @@
+.metric {
+  display: grid;
+  gap: 4px;
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+}
+
+.lg {
+  padding: var(--space-lg);
+  gap: 6px;
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--subtle-foreground);
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+}
+
+.value {
+  font-size: var(--text-3xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-display);
+  line-height: 1.05;
+}
+
+.lg .value {
+  font-size: var(--text-4xl);
+}
+
+.success {
+  color: var(--success);
+}
+
+.info {
+  color: var(--info);
+}
+
+.assistant {
+  color: var(--assistant);
+}
+
+.unit {
+  font-size: var(--text-md);
+  color: var(--subtle-foreground);
+}
+
+.delta {
+  display: inline-flex;
+  align-items: center;
+  height: 22px;
+  padding-inline: 7px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.up {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.down {
+  background: var(--destructive-soft);
+  color: var(--destructive);
+}
+
+.flat {
+  background: var(--muted);
+  color: var(--subtle-foreground);
+}
+
+.caption {
+  font-size: var(--text-md);
+  color: var(--muted-foreground);
+}
+
+.footer {
+  margin-block-start: var(--space-xs);
+  padding-block-start: var(--space-xs);
+  border-top: 1px solid var(--border);
+}

@@ -1,0 +1,222 @@
+/* ————————————————————————————————— colour */
+
+.panels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+  gap: var(--space-md);
+}
+
+/* One theme. The panel carries its own ground, so each half is seen on the page
+   colour it will really sit on. */
+.panel {
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-xl);
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+.panelTitle {
+  font-size: var(--text-lg);
+}
+
+.swatchRow {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.rowLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--muted-foreground);
+}
+
+.swatches {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(112px, 1fr));
+  gap: var(--space-xs);
+}
+
+.swatch {
+  display: grid;
+  gap: 6px;
+}
+
+.chip {
+  display: block;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.token {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  color: var(--subtle-foreground);
+  letter-spacing: 0;
+}
+
+.tints {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.tint {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding-inline: 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+/* ————————————————————————————————— measured contrast */
+
+.contrast {
+  display: grid;
+  padding: var(--space-xs) var(--space-sm);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.contrastRow {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto 92px;
+  align-items: center;
+  gap: var(--space-sm);
+  padding-block: 6px;
+}
+
+.contrastRow + .contrastRow {
+  border-top: 1px solid var(--border);
+}
+
+.sample {
+  display: grid;
+  place-items: center;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.contrastLabel {
+  display: grid;
+  min-width: 0;
+  font-size: var(--text-md);
+}
+
+.ratio {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+}
+
+.verdict {
+  justify-self: end;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--destructive);
+}
+
+.verdict[data-pass='true'] {
+  color: var(--subtle-foreground);
+}
+
+/* ————————————————————————————————— type */
+
+.typeScale {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.typeRow {
+  display: grid;
+  gap: 2px;
+}
+
+.typeMeta {
+  font-size: var(--text-xs);
+  color: var(--subtle-foreground);
+}
+
+.typeSample {
+  line-height: var(--leading-snug);
+  letter-spacing: var(--tracking-title);
+  overflow-wrap: anywhere;
+}
+
+/* ————————————————————————————————— material */
+
+/* A deliberately busy ground: two blooms and a ruled grid, so each glass level
+   shows how much of what's behind it survives. */
+.ground {
+  position: relative;
+  display: grid;
+  padding: var(--space-lg);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background:
+    radial-gradient(40% 60% at 20% 30%, var(--assistant-soft-2), transparent 70%),
+    radial-gradient(40% 60% at 80% 70%, var(--info-soft-2), transparent 70%),
+    repeating-linear-gradient(0deg, var(--muted-strong) 0 1px, transparent 1px 12px),
+    var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.groundText {
+  position: absolute;
+  inset: var(--space-sm) var(--space-lg) auto;
+  font-size: var(--text-md);
+  color: var(--subtle-foreground);
+}
+
+.materials {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: var(--space-md);
+  padding-block-start: var(--space-xl);
+}
+
+.material {
+  display: grid;
+  align-content: end;
+  gap: 2px;
+  height: 116px;
+  padding: var(--space-md);
+}
+
+.materialName {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+}
+
+.materialNote {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+/* ————————————————————————————————— mark */
+
+.marks {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--space-lg);
+}
+
+.markSize {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+}

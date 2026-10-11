@@ -1,0 +1,77 @@
+.group {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.head {
+  display: grid;
+  gap: var(--space-3xs);
+}
+
+.title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.lead {
+  max-width: var(--measure);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+/* Rows on one card, split by hairlines: the card is the group, so the rows need
+   no boxes of their own. */
+.card {
+  display: grid;
+  padding: var(--space-3xs) var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.card > * {
+  padding-block: var(--space-sm);
+}
+
+.card > * + * {
+  border-top: 1px solid var(--border);
+}
+
+.row {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs) var(--space-md);
+  min-height: var(--tap-min);
+}
+
+.text {
+  display: grid;
+  flex: 1 1 240px;
+  gap: 2px;
+  min-width: 0;
+}
+
+.label {
+  font-size: var(--text-base);
+}
+
+.description {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  text-wrap: pretty; /* a paragraph's rule: no unit left alone on the last line */
+}
+
+.control {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-xs);
+  max-width: 100%;
+}

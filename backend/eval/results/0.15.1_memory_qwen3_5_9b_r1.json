@@ -1,0 +1,444 @@
+{
+  "version": "0.15.1",
+  "family": "memory",
+  "model": "qwen3.5:9b",
+  "run": 1,
+  "cases_hash": "0ff5045f563369cf",
+  "parse_failures": 0,
+  "proposed_false_memories": 1,
+  "proposed_recall": 0.7692,
+  "proposed_precision": 0.7333,
+  "filed_false_memories": 0,
+  "filed_recall": 0.7692,
+  "filed_precision": 0.7857,
+  "cases": [
+    {
+      "id": "m01",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is learning the cello\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User takes cello lessons on Thursday evenings\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User is learning the cello",
+          "User takes cello lessons on Thursday evenings"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [
+          "User is learning the cello",
+          "User takes cello lessons on Thursday evenings"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m02",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m03",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m04",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m05",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User prefers short answers in the mornings\", \"confidence\": 0.95, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User prefers short answers in the mornings"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [
+          "User prefers short answers in the mornings"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m06",
+      "parsed": true,
+      "reply": "{\"profile\": {\"name\": \"Morgan\"}, \"facts\": []}",
+      "proposed": {
+        "filed": [
+          "name: Morgan"
+        ],
+        "expected": 3,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "name: Morgan"
+        ]
+      },
+      "filed": {
+        "filed": [],
+        "expected": 3,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m07",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m08",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is vegetarian\", \"confidence\": 0.9, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User is vegetarian"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [
+          "User is vegetarian"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m09",
+      "parsed": true,
+      "reply": "{\"profile\": {\"name\": \"Ro\"}, \"facts\": [{\"content\": \"User's name is Ro\", \"confidence\": 1.0, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "name: Ro",
+          "User's name is Ro"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [
+          "name: Ro",
+          "User's name is Ro"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m10",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User would name their future dog Biscuit\", \"confidence\": 0.9, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User would name their future dog Biscuit"
+        ],
+        "expected": 0,
+        "met": 0,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [
+          "User would name their future dog Biscuit"
+        ],
+        "expected": 0,
+        "met": 0,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m11",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m12",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m13",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is building a raised bed for their garden\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User is using old pallets to build the raised bed\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User is building a raised bed for their garden",
+          "User is using old pallets to build the raised bed"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [
+          "User is building a raised bed for their garden",
+          "User is using old pallets to build the raised bed"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m14",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User dislikes horror films\", \"confidence\": 0.95, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User dislikes horror films"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [
+          "User dislikes horror films"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m15",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User works nights at the hospital\", \"confidence\": 1.0, \"kind\": \"fact\"}, {\"content\": \"User usually sleeps until noon\", \"confidence\": 1.0, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User works nights at the hospital",
+          "User usually sleeps until noon"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [
+          "User works nights at the hospital",
+          "User usually sleeps until noon"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m16",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m17",
+      "parsed": true,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m18",
+      "parsed": true,
+      "reply": "{\n  \"profile\": {\n    \"name\": \"Rowan\"\n  },\n  \"facts\": [\n    {\n      \"content\": \"User's name is Rowan\",\n      \"confidence\": 0.95,\n      \"kind\": \"fact\"\n    }\n  ]\n}",
+      "proposed": {
+        "filed": [
+          "name: Rowan",
+          "User's name is Rowan"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      },
+      "filed": {
+        "filed": [
+          "name: Rowan",
+          "User's name is Rowan"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      }
+    }
+  ]
+}

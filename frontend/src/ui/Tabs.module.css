@@ -1,0 +1,54 @@
+/* Tabs as words on a line with a rule under the chosen one: quieter than a
+   segmented control, for moving between a page's parts rather than setting
+   something. */
+.tabs {
+  display: flex;
+  gap: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.tab {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--muted-foreground);
+  transition: color var(--motion-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .tab:hover {
+    color: var(--foreground);
+  }
+}
+
+.selected {
+  color: var(--foreground);
+}
+
+.selected::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+  background: var(--foreground);
+}
+
+.count {
+  min-width: 20px;
+  height: 20px;
+  padding-inline: 6px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  line-height: 20px;
+  text-align: center;
+  color: var(--muted-foreground);
+  background: var(--muted);
+}

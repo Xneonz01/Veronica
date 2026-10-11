@@ -1,0 +1,41 @@
+.devices {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.level {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.track {
+  flex: 1;
+  min-width: 120px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--muted-strong);
+  overflow: hidden;
+}
+
+/* Written each frame by the audio loop, never by React. */
+.bar {
+  display: block;
+  height: 100%;
+  background: var(--assistant);
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+.note,
+.refused {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.refused {
+  flex-basis: 100%;
+  color: var(--destructive);
+}

@@ -1,0 +1,112 @@
+/* Content, not a bubble. Her mark sits in a narrow gutter beside it, so she is
+   present without a name tag on every answer. */
+.answer {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr);
+  gap: var(--space-sm);
+}
+
+.gutter {
+  display: grid;
+  justify-items: center;
+  padding-top: var(--space-3xs);
+}
+
+/* Breathing only while she works: a still mark means the answer is done. */
+.working :global(svg) {
+  animation: var(--anim-breathe);
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: var(--space-md);
+  min-width: 0;
+}
+
+/* The status words with a highlight passing through them, left to right: work
+   in progress, said quietly. Reduced motion keeps the words and drops the pass. */
+.thinking {
+  margin: 0;
+  width: fit-content;
+  font-size: var(--text-md);
+  color: transparent;
+  background: linear-gradient(90deg, var(--subtle-foreground) 0%, var(--subtle-foreground) 35%, var(--foreground) 50%, var(--subtle-foreground) 65%, var(--subtle-foreground) 100%);
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: var(--anim-shimmer);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .thinking {
+    color: var(--subtle-foreground);
+    background: none;
+  }
+}
+
+.waiting {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--text-md);
+  color: var(--warning);
+}
+
+.waitingDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--warning-dot);
+  animation: var(--anim-pulse);
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-xs);
+  margin-top: calc(-1 * var(--space-2xs));
+  animation: var(--anim-fade-in);
+}
+
+.trust {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 26px;
+  padding-inline: 10px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--info-on-soft);
+  background: var(--info-soft);
+}
+
+/* What the answer said she did and she didn't: in her words, quiet and never
+   collapsed (DESIGN.md, honesty is a visual feature). The mark takes attention's
+   colour; the sentence stays secondary text. */
+.caveat {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  margin: 0;
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  color: var(--muted-foreground);
+  animation: var(--anim-fade-in);
+}
+
+/* One line tall, so the mark sits centred on the first line however the sentence wraps. */
+.caveatIcon {
+  flex: none;
+  height: calc(var(--text-md) * var(--leading-normal));
+  color: var(--warning);
+}
+
+/* A settled answer with nothing in it: said, so her mark alone doesn't look
+   like she is still working. */
+.empty {
+  font-size: var(--text-md);
+  color: var(--subtle-foreground);
+}

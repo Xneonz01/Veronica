@@ -1,0 +1,67 @@
+/*
+ * Layer 3: material. Glass, elevation and glow.
+ *
+ * Five levels, and the rule that keeps them from becoming decoration:
+ *   content is flat, chrome is glass, a result Veronica produced may be glass,
+ *   and her own presence may be emissive — once per screen at most.
+ *
+ * Glass is a stack: a translucent fill, a blur that lifts saturation slightly,
+ * one hairline edge, one top highlight, one shadow. Never a thick border, never
+ * a heavy shadow, never a blur so wide the content behind turns to soup. Blur
+ * costs GPU per painted pixel, so a glass surface stays the size of a control,
+ * a card or a bar; there is no page-sized blur layer anywhere.
+ */
+
+/* Declared again under [data-palette] for the reason given in semantic.css. */
+:root,
+[data-palette] {
+  --blur-sm: 8px;
+  --blur-md: 18px;
+  --blur-lg: 30px;
+  --glass-saturate: 1.5;
+
+  /* Fills, back to front. Light glass carries a trace of the page's celadon
+     rather than being pure white: over a tinted page a pure-white pane reads as
+     a hole cut in it. The trace is slight, because glass that carries the
+     page's full colour stops reading as glass and starts reading as a tinted card. */
+  --glass-subtle-bg: light-dark(oklch(0.995 0.005 var(--hue-porcelain) / 0.52), oklch(0.26 0.006 var(--hue-neutral) / 0.4));
+  --glass-bg: light-dark(oklch(0.995 0.005 var(--hue-porcelain) / 0.7), oklch(0.24 0.006 var(--hue-neutral) / 0.62));
+  --glass-elevated-bg: light-dark(oklch(0.996 0.004 var(--hue-porcelain) / 0.82), oklch(0.27 0.007 var(--hue-neutral) / 0.76));
+
+  /* Tint: a control resting ON glass, or on a flat plane. The same translucent
+     fill and hairline, and no blur: the pane underneath already blurred, and a
+     second pass costs a full-size filter to composite almost the same pixels.
+     Separate tokens rather than aliases, because the fallback below must not
+     touch these: a tint never relied on blur for legibility. */
+  --tint-subtle: light-dark(oklch(0.995 0.005 var(--hue-porcelain) / 0.52), oklch(0.26 0.006 var(--hue-neutral) / 0.4));
+  --tint: light-dark(oklch(0.995 0.005 var(--hue-porcelain) / 0.7), oklch(0.24 0.006 var(--hue-neutral) / 0.62));
+
+  /* The two lines that make glass read as a pane rather than a tint: an edge in
+     the page's own hue, and a faintly cool top highlight. The difference across
+     one pane is refraction, and it is what stops glass on a tinted page looking
+     like a smear of the same colour. */
+  --glass-edge: light-dark(oklch(0.3 0.02 var(--hue-porcelain) / 0.1), oklch(1 0 0 / 0.08));
+  --glass-top: light-dark(oklch(0.995 0.006 245 / 0.82), oklch(1 0 0 / 0.1));
+
+  /* Elevation: the lightest that still reads. Depth comes from tone first. A
+     shadow cast on porcelain is cool; a warm one would read as dirt. */
+  --shadow-subtle: 0 1px 2px light-dark(oklch(0.25 0.02 200 / 0.07), oklch(0 0 0 / 0.4));
+  --shadow-glass: 0 1px 2px light-dark(oklch(0.25 0.02 200 / 0.06), oklch(0 0 0 / 0.35)),
+    0 12px 32px -10px light-dark(oklch(0.25 0.02 200 / 0.17), oklch(0 0 0 / 0.55));
+  --shadow-elevated: 0 2px 6px light-dark(oklch(0.25 0.02 200 / 0.07), oklch(0 0 0 / 0.4)),
+    0 32px 80px -16px light-dark(oklch(0.25 0.02 200 / 0.3), oklch(0 0 0 / 0.7));
+
+  /* Veronica's bloom: the only glow in the system */
+  --glow-assistant: 0 0 44px -14px var(--assistant-glow);
+}
+
+/* Where the browser cannot blur, glass becomes an honest opaque surface rather
+   than a transparent panel with unreadable text behind it. */
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  :root,
+  [data-palette] {
+    --glass-subtle-bg: light-dark(oklch(0.995 0.005 var(--hue-porcelain) / 0.92), oklch(0.26 0.006 var(--hue-neutral) / 0.92));
+    --glass-bg: light-dark(oklch(0.995 0.005 var(--hue-porcelain) / 0.96), oklch(0.24 0.006 var(--hue-neutral) / 0.96));
+    --glass-elevated-bg: light-dark(oklch(0.996 0.004 var(--hue-porcelain)), oklch(0.27 0.007 var(--hue-neutral)));
+  }
+}

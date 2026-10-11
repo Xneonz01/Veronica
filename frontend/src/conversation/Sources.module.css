@@ -1,0 +1,92 @@
+.sources {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--subtle-foreground);
+  margin-inline-end: 2px;
+}
+
+.list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 260px;
+  height: 28px;
+  padding-inline: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--muted);
+  font-size: var(--text-sm);
+  transition: background-color var(--motion-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .pill:hover {
+    background: var(--muted-strong);
+  }
+}
+
+.number {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  min-width: 20px;
+  height: 20px;
+  padding-inline: 5px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  color: var(--info-on-soft);
+  background: var(--info-soft);
+}
+
+.title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ————————————————————————————————— the passage */
+
+.passage {
+  display: grid;
+  gap: var(--space-sm);
+  margin: 0;
+}
+
+.quote {
+  margin: 0;
+  padding: var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
+  box-shadow: inset 3px 0 0 var(--info);
+  line-height: var(--leading-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.caption {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.missing {
+  color: var(--muted-foreground);
+}

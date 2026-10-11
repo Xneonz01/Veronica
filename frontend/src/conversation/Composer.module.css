@@ -1,0 +1,49 @@
+/* The composer is the one raised thing at the bottom of the conversation: an
+   elevated card whose edge turns to her colour while you write in it. */
+.composer {
+  display: grid;
+  gap: var(--space-2xs);
+  padding: 10px 10px 10px 16px;
+  border-radius: var(--radius-2xl);
+  background: var(--surface-elevated);
+  box-shadow:
+    inset 0 0 0 1px var(--border-strong),
+    var(--shadow-glass);
+  transition: box-shadow var(--motion-default) var(--ease-standard);
+}
+
+.composer:focus-within {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--assistant) 45%, var(--border-strong)),
+    0 0 0 4px var(--assistant-soft),
+    var(--shadow-glass);
+}
+
+
+.field {
+  width: 100%;
+  min-height: 28px;
+  max-height: 240px;
+  padding: 6px 0 2px;
+  border: 0;
+  background: transparent;
+  resize: none;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  outline: none;
+}
+
+.field::placeholder {
+  color: var(--subtle-foreground);
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-inline-start: calc(-1 * var(--space-xs));
+}
+
+.spacer {
+  flex: 1;
+}

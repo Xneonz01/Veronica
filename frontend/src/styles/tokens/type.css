@@ -1,0 +1,35 @@
+/*
+ * Layer 4: type. One family, one scale.
+ *
+ * Inter, self-hosted (no font CDN: nothing about what you read here leaves the
+ * machine), with its optical-size axis so display sizes tighten on their own.
+ * Hierarchy comes from size, weight and colour; weights stop at 600.
+ */
+
+:root {
+  --font-sans: 'Inter Variable', Inter, -apple-system, BlinkMacSystemFont, 'SF Pro Text',
+    'Segoe UI Variable Text', 'Segoe UI', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.8125rem;
+  --text-md: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
+  --text-3xl: 2.25rem;
+  --text-4xl: 3rem;
+
+  --leading-tight: 1.12;
+  --leading-snug: 1.3;
+  --leading-normal: 1.55;
+
+  --tracking-display: -0.03em;
+  --tracking-title: -0.018em;
+  --tracking-ui: -0.006em;
+
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+}

@@ -1,0 +1,63 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.pfx
+*.p12
+
+# Personal data: never commit. data/ holds the memory database (profile, memories,
+# conversation summaries, indexed documents), attachments, voice clips, the persona and
+# policy files, call metrics and diagnostics. The patterns below it are a safety net in
+# case a path is ever configured outside data/.
+data/
+backend/data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.wav
+*.pt
+**/metrics/*.jsonl
+*.log
+
+# Node / front end
+node_modules/
+dist/
+*.local
+*.tsbuildinfo
+
+# Rust / Tauri
+target/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+.cursor/
+.cursorignore
+
+# Local tooling and private notes; kept on this machine, not published
+.claude/
+.agents/
+CLAUDE.md
+scratchpad/
+VERONICA_MASTER_PLAN.md
+AUDIT_2026-07-28.md
+
+# Sync / FUSE artifacts
+.fuse_hidden*

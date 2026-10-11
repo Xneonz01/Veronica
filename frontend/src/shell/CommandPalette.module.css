@@ -1,0 +1,133 @@
+/* A modal <dialog> set high in the window, the way a spotlight search sits. The
+   layout is only applied while it is open: a class that sets `display` would
+   otherwise override the browser's `display: none` for a closed dialog. */
+.dialog {
+  width: min(640px, calc(100vw - 32px));
+  max-width: none;
+  max-height: min(560px, 76dvh);
+  margin: 12dvh auto auto;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-xl);
+  color: var(--foreground);
+  background: var(--glass-elevated-bg);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-elevated);
+  overflow: hidden;
+}
+
+.dialog[open] {
+  display: flex;
+  flex-direction: column;
+  animation: var(--anim-pop-in);
+}
+
+.dialog::backdrop {
+  background: var(--scrim);
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: 56px;
+  padding-inline: var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+.searchIcon {
+  color: var(--subtle-foreground);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  background: transparent;
+  font-size: var(--text-base);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--subtle-foreground);
+}
+
+.list {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+}
+
+.group + .group {
+  margin-top: 6px;
+}
+
+.groupLabel {
+  padding: 8px 10px 4px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  color: var(--subtle-foreground);
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  height: 40px;
+  padding-inline: 10px;
+  border-radius: calc(var(--radius-xl) - 6px);
+  cursor: pointer;
+  font-size: var(--text-md);
+}
+
+.active {
+  background: var(--muted-strong);
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  color: var(--subtle-foreground);
+}
+
+.active .icon {
+  color: var(--foreground);
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.hint {
+  flex: none;
+  font-size: var(--text-xs);
+  color: var(--subtle-foreground);
+}
+
+.empty {
+  padding: var(--space-lg) var(--space-md);
+  color: var(--muted-foreground);
+  text-align: center;
+}
+
+.footer {
+  display: flex;
+  gap: var(--space-md);
+  padding: 8px var(--space-md);
+  border-top: 1px solid var(--border);
+  font-size: var(--text-xs);
+  color: var(--subtle-foreground);
+}

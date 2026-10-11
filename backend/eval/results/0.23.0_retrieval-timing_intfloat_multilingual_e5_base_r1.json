@@ -1,0 +1,31 @@
+{
+  "version": "0.23.0",
+  "family": "retrieval-timing",
+  "cases_hash": "f43539e013201ec9",
+  "corpus_hash": "aecb6702ad8854c8",
+  "harness_hash": "6094b3d596cdfbcd",
+  "embedding_model": "intfloat/multilingual-e5-base",
+  "embedding_device": "cuda",
+  "reranker": "cross-encoder/ms-marco-MiniLM-L-6-v2",
+  "settings": {
+    "rag_top_k": 5,
+    "rag_keyword_depth": 20,
+    "rag_relevance_floor": 0.25,
+    "rag_rerank_depth": 10,
+    "rag_rerank_floor": -7.5,
+    "rag_token_budget": 768,
+    "semantic_baseline": 0.72,
+    "chunk_target_chars": 800,
+    "chunk_overlap_chars": 120
+  },
+  "pause_s": 1.0,
+  "questions": 69,
+  "configured": {
+    "median_ms": 134.3,
+    "p90_ms": 189.9
+  },
+  "not_reranked": {
+    "median_ms": 56.3,
+    "p90_ms": 107.3
+  }
+}

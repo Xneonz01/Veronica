@@ -1,0 +1,82 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-pill);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+
+.badge svg {
+  flex: none;
+}
+
+.md {
+  height: 26px;
+  padding-inline: 10px;
+  font-size: var(--text-sm);
+}
+
+.sm {
+  height: 22px;
+  padding-inline: 8px;
+  font-size: var(--text-xs);
+}
+
+.success {
+  background: var(--success-soft);
+  color: var(--success-on-soft);
+}
+
+.assistant {
+  background: var(--assistant-soft);
+  color: var(--assistant-on-soft);
+}
+
+.info {
+  background: var(--info-soft);
+  color: var(--info-on-soft);
+}
+
+.warning {
+  background: var(--warning-soft);
+  color: var(--warning-on-soft);
+}
+
+.danger {
+  background: var(--destructive-soft);
+  color: var(--destructive-on-soft);
+}
+
+/* Filled: for the one badge in a view that must be read first. */
+.solid.success {
+  background: var(--success-strong);
+  color: var(--success-foreground);
+}
+
+.solid.assistant {
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.solid.info {
+  background: var(--info-solid);
+  color: var(--info-foreground);
+}
+
+.solid.warning {
+  background: var(--warning);
+  color: var(--background);
+}
+
+.solid.danger {
+  background: var(--destructive-solid);
+  color: var(--destructive-foreground);
+}
+
+.solid.neutral {
+  background: var(--foreground);
+  color: var(--background);
+}

@@ -1,0 +1,40 @@
+{
+  "version": "0.21.5",
+  "family": "retrieval",
+  "cases_hash": "cd5d15ff0495cf72",
+  "corpus_hash": "e17c3825b3bb0de4",
+  "embedding_model": "intfloat/multilingual-e5-base",
+  "embedding_device": "cuda",
+  "cases": 69,
+  "recall_at_1": 0.6441,
+  "recall_at_3": 0.9492,
+  "recall_at_5": 0.9831,
+  "mrr_at_10": 0.7812,
+  "cited": 0.8814,
+  "cited_per_question": 3.36,
+  "no_answer_grounded": 0.7,
+  "exact_recall_at_5": 0.95,
+  "exact_cited": 0.7,
+  "paraphrase_recall_at_5": 1.0,
+  "paraphrase_cited": 0.9688,
+  "heading_recall_at_5": 1.0,
+  "heading_cited": 1.0,
+  "misses": [
+    "x09",
+    "x13",
+    "x15",
+    "x17",
+    "x18",
+    "x20",
+    "p11"
+  ],
+  "grounded_ids": [
+    "n01",
+    "n02",
+    "n03",
+    "n04",
+    "n05",
+    "n06",
+    "n08"
+  ]
+}

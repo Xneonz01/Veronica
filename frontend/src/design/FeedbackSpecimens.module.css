@@ -1,0 +1,16 @@
+.rows {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.skeletonRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.skeletonText {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+}

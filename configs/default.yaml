@@ -1,0 +1,81 @@
+# Base configuration. A profile (configs/profile.<name>.yaml, chosen with
+# VERONICA_PROFILE), then .env, then environment variables override these values.
+# Every setting and its default is defined in backend/app/core/config.py; only the
+# ones worth seeing at a glance are repeated here.
+app:
+  name: Veronica
+  env: dev
+logging:
+  level: INFO
+gpu:
+  vram_budget_gb: 16
+
+# All of her data: the personality, the policy, attachments, and every store below
+# that doesn't name a place of its own (memory.db, voices, call metrics, telemetry).
+# Relative to the installation; made private to the account she runs as.
+data_dir: data
+
+# Streaming speech-to-text (faster-whisper).
+asr:
+  model_size: large-v3-turbo
+  device: cuda
+  compute_type: float16
+  language: null            # null = detect the language
+  partial_beam_size: 1      # fast partial transcripts while you speak
+  final_beam_size: 5        # a more careful decode once you stop
+  decode_interval_ms: 400
+
+# Language model, served by a local Ollama (native /api/chat with tool calling).
+llm:
+  base_url: http://127.0.0.1:11434  # an address: "localhost" cost ~250 ms a connection
+  model: qwen3.5:9b     # the one model: chat, the live call, and learning after a session
+  temperature: 0.7
+  request_timeout_s: 60
+  think: false          # qwen3 reasons by default; that costs seconds of latency
+  keep_alive: 30m       # keep the model loaded between turns
+  num_ctx: 8192         # the context window, sent rather than left at Ollama's 4,096
+  num_predict: 2048     # the most one reply may run to; 0 sends no limit
+
+# Speech synthesis (Chatterbox Turbo).
+tts:
+  device: cuda
+
+# Voice activity detection (Silero) and end-of-turn detection (smart-turn).
+vad:
+  sample_rate: 16000
+  threshold: 0.5
+  min_speech_ms: 250
+  end_silence_min_ms: 200      # ask smart-turn whether they've finished from here
+  end_silence_max_ms: 800      # and end the turn here whatever it says
+  recheck_ms: 100
+  turn_complete_threshold: 0.6
+
+# Voices for zero-shot cloning. The voice she starts in until another is chosen in the
+# Voice Studio, which is kept beside the voices and wins while she still has it.
+voice:
+  active_voice_id: veronica-default
+
+# The live call.
+realtime:
+  history_turns: 8
+  chunk_max_chars: 220
+  clause_chunking: true    # start speaking at the first short clause
+  min_clause_chars: 16
+  partial_throttle_ms: 200
+  reply_max_chars: 900          # a spoken reply ends after the sentence that passes this
+  release_models_after_s: 60    # speech models stay this long after the last call
+
+# Memory and retrieval.
+memory:
+  embedding_model: intfloat/multilingual-e5-base   # 768-dimensional, multilingual
+  embedding_device: cuda
+  semantic_baseline: 0.72   # e5's similarity for unrelated text; scores are rescaled above it
+  relevance_floor: 0.18     # a memory needs this much real relevance to be used
+  recency_half_life_days: 14
+
+# Local diagnostics: the black box and the performance log. Nothing leaves the machine.
+telemetry:
+  enabled: true
+  runs_kept: 20             # run folders kept by the black box
+  perf_max_bytes: 10000000  # the performance log rotates at this size...
+  perf_files_kept: 5        # ...keeping this many older files

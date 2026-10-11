@@ -1,0 +1,32 @@
+.header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--space-sm);
+  height: 52px;
+  padding-inline: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-ui);
+}
+
+.project {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding-inline: 8px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  background: var(--muted);
+}

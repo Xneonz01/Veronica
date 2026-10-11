@@ -1,0 +1,142 @@
+/* Loading, working, empty and notices: every async surface's states. */
+
+.skeleton {
+  display: block;
+  border-radius: var(--radius-xs);
+  background: linear-gradient(90deg, var(--muted) 0%, var(--muted-strong) 40%, var(--muted) 80%);
+  background-size: 200% 100%;
+  animation: var(--anim-shimmer);
+}
+
+.working {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: var(--text-md);
+  color: var(--muted-foreground);
+  animation: var(--anim-fade-in);
+}
+
+.dots {
+  display: inline-flex;
+  gap: 3px;
+}
+
+/* Emerald: in this product, work in progress is Veronica working. */
+.dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--assistant);
+  animation: var(--anim-pulse);
+  animation-duration: 1.2s;
+}
+
+.dots span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.dots span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-xs);
+  padding-block: var(--space-lg);
+}
+
+.emptyIcon {
+  color: var(--subtle-foreground);
+  margin-block-end: var(--space-2xs);
+}
+
+.emptyTitle {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-title);
+}
+
+.emptyBody {
+  color: var(--muted-foreground);
+  max-width: var(--measure-tight);
+}
+
+.emptyAction {
+  margin-block-start: var(--space-xs);
+}
+
+.notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--muted);
+  font-size: var(--text-md);
+}
+
+.noticeIcon {
+  display: inline-flex;
+  padding-block-start: 2px;
+}
+
+.noticeText {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.noticeTitle {
+  font-weight: var(--weight-medium);
+  color: var(--foreground);
+}
+
+.noticeBody {
+  color: var(--muted-foreground);
+}
+
+.noticeAction {
+  flex: none;
+  align-self: center;
+}
+
+.info .noticeIcon {
+  color: var(--info);
+}
+
+.attention {
+  background: var(--warning-soft);
+}
+
+.attention .noticeIcon {
+  color: var(--warning);
+}
+
+.critical {
+  background: var(--destructive-soft);
+}
+
+.critical .noticeIcon {
+  color: var(--destructive);
+}
+
+.positive {
+  background: var(--success-soft);
+}
+
+.positive .noticeIcon {
+  color: var(--success);
+}
+
+/* The shimmer is a 200%-wide gradient travelling across the block, so freezing
+   it parks a bright band at one edge and the skeleton reads as lit from the
+   side. Reduced motion gets the flat fill the gradient was built from. */
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    background: var(--muted);
+    animation: none;
+  }
+}

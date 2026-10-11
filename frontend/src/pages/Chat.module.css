@@ -1,0 +1,91 @@
+.chat {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* A new conversation: greeting and composer together, a little above centre. Safe:
+   taller than the room left under a notice, it starts at the top instead of spilling
+   out above it, where no scroll could reach. */
+.start {
+  flex: 1;
+  display: grid;
+  align-content: safe center;
+  padding: var(--space-xl) var(--space-lg) 12dvh;
+  overflow-y: auto;
+}
+
+.startInner {
+  display: grid;
+  gap: var(--space-xl);
+  width: min(680px, 100%);
+  margin-inline: auto;
+}
+
+.loading {
+  flex: 1;
+  display: grid;
+  align-content: start;
+  gap: 14px;
+  width: min(var(--conversation-max), 100%);
+  margin-inline: auto;
+  padding: var(--space-xl) var(--space-lg);
+}
+
+/* The composer stays at the foot of the conversation, and the text scrolling
+   under its edge fades rather than being cut. */
+.dock {
+  position: relative;
+  flex: none;
+  padding: 0 var(--space-lg) var(--space-sm);
+}
+
+.dock::before {
+  content: '';
+  position: absolute;
+  inset: -28px 0 100%;
+  background: linear-gradient(to bottom, transparent, var(--surface));
+  pointer-events: none;
+}
+
+.dockInner {
+  display: grid;
+  gap: var(--space-xs);
+  width: min(var(--conversation-max), 100%);
+  margin-inline: auto;
+}
+
+.fineprint {
+  margin: 0;
+  text-align: center;
+  font-size: var(--text-xs);
+  color: var(--subtle-foreground);
+}
+
+.drop {
+  position: absolute;
+  inset: var(--space-sm);
+  z-index: var(--z-dropdown);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: var(--space-xs);
+  border: 2px dashed color-mix(in oklab, var(--assistant) 60%, transparent);
+  border-radius: var(--radius-xl);
+  background: color-mix(in oklab, var(--surface) 80%, transparent);
+  -webkit-backdrop-filter: blur(var(--blur-sm));
+  backdrop-filter: blur(var(--blur-sm));
+  font-weight: var(--weight-medium);
+  color: var(--assistant-on-soft);
+  pointer-events: none;
+  animation: var(--anim-fade-in);
+}
+
+@media (max-width: 767px) {
+  .dock,
+  .start {
+    padding-inline: var(--space-md);
+  }
+}

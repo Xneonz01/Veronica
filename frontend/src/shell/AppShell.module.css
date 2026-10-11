@@ -1,0 +1,70 @@
+.frame {
+  display: grid;
+  grid-template-columns: var(--sidebar-w) minmax(0, 1fr);
+  height: 100dvh;
+  overflow: hidden;
+  background: var(--background);
+  color: var(--foreground);
+  transition: grid-template-columns var(--motion-slow) var(--ease-sheet);
+}
+
+.frame[data-sidebar='rail'] {
+  grid-template-columns: var(--rail-w) minmax(0, 1fr);
+}
+
+/* The page sits on a sheet that floats on the window's ground: the one surface
+   with an edge, so the sidebar can have none. */
+.sheet {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  margin: 8px 8px 8px 0;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow:
+    inset 0 0 0 1px var(--border),
+    var(--shadow-subtle);
+  overflow: hidden;
+}
+
+/* It takes the keyboard from the skip link, which needs no ring around the
+   whole page to be followed. */
+.sheet:focus {
+  outline: none;
+}
+
+.page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.banner {
+  flex: none;
+  padding: var(--space-sm) var(--space-sm) 0;
+  animation: var(--anim-rise-in);
+}
+
+/* Off screen until the keyboard reaches it: the first stop for Tab. */
+.skip {
+  position: fixed;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  z-index: var(--z-tooltip);
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  translate: 0 calc(-100% - var(--space-md));
+}
+
+/* The shadow only while it shows: off screen, it would still spill into view. */
+.skip:focus-visible {
+  translate: 0 0;
+  box-shadow: var(--shadow-glass);
+}

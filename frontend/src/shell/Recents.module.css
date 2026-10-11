@@ -1,0 +1,158 @@
+/* minmax(0, 1fr): a grid track otherwise grows to its widest unwrapped title, and
+   long titles would push the list sideways instead of ending in an ellipsis. */
+.recents {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-content: start;
+  gap: 2px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 32px;
+  padding: var(--space-sm) 2px 4px 10px;
+}
+
+/* A section's name is a step louder than the day labels inside it. */
+.title {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: normal;
+  color: var(--muted-foreground);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.group + .group {
+  margin-top: var(--space-xs);
+}
+
+.groupLabel {
+  padding: 6px 10px 4px;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  letter-spacing: normal;
+  color: var(--subtle-foreground);
+}
+
+.list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  position: relative;
+}
+
+/* Room for the options button only while it shows, so a title uses the whole row
+   the rest of the time and ends before the button when it appears. */
+.item:focus-within > button:first-child,
+.item:has(.more[aria-expanded='true']) > button:first-child {
+  padding-inline-end: 36px;
+}
+
+@media (hover: hover) {
+  .item:hover > button:first-child {
+    padding-inline-end: 36px;
+  }
+
+  .item:hover .more {
+    opacity: 1;
+  }
+}
+
+/* The options button waits until the row is pointed at or reached by keyboard,
+   and stays while its menu is open. */
+.more {
+  position: absolute;
+  top: 50%;
+  right: 3px;
+  translate: 0 -50%;
+  opacity: 0;
+  transition: opacity var(--motion-fast) var(--ease-standard);
+}
+
+.item:focus-within .more,
+.more[aria-expanded='true'] {
+  opacity: 1;
+}
+
+/* Without hover the button is always there, and so is its room. */
+@media (hover: none) {
+  .more {
+    opacity: 1;
+  }
+
+  .item > button:first-child {
+    padding-inline-end: 36px;
+  }
+}
+
+.rename {
+  width: 100%;
+  height: 34px;
+  padding-inline: 9px;
+  border: 1px solid color-mix(in oklab, var(--assistant) 55%, var(--border-strong));
+  border-radius: var(--radius-sm);
+  background: var(--surface-elevated);
+  color: var(--foreground);
+  font-size: var(--text-md);
+  box-shadow: 0 0 0 3px var(--assistant-soft);
+  /* The ring above is drawn as a shadow, which forced-colours modes remove; this
+     outline takes its place there and is invisible everywhere else. */
+  outline: 2px solid transparent;
+}
+
+.rename::placeholder {
+  color: var(--subtle-foreground);
+}
+
+.loading {
+  display: grid;
+  gap: 14px;
+  padding: 10px;
+}
+
+.empty {
+  padding: 6px 10px;
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.problem {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2xs);
+  padding: 6px 10px;
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.problem > button {
+  margin-inline-start: -8px;
+}
+
+/* ————————————————————————————————— the move sheet */
+
+.choices {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sheetEmpty {
+  color: var(--muted-foreground);
+}
+
+.sheetNotice {
+  margin-top: var(--space-sm);
+}

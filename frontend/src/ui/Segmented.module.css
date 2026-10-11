@@ -1,0 +1,71 @@
+.group {
+  --inset: 3px;
+  display: inline-flex;
+  gap: 2px;
+  padding: var(--inset);
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  /* Sized to its options, even where a grid or flex parent would stretch it. */
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.group::-webkit-scrollbar {
+  display: none;
+}
+
+.option {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1 0 auto;
+  height: 30px;
+  padding-inline: 12px;
+  /* Concentric with the track: its radius less the inset. */
+  border-radius: calc(var(--radius-md) - var(--inset));
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--muted-foreground);
+  white-space: nowrap;
+  transition:
+    background-color var(--motion-default) var(--ease-standard),
+    color var(--motion-default) var(--ease-standard),
+    box-shadow var(--motion-default) var(--ease-standard);
+}
+
+.sm .option {
+  height: 26px;
+  padding-inline: 10px;
+  font-size: var(--text-sm);
+}
+
+/* A finger needs 44px, whatever the control's visual size (WCAG 2.5.5). The
+   small variant is listed too: its two-class selector would otherwise win. */
+@media (pointer: coarse) {
+  .option,
+  .sm .option {
+    height: var(--tap-min);
+    min-width: var(--tap-min);
+  }
+
+  .group {
+    --inset: 4px;
+  }
+}
+
+@media (hover: hover) {
+  .option:hover:not([aria-checked='true']) {
+    color: var(--foreground);
+  }
+}
+
+.option[aria-checked='true'] {
+  background: var(--surface-elevated);
+  color: var(--foreground);
+  box-shadow:
+    var(--shadow-subtle),
+    inset 0 0 0 1px var(--glass-edge);
+}

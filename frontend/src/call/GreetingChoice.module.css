@@ -1,0 +1,16 @@
+.choice {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.length {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: var(--tap-min);
+}
+
+.lengthLabel {
+  font-size: var(--text-base);
+}

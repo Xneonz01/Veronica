@@ -1,0 +1,83 @@
+.section {
+  display: grid;
+  gap: var(--space-lg);
+  /* Clears the sticky bar when a section link scrolls here. */
+  scroll-margin-top: 88px;
+}
+
+.head {
+  display: grid;
+  gap: var(--space-2xs);
+  max-width: var(--measure);
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.lead {
+  color: var(--muted-foreground);
+}
+
+.tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: var(--space-md);
+}
+
+.wideTiles {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 460px), 1fr));
+}
+
+.tile {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  margin: 0;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border);
+  overflow: hidden;
+}
+
+.span {
+  grid-column: 1 / -1;
+}
+
+.stage {
+  display: grid;
+  align-content: center;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  min-width: 0;
+}
+
+.caption {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2xs) var(--space-md);
+  padding: var(--space-sm) var(--space-lg);
+  border-top: 1px solid var(--border);
+  font-size: var(--text-sm);
+}
+
+.captionLabel {
+  font-weight: var(--weight-medium);
+}
+
+.captionNote {
+  color: var(--subtle-foreground);
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.stack {
+  display: grid;
+  gap: var(--space-md);
+}

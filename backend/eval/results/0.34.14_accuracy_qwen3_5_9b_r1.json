@@ -1,0 +1,206 @@
+{
+  "version": "0.34.14",
+  "family": "accuracy",
+  "model": "qwen3.5:9b",
+  "run": 1,
+  "cases_hash": "30f1f7b33c9978d9",
+  "overall": 1.0,
+  "fact": 1.0,
+  "grounded": 1.0,
+  "memory": 1.0,
+  "instruction": 1.0,
+  "cases": [
+    {
+      "id": "a01",
+      "kind": "fact",
+      "right": true,
+      "reply": "The capital of Australia is Canberra. \n\nIt was chosen as a compromise between Sydney and Melbourne, the two largest cities, when the federation of Australia was established in 1901. The city was built on land that was originally part of New South Wales but has since become the national capital territory, officially known as the Australian Capital Territory (ACT)."
+    },
+    {
+      "id": "a02",
+      "kind": "fact",
+      "right": true,
+      "reply": "A hexagon has six sides. The name comes from Greek: *hex* means \"six\" and *gonia* means \"angle\" or \"corner.\""
+    },
+    {
+      "id": "a03",
+      "kind": "fact",
+      "right": true,
+      "reply": "Jane Austen wrote *Pride and Prejudice*. She published it in 1813 under her own name. It's widely considered one of her best-known works, though she also tried publishing it anonymously first. I'd recommend reading the text straight through rather than relying on summaries—it's more engaging that way."
+    },
+    {
+      "id": "a04",
+      "kind": "fact",
+      "right": true,
+      "reply": "17 × 23 = 391."
+    },
+    {
+      "id": "a05",
+      "kind": "fact",
+      "right": true,
+      "reply": "Water boils at 100 °C at sea level [1]."
+    },
+    {
+      "id": "a06",
+      "kind": "fact",
+      "right": true,
+      "reply": "Mars is known as the Red Planet. Its surface is rich in iron oxide (rust), which gives it that distinctive reddish appearance when viewed from Earth or through telescopes."
+    },
+    {
+      "id": "a07",
+      "kind": "fact",
+      "right": true,
+      "reply": "The Berlin Wall fell in 1989. Specifically, the opening of the border began on November 9, 1989, following a chaotic press conference where East German officials announced new travel regulations that were misinterpreted as an immediate invitation to cross freely."
+    },
+    {
+      "id": "a08",
+      "kind": "fact",
+      "right": true,
+      "reply": "Au. It comes from the Latin *aurum*, meaning \"shining dawn\" or \"glow of the sun.\""
+    },
+    {
+      "id": "a09",
+      "kind": "fact",
+      "right": true,
+      "reply": "It arrives at 17:15.\n\nStarting from 14:40, adding two full hours gets you to 16:40. Adding the remaining 35 minutes lands exactly on 17:15 (or 5:15 PM)."
+    },
+    {
+      "id": "a10",
+      "kind": "fact",
+      "right": true,
+      "reply": "There are 210 minutes in three and a half hours.\n\nThree hours is 180 minutes (3 × 60), and half an hour is 30 minutes. Adding them together gives 210."
+    },
+    {
+      "id": "g01",
+      "kind": "grounded",
+      "right": true,
+      "reply": "To reset your Model V2 boiler, hold the red button for 10 seconds [1]. If the pressure is low (below 1 bar), top it up using the filling loop located under the boiler before or after resetting [1].\n\nThe stopcock for that loop is under the kitchen sink if you need to access the main supply quickly [2]."
+    },
+    {
+      "id": "g02",
+      "kind": "grounded",
+      "right": true,
+      "reply": "The stopcock is under the kitchen sink [2]."
+    },
+    {
+      "id": "g03",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Top up the system using the filling loop under the boiler [1]. If you need to reset the Model V2 after doing so, hold the red button for 10 seconds [1]."
+    },
+    {
+      "id": "g04",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Ash & Sons are more expensive at 2,400 pounds with a start date of the 30th [1]. Morgan Roofing is cheaper at 2,150 pounds and can start on the 7th [1]."
+    },
+    {
+      "id": "g05",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Your flight to Lisbon departs Friday at 07:15 from Gatwick [1]."
+    },
+    {
+      "id": "g06",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Banana bread bakes for 55 minutes at 170°C [1]."
+    },
+    {
+      "id": "g07",
+      "kind": "grounded",
+      "right": true,
+      "reply": "I don't know what colour your front door is. I haven't received any documents or information about it yet, and I don't have that detail in my memory for you. If you tell me, I'll note it down."
+    },
+    {
+      "id": "g08",
+      "kind": "grounded",
+      "right": true,
+      "reply": "I don't know how much the hotel cost. The only details I have are that your flight to Lisbon departs Friday at 07:15 from Gatwick and check-in is from 15:00 [1]. You'll need to check your booking confirmation or email for the price."
+    },
+    {
+      "id": "g09",
+      "kind": "grounded",
+      "right": true,
+      "reply": "I don't have any information about your car insurance in my memory or in the provided documents. The only document I have access to concerns home contents insurance, which lists an excess of 250 euros per claim [1].\n\nIf you need details about your car insurance, please check your policy documents or contact your insurer directly, as that specific data isn't available here."
+    },
+    {
+      "id": "g10",
+      "kind": "grounded",
+      "right": true,
+      "reply": "I don't have the departure time for your return flight to London in my memory or in the provided documents. The only flight information I have is that you are departing *to* Lisbon on Friday at 07:15 [1]. To give you an accurate answer, please provide the details of your return booking."
+    },
+    {
+      "id": "g11",
+      "kind": "grounded",
+      "right": true,
+      "reply": "I don't have any record of Morgan's birthday in my memory or the documents available to me."
+    },
+    {
+      "id": "p01",
+      "kind": "memory",
+      "right": true,
+      "reply": "Your sister, Morgan, lives in Leeds."
+    },
+    {
+      "id": "p02",
+      "kind": "memory",
+      "right": true,
+      "reply": "How about a hearty lentil and vegetable stew with crusty bread?"
+    },
+    {
+      "id": "p03",
+      "kind": "memory",
+      "right": true,
+      "reply": "Your dentist appointment is on Thursday at 10:30."
+    },
+    {
+      "id": "p04",
+      "kind": "memory",
+      "right": true,
+      "reply": "Put your phone in another room or on \"Do Not Disturb\" mode before starting. Physical separation beats willpower every time.\n\nIf you're working on something complex, break it into tiny, specific tasks (e.g., \"write the intro paragraph\") rather than vague goals like \"work on project.\" Vague goals invite procrastination; specific ones trigger action."
+    },
+    {
+      "id": "p05",
+      "kind": "memory",
+      "right": true,
+      "reply": "Bees have been able to navigate using the sun as a compass even when it's hidden behind clouds or during twilight by detecting the polarization pattern of the sky. They also communicate the location of food sources through a complex \"waggle dance\" that encodes both distance and direction relative to the sun. \n\nSome species, like certain bumblebees, can actively vibrate their wings while carrying h"
+    },
+    {
+      "id": "i01",
+      "kind": "instruction",
+      "right": true,
+      "reply": "Photosynthesis is the process by which green plants and some other organisms use sunlight to synthesize foods with the aid of chlorophyll."
+    },
+    {
+      "id": "i02",
+      "kind": "instruction",
+      "right": true,
+      "reply": "*   Sleep consolidates memory and strengthens neural connections formed during wakefulness [1].\n*   It activates the glymphatic system to clear metabolic waste like beta-amyloid from the brain [2].\n*   Chronic lack of sleep significantly increases the risk of cardiovascular disease and impairs immune function."
+    },
+    {
+      "id": "i03",
+      "kind": "instruction",
+      "right": true,
+      "reply": "144"
+    },
+    {
+      "id": "i04",
+      "kind": "instruction",
+      "right": true,
+      "reply": "Yes. The Pacific Ocean is the largest ocean by surface area."
+    },
+    {
+      "id": "i05",
+      "kind": "instruction",
+      "right": true,
+      "reply": "It is a vast, restless expanse of shifting blue and grey."
+    },
+    {
+      "id": "i06",
+      "kind": "instruction",
+      "right": true,
+      "reply": "Mercury, Venus, Earth, Mars"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+.documents {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.accepts {
+  margin-inline-start: auto;
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.icon {
+  margin-top: 2px;
+  color: var(--info);
+}

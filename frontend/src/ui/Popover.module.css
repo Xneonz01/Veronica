@@ -1,0 +1,37 @@
+/* An anchored panel in the top layer. The browser's own [popover] styles centre
+   the element with `inset: 0; margin: auto` and draw a border; this takes all
+   of that back and lets Popover.tsx write `top` and `left`. */
+.panel {
+  --origin-x: left;
+  --origin-y: top;
+  inset: auto;
+  margin: 0;
+  border: 0;
+  min-width: 240px;
+  max-width: min(360px, calc(100vw - 16px));
+  max-height: calc(100dvh - 16px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px;
+  border-radius: var(--radius-xl);
+  color: var(--foreground);
+  background: var(--glass-elevated-bg);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-glass);
+  /* It grows out of the corner nearest its anchor, not out of its own middle. */
+  transform-origin: var(--origin-x) var(--origin-y);
+  animation: var(--anim-pop-in);
+  animation-timing-function: var(--ease-spring);
+}
+
+.panel[data-side='top'] {
+  --origin-y: bottom;
+}
+
+.panel[data-align='end'] {
+  --origin-x: right;
+}

@@ -1,0 +1,62 @@
+.loading,
+.editor {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.count {
+  margin-inline-start: auto;
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.near {
+  color: var(--warning);
+}
+
+.over {
+  color: var(--destructive);
+}
+
+.saved {
+  font-size: var(--text-sm);
+  color: var(--success);
+}
+
+/* Empty, it keeps its place in the accessibility tree (so the next "Saved" is
+   announced) but takes no row in the grid. */
+.saved:empty {
+  position: absolute;
+}
+
+.scaffold {
+  padding-inline: var(--space-sm);
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+}
+
+.summary {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  color: var(--muted-foreground);
+}
+
+.prompt {
+  max-height: 320px;
+  overflow: auto;
+  margin: 0;
+  padding-bottom: var(--space-sm);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: var(--leading-normal);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  color: var(--muted-foreground);
+}

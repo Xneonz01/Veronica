@@ -1,0 +1,215 @@
+/* An answer reads like a well-set page: body size, a comfortable measure, air
+   between blocks, and structure from weight and spacing rather than colour. */
+
+.text {
+  display: grid;
+  gap: 0.85em;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  color: var(--foreground);
+  overflow-wrap: anywhere;
+}
+
+.text > * {
+  margin: 0;
+}
+
+.text strong {
+  font-weight: var(--weight-semibold);
+}
+
+.h3,
+.h4 {
+  margin-top: 0.4em;
+  letter-spacing: var(--tracking-title);
+}
+
+.h3 {
+  font-size: var(--text-lg);
+}
+
+.h4 {
+  font-size: var(--text-base);
+}
+
+/* Markers set here on purpose: the base reset takes them off every list. */
+.list {
+  display: grid;
+  gap: 0.35em;
+  padding-inline-start: 1.4em;
+  list-style: disc;
+}
+
+.list .list {
+  margin-top: 0.35em;
+  list-style: circle;
+}
+
+.ordered {
+  list-style: decimal;
+}
+
+.list li::marker {
+  color: var(--subtle-foreground);
+}
+
+/* Numbers in the list's own tabular figures, so 9 and 10 line up. */
+.ordered li::marker {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--weight-medium);
+}
+
+.quote {
+  padding-inline-start: var(--space-md);
+  border-inline-start: 2px solid var(--border-strong);
+  color: var(--muted-foreground);
+}
+
+.rule {
+  border: 0;
+  border-top: 1px solid var(--border);
+}
+
+.code {
+  padding: 1px 5px;
+  border-radius: var(--radius-xs);
+  background: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+}
+
+.url {
+  color: var(--subtle-foreground);
+  font-size: 0.92em;
+}
+
+/* A marker never starts a line: it stays with the word before it and the
+   punctuation after it. */
+.keep {
+  white-space: nowrap;
+}
+
+/* A citation: a small numbered pill in the sentence, in the blue of information. */
+.cite {
+  display: inline-grid;
+  place-items: center;
+  min-width: 18px;
+  height: 18px;
+  margin-inline: 3px 1px;
+  padding-inline: 4px;
+  border-radius: var(--radius-pill);
+  vertical-align: 0.15em;
+  font-size: 11px;
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  color: var(--info-on-soft);
+  background: var(--info-soft);
+  transition: background-color var(--motion-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .cite:hover {
+    background: var(--info-soft-2);
+  }
+}
+
+/* ————————————————————————————————— code */
+
+.codeBlock {
+  margin: 0;
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
+  box-shadow: inset 0 0 0 1px var(--border);
+  overflow: hidden;
+}
+
+.codeBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 36px;
+  padding-inline: var(--space-md) 6px;
+  border-bottom: 1px solid var(--border);
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding-inline: 8px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .copy:hover {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+}
+
+.pre {
+  margin: 0;
+  padding: var(--space-sm) var(--space-md);
+  overflow-x: auto;
+  font-family: var(--font-mono);
+  font-size: var(--text-md);
+  line-height: 1.6;
+  tab-size: 2;
+  overflow-wrap: normal;
+}
+
+/* ————————————————————————————————— tables */
+
+.tableWrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-md);
+  font-variant-numeric: tabular-nums;
+}
+
+.table th,
+.table td {
+  padding: 8px 12px;
+  text-align: start;
+  vertical-align: top;
+  overflow-wrap: normal;
+}
+
+.table th {
+  font-weight: var(--weight-semibold);
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.table tr + tr td {
+  border-top: 1px solid var(--border);
+}
+
+/* ————————————————————————————————— streaming */
+
+/* Where the next words land: her colour, breathing, never blinking. */
+.caret {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin-inline-start: 4px;
+  border-radius: 50%;
+  vertical-align: 0.05em;
+  background: var(--assistant);
+  animation: var(--anim-pulse);
+}

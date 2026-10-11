@@ -1,0 +1,41 @@
+.page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.header {
+  display: grid;
+  gap: 6px;
+  width: min(var(--page-max), 100%);
+  margin-inline: auto;
+  padding: var(--space-2xl) var(--space-lg) var(--space-lg);
+}
+
+.title {
+  font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-display);
+}
+
+.lead {
+  color: var(--muted-foreground);
+}
+
+.body {
+  display: grid;
+  gap: var(--space-md);
+  width: min(var(--page-max), 100%);
+  margin-inline: auto;
+  padding: 0 var(--space-lg) var(--space-3xl);
+}
+
+.panel {
+  display: grid;
+  gap: var(--space-xl);
+  padding-top: var(--space-xs);
+}
+
+/* The panel takes the focus after its tabs; the ring stands off the content. */
+.panel:focus-visible {
+  outline-offset: 6px;
+}

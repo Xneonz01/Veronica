@@ -1,0 +1,6 @@
+.actions {
+  display: flex;
+  flex: none;
+  align-self: center;
+  gap: var(--space-2xs);
+}

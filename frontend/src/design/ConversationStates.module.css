@@ -1,0 +1,27 @@
+/* Each state sits in a window-sized frame of the page's own sheet, so the
+   transcript's scrolling and the last turn's height behave as they do in the app. */
+.frame,
+.tall {
+  display: flex;
+  flex-direction: column;
+  margin: calc(-1 * var(--space-lg));
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+  background: var(--surface);
+  overflow: hidden;
+}
+
+.frame {
+  height: 380px;
+}
+
+.tall {
+  height: 920px;
+}
+
+.start {
+  display: grid;
+  gap: var(--space-xl);
+  width: min(680px, 100%);
+  margin-inline: auto;
+  padding-block: var(--space-lg);
+}

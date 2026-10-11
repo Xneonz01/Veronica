@@ -1,0 +1,213 @@
+/* The sidebar has no surface of its own: it is the window's ground, and the
+   content sheet is what sits on it. */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  height: 100dvh;
+  padding: 8px 8px 10px 10px;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding-inline: 6px 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.wordmark {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-title);
+}
+
+.actions,
+.nav {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  flex: none;
+  gap: 1px;
+}
+
+.actions {
+  padding-block: 4px 2px;
+}
+
+.nav {
+  padding-block: 2px var(--space-xs);
+}
+
+/* Starting a conversation is her acting, so it is the one emerald in the list. */
+.newChat {
+  display: inline-grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+
+/* The scrollbar shows only while the pointer is over the list: a bar standing
+   beside every row is noise on a column this narrow. */
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  margin-inline: -4px;
+  padding: 0 4px var(--space-md);
+  border-top: 1px solid var(--border);
+}
+
+.scroll:hover,
+.scroll:focus-within {
+  scrollbar-color: var(--muted-stronger) transparent;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.footer {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+  padding: var(--space-xs) 0 0 6px;
+  border-top: 1px solid var(--border);
+}
+
+.footerActions {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.bell {
+  position: relative;
+  display: inline-flex;
+}
+
+.unseen {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--assistant);
+  box-shadow: 0 0 0 2px var(--background);
+  pointer-events: none;
+}
+
+.iconLink {
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-sm);
+  color: var(--muted-foreground);
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .iconLink:hover {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+}
+
+.iconLink[aria-current='page'] {
+  background: var(--muted-strong);
+  color: var(--foreground);
+}
+
+.status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.statusText {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.statusDot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--faint-foreground);
+}
+
+.statusDot[data-status='online'] {
+  background: var(--success);
+}
+
+.statusDot[data-status='connecting'] {
+  animation: var(--anim-pulse);
+}
+
+.statusDot[data-status='offline'] {
+  background: var(--warning-dot);
+}
+
+/* ————————————————————————————————— the rail */
+
+.rail {
+  align-items: center;
+  padding-inline: 8px;
+}
+
+/* The mark sits where it did in the 48px row, with the toggle below it. */
+.rail .header {
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--space-sm);
+  height: auto;
+  padding: var(--space-sm) 0 var(--space-2xs);
+}
+
+.rail .actions,
+.rail .nav {
+  width: 100%;
+}
+
+.rail .footer {
+  flex-direction: column;
+  padding: var(--space-xs) 0 0;
+}
+
+.rail .footerActions {
+  flex-direction: column-reverse;
+}
+
+.rail .statusText {
+  display: none;
+}
+
+.rail .status {
+  justify-content: center;
+  height: 30px;
+}

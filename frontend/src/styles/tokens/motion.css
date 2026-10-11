@@ -1,0 +1,43 @@
+/*
+ * Layer 5: motion. Three durations, four curves, and a rule.
+ *
+ * The rule: motion carries information or it does not ship. A card that unfolds
+ * says a result landed; a figure that slides says a number changed; a press
+ * that compresses says the tap registered. Nothing loops except to say
+ * "working" or "listening", nothing floats, nothing animates while you read.
+ *
+ * Durations are the ceiling, not the target: a hover is 150ms because anything
+ * slower feels like lag; a sheet is 340ms because it travels further.
+ */
+
+:root {
+  --motion-fast: 150ms;
+  --motion-default: 220ms;
+  --motion-slow: 340ms;
+
+  /* standard: decelerating, no overshoot. Everything uses this by default. */
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  /* spring: one soft overshoot, only where something arrives. */
+  --ease-spring: cubic-bezier(0.34, 1.28, 0.64, 1);
+  /* in-out: symmetric, for the few things that loop — a breath has no
+     direction, so a decelerating curve makes one half look faster. */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  /* sheets and the palette: a long, settling travel. */
+  --ease-sheet: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* Whole animations, not names. CSS Modules rewrites an animation NAME used
+     inside a module into a scoped one that no @keyframes answers to, so the
+     animation silently never runs. A custom property's value is not rewritten,
+     so modules write `animation: var(--anim-rise-in)` and the keyframes stay
+     global in base.css. */
+  --anim-fade-in: app-fade-in var(--motion-default) var(--ease-standard) both;
+  --anim-rise-in: app-rise-in var(--motion-default) var(--ease-standard) both;
+  --anim-rise-in-slow: app-rise-in var(--motion-slow) var(--ease-standard) both;
+  --anim-pop-in: app-pop-in var(--motion-default) var(--ease-standard) both;
+  --anim-pop-in-spring: app-pop-in var(--motion-slow) var(--ease-spring) both;
+  --anim-unfold: app-unfold var(--motion-slow) var(--ease-standard) both;
+  --anim-pulse: app-pulse 1.4s var(--ease-in-out) infinite;
+  --anim-breathe: app-breathe 2.4s var(--ease-in-out) infinite;
+  --anim-shimmer: app-shimmer 1.6s var(--ease-in-out) infinite;
+  --anim-spin: app-spin 0.7s linear infinite;
+}

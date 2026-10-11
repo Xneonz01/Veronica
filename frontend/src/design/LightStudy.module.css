@@ -1,0 +1,71 @@
+.options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 480px), 1fr));
+  gap: var(--space-md);
+}
+
+.option {
+  display: grid;
+  align-content: start;
+  gap: var(--space-md);
+  padding: var(--space-lg);
+  border-radius: var(--radius-xl);
+  background: var(--background);
+  color: var(--foreground);
+  box-shadow: inset 0 0 0 1px var(--border-strong);
+}
+
+.head {
+  display: grid;
+  gap: 2px;
+}
+
+.title {
+  font-size: var(--text-lg);
+}
+
+.note {
+  font-size: var(--text-md);
+  color: var(--muted-foreground);
+}
+
+.turn {
+  display: flex;
+  flex-direction: column;
+  height: 440px;
+  border-radius: var(--radius-xl);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--border);
+  overflow: hidden;
+}
+
+.measured {
+  font-size: var(--text-md);
+}
+
+.summary {
+  cursor: pointer;
+  color: var(--muted-foreground);
+  margin-block-end: var(--space-sm);
+}
+
+/* Porcelain needs no rule: it is the ramp primitives.css declares. Ivory: the porcelain stops at the same lightness, so every contrast pair
+   lands where it does today, with a warm hue. Warm hues read as colour at a
+   higher chroma than green does, so the chroma is a touch higher. The ink
+   warms too, toward a soft brown-black. */
+.ivory[data-palette] {
+  --hue-porcelain: 85;
+  --porcelain-0: oklch(0.997 0.004 85);
+  --porcelain-25: oklch(0.99 0.007 85);
+  --porcelain-50: oklch(0.968 0.012 85);
+  --porcelain-100: oklch(0.948 0.013 84);
+  --porcelain-150: oklch(0.941 0.014 84);
+  --porcelain-200: oklch(0.915 0.015 83);
+  --porcelain-300: oklch(0.872 0.016 80);
+  --porcelain-400: oklch(0.74 0.015 75);
+  --porcelain-600: oklch(0.52 0.013 68);
+  --porcelain-700: oklch(0.42 0.012 62);
+  --porcelain-900: oklch(0.2 0.01 60);
+  /* The glass highlight is cool on porcelain; on paper it warms with it. */
+  --glass-top: light-dark(oklch(0.995 0.006 85 / 0.82), oklch(1 0 0 / 0.1));
+}

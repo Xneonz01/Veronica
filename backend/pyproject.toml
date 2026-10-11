@@ -1,0 +1,90 @@
+[project]
+name = "veronica-backend"
+version = "0.34.14"
+description = "Veronica backend: a local-first voice and chat assistant (FastAPI)."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "aiosqlite>=0.22.1",
+    "chatterbox-tts==0.1.7",
+    "cryptography==50.0.1",  # AES-256-GCM for her voice clips (ADR 0001)
+    "fastapi>=0.138.0",
+    "faster-whisper==1.2.1",  # exact: app/adapters/stt/one_pass.py uses its internals
+    "httpx>=0.28.1",
+    "numpy<2",
+    "onnxruntime>=1.27.0",
+    "pydantic-settings>=2.14.2",
+    "pydantic>=2.13.4",
+    "pypdf>=6.14.2",
+    "python-multipart>=0.0.32",
+    "pyyaml>=6.0.3",
+    "sentence-transformers>=5.6.0",
+    "setuptools<81",
+    "silero-vad>=6.2.1",
+    "soundfile>=0.14.0",
+    "sqlcipher3-wheels==0.5.7",  # exact: the measured build (SQLCipher 4.12.0, OpenSSL 3.6.0)
+    "sqlite-vec>=0.1.9",
+    "tokenizers>=0.22.2",
+    "torch==2.6.0",
+    "torchaudio==2.6.0",
+    "transformers>=5.2.0",
+    "uvicorn[standard]>=0.49.0",
+]
+
+[dependency-groups]
+dev = [
+    "mypy>=2.1.0",
+    "pytest>=9.1.1",
+    "pytest-asyncio>=1.4.0",
+    "ruff>=0.15.19",
+    "types-pyyaml>=6.0.12.20260518",
+]
+
+# Torch + torchaudio come from PyTorch's CUDA 12.4 wheel index (GPU builds);
+# everything else resolves from PyPI. cu124 has cp312 win_amd64 wheels for 2.6.0.
+[[tool.uv.index]]
+name = "pytorch-cu124"
+url = "https://download.pytorch.org/whl/cu124"
+explicit = true
+
+[tool.uv.sources]
+torch = { index = "pytorch-cu124" }
+torchaudio = { index = "pytorch-cu124" }
+
+# pkuseg (a Chatterbox text-norm dep) builds from sdist and needs numpy/setuptools
+# available in its isolated build env; declare them so the wheel build succeeds.
+[tool.uv.extra-build-dependencies]
+pkuseg = ["numpy", "setuptools"]
+spacy-pkuseg = ["numpy", "setuptools"]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+files = ["app"]
+plugins = ["pydantic.mypy"]
+
+# These ML/audio libraries ship no type stubs; don't fail strict mode on them.
+[[tool.mypy.overrides]]
+module = [
+    "faster_whisper.*", "chatterbox.*", "silero_vad.*", "soundfile.*", "perth.*",
+    "sqlite_vec.*", "sentence_transformers.*", "onnxruntime.*", "tokenizers.*",
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+markers = [
+    "slow: real-model tests (GPU); excluded from the default run",
+    "model_files: sees the real check of which models are on disk",
+    "card_room: sees the real check of a call's room on the graphics card",
+]
+addopts = "-m 'not slow'"

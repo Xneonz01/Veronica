@@ -1,0 +1,193 @@
+/*
+ * The input contract: a labelled control, one hairline, and a focus state in
+ * Veronica's colour rather than the browser's. Height clears the 44px target on
+ * every pointer, and an error is a colour plus a sentence, never a colour.
+ */
+
+.field {
+  display: grid;
+  gap: 6px;
+}
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--muted-foreground);
+}
+
+.control {
+  width: 100%;
+  height: var(--tap-min);
+  padding-inline: 14px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--input);
+  background: var(--surface-elevated);
+  color: var(--foreground);
+  font-size: var(--text-base);
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard);
+}
+
+.control::placeholder {
+  color: var(--subtle-foreground);
+}
+
+@media (hover: hover) {
+  .control:hover:not(:disabled):not(:focus-visible) {
+    border-color: var(--border-strong);
+    background: var(--surface);
+  }
+}
+
+.control:focus-visible {
+  outline: none;
+  border-color: color-mix(in oklab, var(--assistant) 55%, var(--border-strong));
+  box-shadow: 0 0 0 3px var(--assistant-soft);
+}
+
+.control:disabled {
+  background: var(--muted);
+  color: var(--subtle-foreground);
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.invalid {
+  border-color: var(--destructive);
+}
+
+.invalid:focus-visible {
+  border-color: var(--destructive);
+  box-shadow: 0 0 0 3px var(--destructive-soft);
+}
+
+.hint {
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  color: var(--destructive);
+}
+
+.selectWrap {
+  position: relative;
+}
+
+.select {
+  appearance: none;
+  padding-inline-end: 38px;
+  cursor: pointer;
+}
+
+.chevron {
+  position: absolute;
+  inset-inline-end: 12px;
+  top: 50%;
+  translate: 0 -50%;
+  color: var(--subtle-foreground);
+  pointer-events: none;
+}
+
+/* ————————————————————————————————— search */
+
+.search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.searchIcon {
+  position: absolute;
+  inset-inline-start: 14px;
+  color: var(--subtle-foreground);
+  pointer-events: none;
+}
+
+.searchInput {
+  padding-inline-start: 42px;
+}
+
+.searchInput::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+/* ————————————————————————————————— switch */
+
+.switchRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: var(--tap-min);
+}
+
+.switchText {
+  display: grid;
+  gap: 2px;
+}
+
+.switchLabel {
+  font-size: var(--text-base);
+  color: var(--foreground);
+}
+
+/* Checked is blue, not emerald: a setting is information you chose, not
+   Veronica acting. */
+.switch {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: 26px;
+  border-radius: var(--radius-pill);
+  background: var(--muted-stronger);
+  transition: background-color var(--motion-default) var(--ease-standard);
+}
+
+.switch[aria-checked='true'] {
+  background: var(--info-solid);
+}
+
+.thumb {
+  position: absolute;
+  top: 3px;
+  inset-inline-start: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: oklch(1 0 0);
+  box-shadow: 0 1px 3px oklch(0 0 0 / 0.25);
+  transition: translate var(--motion-default) var(--ease-standard);
+}
+
+.switch[aria-checked='true'] .thumb {
+  translate: 18px 0;
+}
+
+.switch:disabled {
+  opacity: 0.45;
+}
+
+@media (pointer: coarse) {
+  .switch::before {
+    content: '';
+    position: absolute;
+    inset: -10px -2px;
+  }
+}
+
+/* Prose, not a line. Resizes down the block axis only: sideways growth would
+   push the form past the page. */
+.area {
+  height: auto;
+  min-height: 84px;
+  padding-block: 10px;
+  line-height: var(--leading-normal);
+  resize: vertical;
+}

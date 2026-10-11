@@ -1,0 +1,13 @@
+Car maintenance log
+
+2025-11-08, 46,120 km: winter tyres fitted, 205/55 R16. The summer set is stored at the tyre shop on Mill Road until spring, under the ticket number in the glovebox.
+
+2026-03-14, 48,210 km: oil and filter changed. 5W-30 fully synthetic, 4.2 litres. Oil filter part number OF-2291. Air filter checked and still clean.
+
+2026-04-02, 48,900 km: summer tyres back on. Pressures 2.3 bar front and 2.1 bar rear, both a little higher when fully loaded for a long trip.
+
+2026-06-02, 52,880 km: front brake pads replaced, part BP-7730. The discs are still fine at 22 mm, against a minimum of 20 mm, so they can wait until the next set of pads.
+
+2026-08-19, 55,400 km: the battery would not start the car after a cold night and was replaced with a 60 Ah one, part BT-60. The old one went back to the shop for recycling.
+
+Next service is due at 60,000 km or in March 2027, whichever comes first. The yearly inspection is due by 30 September. Screenwash takes the ready-mixed kind in winter so it does not freeze.

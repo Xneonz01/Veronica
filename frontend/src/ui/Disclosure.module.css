@@ -1,0 +1,44 @@
+/* Where the summary's words start, past the chevron: content that should line up
+   under them indents by this. */
+.disclosure {
+  --disclosure-indent: 19px;
+}
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--space-2xs) var(--space-sm);
+  min-height: var(--tap-min);
+  padding-block: var(--space-xs);
+  cursor: pointer;
+  list-style: none;
+  border-radius: var(--radius-xs);
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary::before {
+  content: '';
+  flex: none;
+  align-self: center;
+  width: 7px;
+  height: 7px;
+  margin-inline-end: 2px;
+  border-right: 1.5px solid var(--subtle-foreground);
+  border-bottom: 1.5px solid var(--subtle-foreground);
+  transform: rotate(-45deg);
+  transition: transform var(--motion-fast) var(--ease-standard);
+}
+
+.disclosure[open] > .summary::before {
+  transform: rotate(45deg);
+}
+
+@media (hover: hover) {
+  .summary:hover::before {
+    border-color: var(--foreground);
+  }
+}

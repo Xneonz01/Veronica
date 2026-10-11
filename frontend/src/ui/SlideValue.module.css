@@ -1,0 +1,21 @@
+/* A figure that changes by replacement: the new value slides in over the old
+   one's place. The keyframes are declared here on purpose: a module-local name
+   is renamed together with its keyframes, so it keeps working. */
+
+.window {
+  display: inline-grid;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+
+.value {
+  grid-area: 1 / 1;
+  animation: slide var(--motion-slow) var(--ease-standard) both;
+}
+
+@keyframes slide {
+  from {
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+}

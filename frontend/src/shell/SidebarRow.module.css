@@ -1,0 +1,85 @@
+.row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  padding-inline: 10px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-md);
+  color: var(--muted-foreground);
+  text-align: start;
+  white-space: nowrap;
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .row:hover {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+}
+
+.row:active {
+  background: var(--muted-strong);
+}
+
+/* NavLink marks the page it points at; buttons mark the open conversation. */
+.row[aria-current='page'],
+.row[aria-current='true'] {
+  background: var(--muted-strong);
+  color: var(--foreground);
+  font-weight: var(--weight-medium);
+}
+
+.icon {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 20px;
+  color: var(--subtle-foreground);
+  transition: color var(--motion-fast) var(--ease-standard);
+}
+
+.row:hover .icon,
+.row[aria-current] .icon {
+  color: var(--foreground);
+}
+
+.dot {
+  position: absolute;
+  top: -1px;
+  right: -2px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--assistant);
+  box-shadow: 0 0 0 2px var(--background);
+}
+
+.label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.meta {
+  flex: none;
+  font-size: var(--text-xs);
+  color: var(--subtle-foreground);
+}
+
+/* The rail: a square target per destination, the label kept for assistive
+   technology and shown as the hover hint. */
+.rail {
+  justify-content: center;
+  width: 44px;
+  height: 40px;
+  padding: 0;
+  margin-inline: auto;
+}

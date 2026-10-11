@@ -1,0 +1,39 @@
+.screen {
+  display: grid;
+  place-content: center;
+  min-height: 100dvh;
+  padding: var(--space-lg);
+  background: var(--background);
+}
+
+/* The same message inside the shell, where the page area is its whole world. */
+.page {
+  display: grid;
+  place-content: center;
+  min-height: 100%;
+  padding: var(--space-lg);
+}
+
+.message {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-sm);
+  text-align: center;
+}
+
+/* Her mark, quiet: nothing about this moment is hers to celebrate. */
+.mark {
+  margin-bottom: var(--space-xs);
+  opacity: 0.55;
+  filter: grayscale(1);
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.body {
+  max-width: 44ch;
+  margin-bottom: var(--space-sm);
+  color: var(--muted-foreground);
+}

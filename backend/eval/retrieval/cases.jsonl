@@ -1,0 +1,69 @@
+{"id": "x01", "kind": "exact", "doc": "brewline-duo-guide", "question": "What does error code E07 mean on the coffee machine?", "answer": "boiler temperature sensor"}
+{"id": "x02", "kind": "exact", "doc": "sweeply-s2-manual", "question": "The robot vacuum is showing E03, what's wrong with it?", "answer": "main brush is jammed"}
+{"id": "x03", "kind": "exact", "doc": "brewline-duo-guide", "question": "What should I do about E12 on the espresso machine?", "answer": "Empty the hopper"}
+{"id": "x04", "kind": "exact", "doc": "tidepool-readme", "question": "How do I fix a TP-409 in tidepool?", "answer": "resolve newest"}
+{"id": "x05", "kind": "exact", "doc": "tidepool-readme", "question": "What happens on a TP-503?", "answer": "waits 60 seconds"}
+{"id": "x06", "kind": "exact", "doc": "home-network", "question": "Which device is at 192.168.77.40?", "answer": "called shelf"}
+{"id": "x07", "kind": "exact", "doc": "flat-lease-summary", "question": "Where is parking space P14?", "answer": "underground car park"}
+{"id": "x08", "kind": "exact", "doc": "lisbon-trip", "question": "When does flight GW 1357 land?", "answer": "09:55"}
+{"id": "x09", "kind": "exact", "doc": "car-log", "question": "What was part OF-2291?", "answer": "Oil filter part number"}
+{"id": "x10", "kind": "exact", "doc": "lisbon-trip", "question": "How much luggage can we take on GW 1357?", "answer": "hand luggage only"}
+{"id": "x11", "kind": "exact", "doc": "sweeply-s2-manual", "question": "What is SW-BAT-26?", "answer": "replacement pack"}
+{"id": "x12", "kind": "exact", "doc": "home-network", "question": "Which VLAN is Larkspur-Guest on?", "answer": "VLAN 30"}
+{"id": "x13", "kind": "exact", "doc": "car-log", "question": "What was BP-7730 for?", "answer": "front brake pads"}
+{"id": "x14", "kind": "exact", "doc": "brewline-duo-guide", "question": "What does it mean when the DESC light blinks?", "answer": "amber DESC light"}
+{"id": "x15", "kind": "exact", "doc": "lisbon-trip", "question": "What is booking HX-58213 for?", "answer": "Casa Azulejo"}
+{"id": "x16", "kind": "exact", "doc": "tidepool-readme", "question": "What does TIDEPOOL_LOG do?", "answer": "detailed log in the terminal"}
+{"id": "x17", "kind": "exact", "doc": "brewline-duo-guide", "question": "What does E15 mean?", "answer": "drip tray is full"}
+{"id": "x18", "kind": "exact", "doc": "sweeply-s2-manual", "question": "What does E09 mean?", "answer": "battery is too low"}
+{"id": "x19", "kind": "exact", "doc": "sweeply-s2-manual", "question": "What does E07 mean on the robot vacuum?", "answer": "cliff sensors are dirty"}
+{"id": "x20", "kind": "exact", "doc": "brewline-duo-guide", "question": "What does E03 mean on the Brewline?", "answer": "pump has overheated"}
+{"id": "p01", "kind": "paraphrase", "doc": "brewline-duo-guide", "question": "How often should I get the limescale out of the coffee machine?", "answer": "every 8 weeks"}
+{"id": "p02", "kind": "paraphrase", "doc": "brewline-duo-guide", "question": "How hot should the milk get?", "answer": "Stop at 60 to 65"}
+{"id": "p03", "kind": "paraphrase", "doc": "brewline-duo-guide", "question": "My espresso comes out too quickly, what should I change?", "answer": "grind finer by two steps"}
+{"id": "p04", "kind": "paraphrase", "doc": "flat-lease-summary", "question": "How much do we pay each month for the flat?", "answer": "1,150 euros a month"}
+{"id": "p05", "kind": "paraphrase", "doc": "flat-lease-summary", "question": "How much warning do we have to give before we move out?", "answer": "three months' notice"}
+{"id": "p06", "kind": "paraphrase", "doc": "flat-lease-summary", "question": "Can we keep an animal in the flat?", "answer": "one cat"}
+{"id": "p07", "kind": "paraphrase", "doc": "flat-lease-summary", "question": "Who do I get in touch with when something breaks in the flat?", "answer": "Morgan Hale"}
+{"id": "p08", "kind": "paraphrase", "doc": "home-network", "question": "What time of night do the laptops get backed up?", "answer": "02:30", "also": ["laptop-backup"]}
+{"id": "p09", "kind": "paraphrase", "doc": "lisbon-trip", "question": "Where are we sleeping in Lisbon?", "answer": "Casa Azulejo"}
+{"id": "p10", "kind": "paraphrase", "doc": "lisbon-trip", "question": "What time do we catch the train out to the palace?", "answer": "09:11"}
+{"id": "p11", "kind": "paraphrase", "doc": "q3-planning-notes", "question": "Who is responsible for switching to the new payment company?", "answer": "Jordan owns the payment provider move"}
+{"id": "p12", "kind": "paraphrase", "doc": "q3-planning-notes", "question": "How much money is set aside for design work this quarter?", "answer": "8,000 euros"}
+{"id": "p13", "kind": "paraphrase", "doc": "q3-planning-notes", "question": "What happens if we are late moving off the old payment system?", "answer": "nothing can be taken online"}
+{"id": "p14", "kind": "paraphrase", "doc": "book-club-minutes", "question": "Which book are we reading after Winter Orchard?", "answer": "The Glass Ferry"}
+{"id": "p15", "kind": "paraphrase", "doc": "book-club-minutes", "question": "How much can the host spend on food for a meeting?", "answer": "20 euros a meeting"}
+{"id": "p16", "kind": "paraphrase", "doc": "balcony-garden-calendar", "question": "When can the tomato plants stay outside for good?", "answer": "last frost has passed"}
+{"id": "p17", "kind": "paraphrase", "doc": "balcony-garden-calendar", "question": "How do I get rid of greenfly on the herbs?", "answer": "spray of soapy water"}
+{"id": "p18", "kind": "paraphrase", "doc": "balcony-garden-calendar", "question": "What time of day should I water the pots in summer?", "answer": "Water in the evening"}
+{"id": "p19", "kind": "paraphrase", "doc": "home-insurance-summary", "question": "How much would we get back if my bike was stolen in town?", "answer": "1,500 euros each"}
+{"id": "p20", "kind": "paraphrase", "doc": "home-insurance-summary", "question": "How long do we have to tell the insurer about a claim?", "answer": "Report a claim within 30 days"}
+{"id": "p21", "kind": "paraphrase", "doc": "home-insurance-summary", "question": "What won't the insurance pay for?", "answer": "Wear and tear"}
+{"id": "p22", "kind": "paraphrase", "doc": "car-log", "question": "What size are the winter tyres?", "answer": "205/55 R16"}
+{"id": "p23", "kind": "paraphrase", "doc": "car-log", "question": "What pressure should the tyres be at?", "answer": "2.3 bar front"}
+{"id": "p24", "kind": "paraphrase", "doc": "car-log", "question": "When is the car next due in the garage for a service?", "answer": "60,000 km"}
+{"id": "p25", "kind": "paraphrase", "doc": "tidepool-readme", "question": "How do I check that tidepool can reach the share?", "answer": "tidepool doctor"}
+{"id": "p26", "kind": "paraphrase", "doc": "tidepool-readme", "question": "How can I see what tidepool would change without copying anything?", "answer": "--dry-run"}
+{"id": "p27", "kind": "paraphrase", "doc": "sweeply-s2-manual", "question": "How long does the robot last on its quietest setting?", "answer": "150 minutes"}
+{"id": "p28", "kind": "paraphrase", "doc": "sweeply-s2-manual", "question": "How do I stop the robot bumping into the dog's water bowl?", "answer": "No-go zones"}
+{"id": "p29", "kind": "paraphrase", "doc": "lisbon-trip", "question": "How do we get from the airport into the centre?", "answer": "metro from the airport"}
+{"id": "p30", "kind": "paraphrase", "doc": "lisbon-trip", "question": "Should we carry cash in Lisbon?", "answer": "prefer cash"}
+{"id": "p31", "kind": "paraphrase", "doc": "home-network", "question": "Why does the internet cut out for a couple of minutes early on Sunday mornings?", "answer": "04:00 on Sundays"}
+{"id": "p32", "kind": "paraphrase", "doc": "laptop-backup", "question": "How strongly are the backups compressed?", "answer": "level: 9"}
+{"id": "h01", "kind": "heading", "doc": "family-recipes", "question": "What temperature do I bake the focaccia at?", "answer": "Bake at 230"}
+{"id": "h02", "kind": "heading", "doc": "family-recipes", "question": "How long does the soda bread bake for?", "answer": "Bake at 200"}
+{"id": "h03", "kind": "heading", "doc": "family-recipes", "question": "What oven temperature does the lemon drizzle need?", "answer": "Bake at 180"}
+{"id": "h04", "kind": "heading", "doc": "home-network", "question": "When does the router install its updates?", "answer": "04:00 on Sundays"}
+{"id": "h05", "kind": "heading", "doc": "home-network", "question": "What do I do if a router update goes wrong?", "answer": "reset button for ten seconds"}
+{"id": "h06", "kind": "heading", "doc": "sweeply-s2-manual", "question": "How often should the robot vacuum's filter be replaced?", "answer": "filter every 2 months"}
+{"id": "h07", "kind": "heading", "doc": "sweeply-s2-manual", "question": "How often do the robot's side brushes need replacing?", "answer": "side brushes every 3 months"}
+{"id": "n01", "kind": "no_answer", "question": "When is my dentist appointment?", "probe": "dentist"}
+{"id": "n02", "kind": "no_answer", "question": "What is the excess on the car insurance?", "probe": "car insurance"}
+{"id": "n03", "kind": "no_answer", "question": "What temperature do I bake the sourdough at?", "probe": "sourdough"}
+{"id": "n04", "kind": "no_answer", "question": "What time does our flight home from Lisbon leave?", "probe": "flight home"}
+{"id": "n05", "kind": "no_answer", "question": "How much is the gym membership?", "probe": "gym"}
+{"id": "n06", "kind": "no_answer", "question": "What is the Wi-Fi password?", "probe": "password"}
+{"id": "n07", "kind": "no_answer", "question": "Who won the football match last night?", "probe": "football"}
+{"id": "n08", "kind": "no_answer", "question": "How do I fix a puncture on my bike?", "probe": "puncture"}
+{"id": "n09", "kind": "no_answer", "question": "What is the capital of Australia?", "probe": "Canberra"}
+{"id": "n10", "kind": "no_answer", "question": "Remind me to call Sam tomorrow.", "probe": "call Sam"}

@@ -1,0 +1,38 @@
+.form {
+  display: grid;
+  gap: var(--space-md);
+}
+
+.clips {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+.drop {
+  display: grid;
+  /* A long file name wraps inside the box instead of widening it. */
+  grid-template-columns: minmax(0, 1fr);
+  place-items: center;
+  gap: 6px;
+  padding: var(--space-lg);
+  border-radius: var(--radius-lg);
+  border: 1.5px dashed var(--border-strong);
+  font-size: var(--text-md);
+  color: var(--muted-foreground);
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .drop:hover {
+    background: var(--muted);
+    border-color: var(--subtle-foreground);
+  }
+}
+
+.recorded {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--success);
+}

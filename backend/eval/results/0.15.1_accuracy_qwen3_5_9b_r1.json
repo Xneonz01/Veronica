@@ -1,0 +1,188 @@
+{
+  "version": "0.15.1",
+  "family": "accuracy",
+  "model": "qwen3.5:9b",
+  "run": 1,
+  "cases_hash": "7a5721fe3bfbc3bd",
+  "overall": 1.0,
+  "fact": 1.0,
+  "grounded": 1.0,
+  "memory": 1.0,
+  "instruction": 1.0,
+  "cases": [
+    {
+      "id": "a01",
+      "kind": "fact",
+      "right": true,
+      "reply": "The capital of Australia is Canberra. It's a common misconception that Sydney or Melbourne are the capitals, but those cities are just larger and more prominent. Canberra was specifically built to resolve a rivalry between them for the role."
+    },
+    {
+      "id": "a02",
+      "kind": "fact",
+      "right": true,
+      "reply": "A hexagon has six sides."
+    },
+    {
+      "id": "a03",
+      "kind": "fact",
+      "right": true,
+      "reply": "Jane Austen wrote *Pride and Prejudice*. It was published in 1813."
+    },
+    {
+      "id": "a04",
+      "kind": "fact",
+      "right": true,
+      "reply": "391."
+    },
+    {
+      "id": "a05",
+      "kind": "fact",
+      "right": true,
+      "reply": "Water boils at 100 °C at sea level."
+    },
+    {
+      "id": "a06",
+      "kind": "fact",
+      "right": true,
+      "reply": "Mars is known as the Red Planet. Its surface contains iron oxide (rust), which gives it that distinctive reddish appearance."
+    },
+    {
+      "id": "a07",
+      "kind": "fact",
+      "right": true,
+      "reply": "The Berlin Wall fell in 1989. Specifically, the opening of the border began on November 9, 1989, following a series of political reforms and mass protests that led to the collapse of the East German regime later that year. The wall was completely dismantled over the following months, with demolition work officially beginning in December 1989 and continuing into 1990."
+    },
+    {
+      "id": "a08",
+      "kind": "fact",
+      "right": true,
+      "reply": "The chemical symbol for gold is Au. This comes from the Latin word *aurum*."
+    },
+    {
+      "id": "a09",
+      "kind": "fact",
+      "right": true,
+      "reply": "It arrives at 17:15.\n\nAdd 2 hours to 14:40 to get 16:40, then add the remaining 35 minutes (which crosses into the next hour) to reach 17:15."
+    },
+    {
+      "id": "a10",
+      "kind": "fact",
+      "right": true,
+      "reply": "There are 210 minutes in three and a half hours.\n\nCalculation: 3.5 hours × 60 minutes/hour = 210 minutes."
+    },
+    {
+      "id": "g01",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Hold the red button on your Model V2 boiler for 10 seconds to reset it [1]. If the pressure drops below 1 bar after resetting, top up the system using the filling loop located under the boiler."
+    },
+    {
+      "id": "g02",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Under the kitchen sink [2]."
+    },
+    {
+      "id": "g03",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Top up the system using the filling loop located under the boiler. Once the pressure has risen, you can reset the Model V2 boiler by holding the red button for 10 seconds [1]."
+    },
+    {
+      "id": "g04",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Morgan Roofing is cheaper at £2,150, compared to Ash & Sons' quote of £2,400. Morgan can start on the 7th, while Ash & Sons can start on the 30th [1]."
+    },
+    {
+      "id": "g05",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Your flight departs Friday at 07:15 from Gatwick [1]."
+    },
+    {
+      "id": "g06",
+      "kind": "grounded",
+      "right": true,
+      "reply": "The banana bread bakes for 55 minutes [1]."
+    },
+    {
+      "id": "g07",
+      "kind": "grounded",
+      "right": true,
+      "reply": "I don't know what colour your front door is. I don't have access to a list of your home's features or photos in my current context, so I can't answer that from memory or the provided documents. If you tell me the colour, I'll remember it for next time."
+    },
+    {
+      "id": "g08",
+      "kind": "grounded",
+      "right": true,
+      "reply": "I don't have information on the price of the hotel in the provided documents or my current memory. The only detail I know is that you are flying to Lisbon departing Friday at 07:15 from Gatwick, with check-in starting at 15:00 [1]."
+    },
+    {
+      "id": "p01",
+      "kind": "memory",
+      "right": true,
+      "reply": "Your sister Morgan lives in Leeds."
+    },
+    {
+      "id": "p02",
+      "kind": "memory",
+      "right": true,
+      "reply": "How about a hearty lentil stew with roasted root vegetables?"
+    },
+    {
+      "id": "p03",
+      "kind": "memory",
+      "right": true,
+      "reply": "Your dentist appointment is this Thursday at 10:30 [1]."
+    },
+    {
+      "id": "p04",
+      "kind": "memory",
+      "right": true,
+      "reply": "Stop scrolling and close the tabs that aren't relevant to the task at hand. [1]\n\nThe most effective immediate action is to physically remove distractions before starting work. Put your phone in another room or turn it face down. Clear your desk of non-essential items. Then, commit to a single block of time (e.g., 25 minutes) where you do one thing. If you find your mind wandering, note the thought"
+    },
+    {
+      "id": "p05",
+      "kind": "memory",
+      "right": true,
+      "reply": "Bee communication works through a mathematically precise \"waggle dance.\" When a forager finds rich nectar, it returns to the hive and performs a figure-eight motion; the angle of the straight run relative to gravity tells other bees the direction of the flowers relative to the sun, while the duration of the waggle correlates directly to distance. They're essentially encoding GPS coordinates in bod"
+    },
+    {
+      "id": "i01",
+      "kind": "instruction",
+      "right": true,
+      "reply": "Photosynthesis is the biochemical process by which plants, algae, and certain bacteria convert light energy into chemical energy stored in glucose while releasing oxygen as a byproduct."
+    },
+    {
+      "id": "i02",
+      "kind": "instruction",
+      "right": true,
+      "reply": "* Sleep consolidates memories and clears metabolic waste from the brain via the glymphatic system.\n* It regulates hormones that control hunger, stress, and immune function.\n* Without it, cognitive performance drops as quickly as if you were intoxicated."
+    },
+    {
+      "id": "i03",
+      "kind": "instruction",
+      "right": true,
+      "reply": "144"
+    },
+    {
+      "id": "i04",
+      "kind": "instruction",
+      "right": true,
+      "reply": "Yes. The Pacific Ocean is the largest, covering more than 30% of Earth's surface area and containing nearly half of the planet's liquid water [1]."
+    },
+    {
+      "id": "i05",
+      "kind": "instruction",
+      "right": true,
+      "reply": "A vast, shifting expanse of saltwater teeming with life and mystery."
+    },
+    {
+      "id": "i06",
+      "kind": "instruction",
+      "right": true,
+      "reply": "Mercury, Venus, Earth, Mars"
+    }
+  ]
+}

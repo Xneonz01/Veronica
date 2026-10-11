@@ -1,0 +1,188 @@
+{
+  "version": "0.15.1",
+  "family": "accuracy",
+  "model": "qwen3:8b",
+  "run": 1,
+  "cases_hash": "7a5721fe3bfbc3bd",
+  "overall": 0.9655,
+  "fact": 1.0,
+  "grounded": 1.0,
+  "memory": 1.0,
+  "instruction": 0.8333,
+  "cases": [
+    {
+      "id": "a01",
+      "kind": "fact",
+      "right": true,
+      "reply": "The capital of Australia is Canberra [1]."
+    },
+    {
+      "id": "a02",
+      "kind": "fact",
+      "right": true,
+      "reply": "A hexagon has six sides."
+    },
+    {
+      "id": "a03",
+      "kind": "fact",
+      "right": true,
+      "reply": "Jane Austen wrote *Pride and Prejudice* [1]."
+    },
+    {
+      "id": "a04",
+      "kind": "fact",
+      "right": true,
+      "reply": "17 times 23 is 391."
+    },
+    {
+      "id": "a05",
+      "kind": "fact",
+      "right": true,
+      "reply": "100°C. This is the standard boiling point of water at sea level under atmospheric pressure [1]."
+    },
+    {
+      "id": "a06",
+      "kind": "fact",
+      "right": true,
+      "reply": "Mars is known as the Red Planet. This is due to its surface being rich in iron oxide, which gives it a reddish appearance when viewed from space [1]."
+    },
+    {
+      "id": "a07",
+      "kind": "fact",
+      "right": true,
+      "reply": "The Berlin Wall fell in 1989."
+    },
+    {
+      "id": "a08",
+      "kind": "fact",
+      "right": true,
+      "reply": "The chemical symbol for gold is Au [1]."
+    },
+    {
+      "id": "a09",
+      "kind": "fact",
+      "right": true,
+      "reply": "Add 2 hours 35 minutes to 14:40. 14:40 + 2 hours = 16:40. 16:40 + 35 minutes = 17:15. The train arrives at 17:15."
+    },
+    {
+      "id": "a10",
+      "kind": "fact",
+      "right": true,
+      "reply": "There are 210 minutes in three and a half hours. Three hours equal 180 minutes, and half an hour equals 30 minutes, so 180 + 30 = 210 [1]."
+    },
+    {
+      "id": "g01",
+      "kind": "grounded",
+      "right": true,
+      "reply": "To reset your boiler, hold the red button for 10 seconds [1]. If the pressure drops below 1 bar, use the filling loop under the boiler to top it up [1]."
+    },
+    {
+      "id": "g02",
+      "kind": "grounded",
+      "right": true,
+      "reply": "The stopcock is under the kitchen sink [2]."
+    },
+    {
+      "id": "g03",
+      "kind": "grounded",
+      "right": true,
+      "reply": "If the boiler pressure is below 1 bar, you should top up the pressure using the filling loop under the boiler [1]. Do not attempt to reset the boiler unless the pressure is above 1 bar, as the red button is only for resetting the boiler, not for adjusting pressure."
+    },
+    {
+      "id": "g04",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Morgan Roofing is cheaper at 2,150 pounds and can start on the 7th. Ash & Sons is more expensive at 2,400 pounds and can start on the 30th [1]."
+    },
+    {
+      "id": "g05",
+      "kind": "grounded",
+      "right": true,
+      "reply": "Your flight to Lisbon departs at 07:15 on Friday [1]."
+    },
+    {
+      "id": "g06",
+      "kind": "grounded",
+      "right": true,
+      "reply": "The banana bread bakes for 55 minutes at 170 C [1]."
+    },
+    {
+      "id": "g07",
+      "kind": "grounded",
+      "right": true,
+      "reply": "I don't have that information. You might want to check the house notes or ask someone who has lived here before."
+    },
+    {
+      "id": "g08",
+      "kind": "grounded",
+      "right": true,
+      "reply": "I don't have information about the cost of the hotel."
+    },
+    {
+      "id": "p01",
+      "kind": "memory",
+      "right": true,
+      "reply": "Your sister lives in Leeds [1]."
+    },
+    {
+      "id": "p02",
+      "kind": "memory",
+      "right": true,
+      "reply": "Have grilled vegetable skewers with quinoa and a side of roasted root vegetables for a vegetarian, tea-friendly dinner [1]."
+    },
+    {
+      "id": "p03",
+      "kind": "memory",
+      "right": true,
+      "reply": "Your dentist appointment is on Thursday at 10:30 [1]."
+    },
+    {
+      "id": "p04",
+      "kind": "memory",
+      "right": true,
+      "reply": "Focus on one task at a time, and eliminate distractions—like turning off notifications or using a website blocker. This reduces mental switching, which drains cognitive resources [1]. If you're working on a project, start with the hardest part first to build momentum. If you're easily distracted, try the Pomodoro Technique: 25 minutes of focused work, then a 5-minute break. It helps maintain conce"
+    },
+    {
+      "id": "p05",
+      "kind": "memory",
+      "right": true,
+      "reply": "Bees are incredibly complex social insects, with colonies organized into a hierarchy that includes a queen, worker bees, and drones. Worker bees, which are all female, perform a variety of tasks such as foraging, nursing, and defending the hive, and they even produce the honey we love [1]. What’s fascinating is that they communicate the location of food sources to other bees through a behavior cal"
+    },
+    {
+      "id": "i01",
+      "kind": "instruction",
+      "right": true,
+      "reply": "Photosynthesis is the process by which plants, algae, and some bacteria convert light energy, usually from the sun, into chemical energy stored in glucose, using carbon dioxide and water as raw materials [1]."
+    },
+    {
+      "id": "i02",
+      "kind": "instruction",
+      "right": true,
+      "reply": "- Sleep helps the brain consolidate memories and process information from the day [1].  \n- It supports the immune system and helps the body repair itself [2].  \n- Lack of sleep can lead to decreased cognitive function, mood swings, and increased risk of chronic diseases [3]."
+    },
+    {
+      "id": "i03",
+      "kind": "instruction",
+      "right": true,
+      "reply": "144"
+    },
+    {
+      "id": "i04",
+      "kind": "instruction",
+      "right": true,
+      "reply": "Yes. The Pacific Ocean is the largest ocean, covering about 63 million square miles (163 million square kilometers) [1]."
+    },
+    {
+      "id": "i05",
+      "kind": "instruction",
+      "right": false,
+      "reply": "The sea is a vast, ever-changing expanse of water, shaped by wind, tide, and time."
+    },
+    {
+      "id": "i06",
+      "kind": "instruction",
+      "right": true,
+      "reply": "Mercury, Venus, Earth, Mars"
+    }
+  ]
+}

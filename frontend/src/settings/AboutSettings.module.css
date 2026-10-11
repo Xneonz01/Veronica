@@ -1,0 +1,71 @@
+.loading,
+.version {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.name {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.product {
+  font-size: var(--text-lg);
+  font-weight: var(--weight-semibold);
+}
+
+.label {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+/* ——— patch notes */
+
+.number {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+}
+
+.title {
+  flex: 1 1 200px;
+  min-width: 0;
+  font-size: var(--text-md);
+}
+
+.date {
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.notes {
+  display: grid;
+  gap: var(--space-md);
+  padding: var(--space-2xs) 0 var(--space-md) var(--disclosure-indent);
+}
+
+.section {
+  display: grid;
+  gap: var(--space-2xs);
+}
+
+.sectionTitle {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--muted-foreground);
+}
+
+.list {
+  display: grid;
+  gap: var(--space-2xs);
+  max-width: var(--measure);
+  padding-inline-start: 18px;
+  list-style: disc;
+  font-size: var(--text-md);
+}
+
+.list li::marker {
+  color: var(--faint-foreground);
+}

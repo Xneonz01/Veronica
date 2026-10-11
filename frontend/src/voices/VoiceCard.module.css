@@ -1,0 +1,75 @@
+.card {
+  display: grid;
+  /* A long name must wrap inside the card, not widen it past its track. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-xs);
+  padding: var(--space-md);
+  border-radius: var(--radius-xl);
+  background: var(--card);
+  box-shadow: inset 0 0 0 1px var(--border);
+  transition: box-shadow var(--motion-default) var(--ease-standard);
+}
+
+/* The voice in use carries her colour at its edge, and nowhere else. */
+.active {
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--assistant) 45%, transparent),
+    0 0 0 4px var(--assistant-soft);
+}
+
+.wave {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  height: 36px;
+  margin-bottom: var(--space-2xs);
+}
+
+.wave span {
+  flex: 1;
+  min-height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--muted-stronger);
+}
+
+.active .wave span {
+  background: var(--assistant);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
+}
+
+/* Two lines at most, broken anywhere if it has to be: a name is never cut to
+   something you can't recognise. */
+.name {
+  display: -webkit-box;
+  min-width: 0;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-size: var(--text-base);
+}
+
+.meta {
+  margin: 0;
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2xs);
+  margin-top: var(--space-xs);
+}
+
+.delete {
+  margin-inline-start: auto;
+}

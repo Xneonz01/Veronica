@@ -1,0 +1,104 @@
+.page {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-lg);
+  width: min(880px, 100%);
+  margin-inline: auto;
+  padding: var(--space-2xl) var(--space-lg) var(--space-lg);
+}
+
+.titles {
+  display: grid;
+  gap: 6px;
+  max-width: 46ch;
+}
+
+.title {
+  font-size: var(--text-2xl);
+  letter-spacing: var(--tracking-display);
+}
+
+.lead {
+  margin: 0;
+  color: var(--muted-foreground);
+}
+
+.learning {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  max-width: 300px;
+}
+
+.learningLabel {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--muted-foreground);
+}
+
+.learningMeans {
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+  text-align: end;
+}
+
+.body {
+  display: grid;
+  gap: var(--space-md);
+  width: min(880px, 100%);
+  margin-inline: auto;
+  padding: 0 var(--space-lg) var(--space-3xl);
+}
+
+.panel {
+  display: grid;
+  gap: var(--space-md);
+  padding-top: var(--space-xs);
+}
+
+/* The panel takes the focus after its tabs; the ring stands off the content. */
+.panel:focus-visible {
+  outline-offset: 6px;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.filters > :first-child {
+  flex: 1 1 260px;
+}
+
+.loading {
+  display: grid;
+  gap: 18px;
+  padding: var(--space-md);
+  border-radius: var(--radius-xl);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.loadingRow {
+  display: grid;
+  gap: var(--space-xs);
+}
+
+@media (max-width: 767px) {
+  .learning {
+    justify-items: start;
+  }
+
+  .learningMeans {
+    text-align: start;
+  }
+}

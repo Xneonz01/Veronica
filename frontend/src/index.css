@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "./styles/tokens.css";
+/* The reset goes in Tailwind's base layer, under its utilities. Every screen is
+   styled by the CSS modules beside its components, which are unlayered and so
+   win over both; no screen uses a Tailwind utility today. */
+@import "./styles/base.css" layer(base);

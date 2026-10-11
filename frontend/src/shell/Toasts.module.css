@@ -1,0 +1,146 @@
+/* The stack ignores the pointer and only the toasts take it, so the corner it
+   covers stays usable. */
+.stack {
+  position: fixed;
+  right: var(--space-md);
+  bottom: var(--space-md);
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-xs);
+  width: min(360px, calc(100vw - 2 * var(--space-md)));
+  pointer-events: none;
+}
+
+.toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-sm) var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--glass-elevated-bg);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-glass);
+  animation: var(--anim-rise-in);
+}
+
+.mark,
+.toneIcon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  height: 22px;
+}
+
+.toneIcon {
+  color: var(--info);
+}
+
+.positive .toneIcon {
+  color: var(--success);
+}
+
+.critical .toneIcon {
+  color: var(--destructive);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+  padding-block: 2px;
+}
+
+.title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+}
+
+.body {
+  font-size: var(--text-md);
+  color: var(--muted-foreground);
+  overflow-wrap: anywhere;
+}
+
+/* Something she inferred, not something you told her: a step quieter. */
+.inferred {
+  color: var(--subtle-foreground);
+}
+
+/* The ring is a small clock beside the word: how long Undo is still on offer. */
+.undo {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  align-self: center;
+  height: 30px;
+  padding-inline: 9px 12px;
+  border-radius: var(--radius-pill);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--assistant-on-soft);
+  background: var(--assistant-soft);
+  transition: background-color var(--motion-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .undo:hover {
+    background: var(--assistant-soft-2);
+  }
+}
+
+.action {
+  flex: none;
+  align-self: center;
+  height: 30px;
+  padding-inline: 12px;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  background: var(--muted-strong);
+  color: var(--foreground);
+}
+
+.dismiss {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-pill);
+  color: var(--subtle-foreground);
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    color var(--motion-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .dismiss:hover {
+    background: var(--muted);
+    color: var(--foreground);
+  }
+}
+
+.expand {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+  text-align: start;
+}
+
+.learned {
+  display: grid;
+  gap: 4px;
+  margin: 6px 0 0;
+  padding: 0 0 0 16px;
+  font-size: var(--text-md);
+  color: var(--muted-foreground);
+}

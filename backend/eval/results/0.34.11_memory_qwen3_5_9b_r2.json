@@ -1,0 +1,1673 @@
+{
+  "version": "0.34.11",
+  "family": "memory",
+  "model": "qwen3.5:9b",
+  "run": 2,
+  "cases_hash": "0fef291d90331951",
+  "parse_failures": 0,
+  "malformed_facts": 0,
+  "proposed_false_memories": 41,
+  "proposed_recall": 0.94,
+  "proposed_precision": 0.534,
+  "filed_false_memories": 2,
+  "filed_recall": 0.94,
+  "filed_precision": 0.8571,
+  "cases": [
+    {
+      "id": "m01",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is learning to play the cello\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User has cello lessons on Thursday evenings\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User is learning to play the cello",
+          "User has cello lessons on Thursday evenings"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User is learning to play the cello",
+          "User has cello lessons on Thursday evenings"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m02",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m03",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m04",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m05",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User prefers short answers from the assistant in the mornings\", \"confidence\": 0.95, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User prefers short answers from the assistant in the mornings"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User prefers short answers from the assistant in the mornings"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m06",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User has a sister named Morgan\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"Morgan lives in Leeds\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User talks to Morgan every Sunday\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User has a sister named Morgan",
+          "Morgan lives in Leeds",
+          "User talks to Morgan every Sunday"
+        ],
+        "expected": 3,
+        "met": 3,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User has a sister named Morgan",
+          "Morgan lives in Leeds",
+          "User talks to Morgan every Sunday"
+        ],
+        "expected": 3,
+        "met": 3,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m07",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m08",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is vegetarian\", \"confidence\": 0.95, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User is vegetarian"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User is vegetarian"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m09",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {\"name\": \"Ro\"}, \"facts\": []}",
+      "proposed": {
+        "filed": [
+          "name: Ro"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "name: Ro"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m10",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User would name their future dog Biscuit\", \"confidence\": 0.95, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User would name their future dog Biscuit"
+        ],
+        "expected": 0,
+        "met": 0,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User would name their future dog Biscuit"
+        ],
+        "expected": 0,
+        "met": 0,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m11",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m12",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m13",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is building a raised bed for the garden\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User is using old pallets to build the raised bed\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User is building a raised bed for the garden",
+          "User is using old pallets to build the raised bed"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User is building a raised bed for the garden",
+          "User is using old pallets to build the raised bed"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m14",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User dislikes horror films\", \"confidence\": 0.95, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User dislikes horror films"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User dislikes horror films"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m15",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User works nights at the hospital\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User usually sleeps until noon\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User works nights at the hospital",
+          "User usually sleeps until noon"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User works nights at the hospital",
+          "User usually sleeps until noon"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m16",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m17",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "m18",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {\"name\": \"Rowan\"}, \"facts\": [{\"content\": \"User's name is Rowan\", \"confidence\": 1.0, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "name: Rowan",
+          "User's name is Rowan"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "name: Rowan",
+          "User's name is Rowan"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "k01",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is allergic to penicillin\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User runs on Saturday mornings with their neighbour\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User is allergic to penicillin",
+          "User runs on Saturday mornings with their neighbour"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User is allergic to penicillin"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User runs on Saturday mornings with their neighbour"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "k02",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User waters their balcony garden in the evening\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User has a balcony garden\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User added basil to their balcony garden\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User waters their balcony garden in the evening",
+          "User has a balcony garden",
+          "User added basil to their balcony garden"
+        ],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User waters their balcony garden in the evening",
+          "User has a balcony garden",
+          "User added basil to their balcony garden"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "k03",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User lives in Bristol\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User cycles to work\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User lives in Bristol",
+          "User cycles to work"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User lives in Bristol"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User cycles to work"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "k04",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\n  \"profile\": {},\n  \"facts\": [\n    {\n      \"content\": \"User takes their coffee without sugar.\",\n      \"confidence\": 0.95,\n      \"kind\": \"preference\"\n    },\n    {\n      \"content\": \"User is learning Portuguese.\",\n      \"confidence\": 0.95,\n      \"kind\": \"fact\"\n    }\n  ]\n}",
+      "proposed": {
+        "filed": [
+          "User takes their coffee without sugar.",
+          "User is learning Portuguese."
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User takes their coffee without sugar."
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User is learning Portuguese."
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "k05",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\n  \"profile\": {\n    \"name\": null\n  },\n  \"facts\": [\n    {\n      \"content\": \"User has a daughter named Morgan.\",\n      \"confidence\": 0.95,\n      \"kind\": \"fact\"\n    },\n    {\n      \"content\": \"Morgan is seven years old.\",\n      \"confidence\": 0.95,\n      \"kind\": \"fact\"\n    },\n    {\n      \"content\": \"Morgan has started swimming lessons.\",\n      \"confidence\": 0.9,\n      \"kind\": \"fact\"\n    }\n  ]\n}",
+      "proposed": {
+        "filed": [
+          "User has a daughter named Morgan.",
+          "Morgan is seven years old.",
+          "Morgan has started swimming lessons."
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User has a daughter named Morgan.",
+          "Morgan is seven years old."
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "Morgan has started swimming lessons."
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "k06",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User works nights at the hospital\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User usually sleeps until noon\", \"confidence\": 0.9, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User works nights at the hospital",
+          "User usually sleeps until noon"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User works nights at the hospital"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User usually sleeps until noon"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "k07",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\n  \"profile\": {},\n  \"facts\": [\n    {\n      \"content\": \"User is vegetarian.\",\n      \"confidence\": 0.9,\n      \"kind\": \"preference\"\n    },\n    {\n      \"content\": \"User has adopted a rescue greyhound named Pepper.\",\n      \"confidence\": 0.9,\n      \"kind\": \"fact\"\n    }\n  ]\n}",
+      "proposed": {
+        "filed": [
+          "User is vegetarian.",
+          "User has adopted a rescue greyhound named Pepper."
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User is vegetarian."
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User has adopted a rescue greyhound named Pepper."
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "k08",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\n  \"profile\": {},\n  \"facts\": [\n    {\n      \"content\": \"User has a partner named Sam.\",\n      \"confidence\": 0.9,\n      \"kind\": \"fact\"\n    },\n    {\n      \"content\": \"Sam is a teacher.\",\n      \"confidence\": 0.9,\n      \"kind\": \"fact\"\n    },\n    {\n      \"content\": \"User is training for a half marathon in October.\",\n      \"confidence\": 0.9,\n      \"kind\": \"fact\"\n    }\n  ]\n}",
+      "proposed": {
+        "filed": [
+          "User has a partner named Sam.",
+          "Sam is a teacher.",
+          "User is training for a half marathon in October."
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User has a partner named Sam.",
+          "Sam is a teacher."
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User is training for a half marathon in October."
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "k09",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User does not drink alcohol\", \"confidence\": 0.95, \"kind\": \"preference\"}, {\"content\": \"User has been cooking a lot of Thai food lately\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User's favourite cuisine is Thai food\", \"confidence\": 0.85, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User does not drink alcohol",
+          "User has been cooking a lot of Thai food lately",
+          "User's favourite cuisine is Thai food"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": [
+          "User does not drink alcohol"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User has been cooking a lot of Thai food lately",
+          "User's favourite cuisine is Thai food"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "k10",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User uses a wheelchair\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User prefers places with step-free access\", \"confidence\": 0.95, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User uses a wheelchair",
+          "User prefers places with step-free access"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User uses a wheelchair"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User prefers places with step-free access"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p01",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User has a sister named Morgan\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"Morgan is vegetarian\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User has a sister named Morgan",
+          "Morgan is vegetarian"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User has a sister named Morgan"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "Morgan is vegetarian"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p02",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User cycles to work\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User works at a library\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User cycles to work",
+          "User works at a library"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User works at a library"
+        ]
+      },
+      "learned": [
+        "User works at a library"
+      ],
+      "filed": {
+        "filed": [
+          "User cycles to work"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p03",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User has a brother named Sam\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"Sam works as a doctor\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User has a brother named Sam",
+          "Sam works as a doctor"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User has a brother named Sam"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "Sam works as a doctor"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p04",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User has a tabby cat named Biscuit\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User adopted Biscuit last month\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User has a tabby cat named Biscuit",
+          "User adopted Biscuit last month"
+        ],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User has a tabby cat named Biscuit",
+          "User adopted Biscuit last month"
+        ]
+      },
+      "learned": [
+        "User adopted a cat named Biscuit"
+      ],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p05",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is learning to bake bread\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User is allergic to cats\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User is learning to bake bread",
+          "User is allergic to cats"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User is learning to bake bread"
+        ]
+      },
+      "learned": [
+        "User is learning to bake bread"
+      ],
+      "filed": {
+        "filed": [
+          "User is allergic to cats"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p06",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is a vegetarian\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User's partner is named Alex\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User's partner does not eat meat\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User is a vegetarian",
+          "User's partner is named Alex",
+          "User's partner does not eat meat"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User's partner is named Alex",
+          "User's partner does not eat meat"
+        ]
+      },
+      "learned": [
+        "User's partner is named Alex",
+        "Alex does not eat meat"
+      ],
+      "filed": {
+        "filed": [
+          "User is a vegetarian"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p07",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User's sister is named Morgan\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"Morgan was vegetarian for years\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"Morgan started eating fish again last month\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"Morgan is now pescatarian\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User's sister is named Morgan",
+          "Morgan was vegetarian for years",
+          "Morgan started eating fish again last month",
+          "Morgan is now pescatarian"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": [
+          "User's sister is named Morgan",
+          "Morgan was vegetarian for years"
+        ]
+      },
+      "learned": [
+        "User's sister is named Morgan",
+        "Morgan has been vegetarian for years"
+      ],
+      "filed": {
+        "filed": [
+          "Morgan started eating fish again last month",
+          "Morgan is now pescatarian"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 1,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p08",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is training for a marathon\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User's first marathon is in Berlin in September\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User is training for a marathon",
+          "User's first marathon is in Berlin in September"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User is training for a marathon"
+        ]
+      },
+      "learned": [
+        "User is training for a marathon"
+      ],
+      "filed": {
+        "filed": [
+          "User's first marathon is in Berlin in September"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p09",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User has a daughter named Rowan\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"Rowan starts school next week\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"Rowan is obsessed with dinosaurs\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User has a daughter named Rowan",
+          "Rowan starts school next week",
+          "Rowan is obsessed with dinosaurs"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User has a daughter named Rowan",
+          "Rowan starts school next week"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "Rowan is obsessed with dinosaurs"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p10",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User plays the cello\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User plays the cello"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [
+        "User works night shifts at a hospital"
+      ],
+      "filed": {
+        "filed": [
+          "User plays the cello"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p11",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User has a dog named Juno\", \"confidence\": 1.0, \"kind\": \"fact\"}, {\"content\": \"Juno is a golden retriever\", \"confidence\": 1.0, \"kind\": \"fact\"}, {\"content\": \"Juno is six months old\", \"confidence\": 1.0, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User has a dog named Juno",
+          "Juno is a golden retriever",
+          "Juno is six months old"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 2,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User has a dog named Juno",
+          "Juno is a golden retriever",
+          "Juno is six months old"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 2,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p12",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User's dad is visiting from Lagos\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User's dad cannot handle spicy food\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User loves spicy food\", \"confidence\": 0.9, \"kind\": \"preference\"}]}",
+      "proposed": {
+        "filed": [
+          "User's dad is visiting from Lagos",
+          "User's dad cannot handle spicy food",
+          "User loves spicy food"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User's dad is visiting from Lagos"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User's dad cannot handle spicy food",
+          "User loves spicy food"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p13",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is learning Spanish\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User plans to visit Madrid\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User is learning Spanish",
+          "User plans to visit Madrid"
+        ],
+        "expected": 0,
+        "met": 0,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": [
+          "User plans to visit Madrid"
+        ]
+      },
+      "learned": [
+        "User is learning Spanish",
+        "User plans to travel to Madrid"
+      ],
+      "filed": {
+        "filed": [],
+        "expected": 0,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p14",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User cycles to work most days\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User has an allotment\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User grows tomatoes and beans\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User plans to build a greenhouse next month\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User cycles to work most days",
+          "User has an allotment",
+          "User grows tomatoes and beans",
+          "User plans to build a greenhouse next month"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 1,
+        "extra": 1,
+        "false_memories": []
+      },
+      "learned": [
+        "User works at a library"
+      ],
+      "filed": {
+        "filed": [
+          "User cycles to work most days",
+          "User has an allotment",
+          "User grows tomatoes and beans",
+          "User plans to build a greenhouse next month"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 1,
+        "extra": 1,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p15",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User has a sister named Morgan who is moving to Leeds\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User plans to visit their sister in Leeds next month\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User is learning Spanish for a trip to Spain in the summer\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User has a sister named Morgan who is moving to Leeds",
+          "User plans to visit their sister in Leeds next month",
+          "User is learning Spanish for a trip to Spain in the summer"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": [
+          "User has a sister named Morgan who is moving to Leeds"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User plans to visit their sister in Leeds next month",
+          "User is learning Spanish for a trip to Spain in the summer"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p16",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User works as a nurse\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User works at St Mary's\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User works night shifts three times a week\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User goes rock climbing on days off\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User works as a nurse",
+          "User works at St Mary's",
+          "User works night shifts three times a week",
+          "User goes rock climbing on days off"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User works as a nurse",
+          "User works at St Mary's"
+        ]
+      },
+      "learned": [
+        "User works as a nurse at St Mary's"
+      ],
+      "filed": {
+        "filed": [
+          "User works night shifts three times a week",
+          "User goes rock climbing on days off"
+        ],
+        "expected": 2,
+        "met": 2,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p17",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User adopted a rescue dog named Pepper\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User works from home\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User adopted a rescue dog named Pepper",
+          "User works from home"
+        ],
+        "expected": 0,
+        "met": 0,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": [
+          "User adopted a rescue dog named Pepper"
+        ]
+      },
+      "learned": [
+        "User adopted a rescue dog named Pepper"
+      ],
+      "filed": {
+        "filed": [
+          "User works from home"
+        ],
+        "expected": 0,
+        "met": 0,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p18",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User's partner is named Alex\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User's partner is vegetarian\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User stopped eating meat last month\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User's partner is named Alex",
+          "User's partner is vegetarian",
+          "User stopped eating meat last month"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User's partner is named Alex",
+          "User's partner is vegetarian"
+        ]
+      },
+      "learned": [
+        "User's partner is named Alex",
+        "Alex is vegetarian"
+      ],
+      "filed": {
+        "filed": [
+          "User stopped eating meat last month"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p19",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 1,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 1,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p20",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User goes up into the hills most weekends\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User goes up into the hills most weekends"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "User goes up into the hills most weekends"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p21",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 1,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 1,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p22",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User teaches maths at a secondary school\", \"confidence\": 1.0, \"kind\": \"fact\"}, {\"content\": \"User mostly teaches year nine this term\", \"confidence\": 1.0, \"kind\": \"fact\"}, {\"content\": \"User coaches the chess club after school on Wednesdays\", \"confidence\": 1.0, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User teaches maths at a secondary school",
+          "User mostly teaches year nine this term",
+          "User coaches the chess club after school on Wednesdays"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": [
+          "User teaches maths at a secondary school"
+        ]
+      },
+      "learned": [
+        "User teaches maths",
+        "User works at a secondary school in town"
+      ],
+      "filed": {
+        "filed": [
+          "User mostly teaches year nine this term",
+          "User coaches the chess club after school on Wednesdays"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p23",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": []}",
+      "proposed": {
+        "filed": [],
+        "expected": 1,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [],
+      "filed": {
+        "filed": [],
+        "expected": 1,
+        "met": 0,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p24",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User has a daughter named Rowan\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"Rowan is learning to play the violin\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"Rowan practices violin every day after school\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User has a daughter named Rowan",
+          "Rowan is learning to play the violin",
+          "Rowan practices violin every day after school"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User has a daughter named Rowan",
+          "Rowan is learning to play the violin"
+        ]
+      },
+      "learned": [],
+      "filed": {
+        "filed": [
+          "Rowan practices violin every day after school"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p25",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User is no longer allergic to penicillin\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User is no longer allergic to penicillin"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      },
+      "learned": [
+        "User is allergic to penicillin"
+      ],
+      "filed": {
+        "filed": [
+          "User is no longer allergic to penicillin"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p26",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User supports Ferrari\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User watches Formula 1 races\", \"confidence\": 0.95, \"kind\": \"fact\"}, {\"content\": \"User watched Formula 1 with their dad since childhood\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User supports Ferrari",
+          "User watches Formula 1 races",
+          "User watched Formula 1 with their dad since childhood"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": [
+          "User watches Formula 1 races"
+        ]
+      },
+      "learned": [
+        "User watches a lot of Formula 1"
+      ],
+      "filed": {
+        "filed": [
+          "User supports Ferrari",
+          "User watches Formula 1 races",
+          "User watched Formula 1 with their dad since childhood"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": [
+          "User watches Formula 1 races"
+        ]
+      }
+    },
+    {
+      "id": "p27",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User fixes old bikes in their spare time\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User sometimes sells fixed bikes\", \"confidence\": 0.8, \"kind\": \"fact\"}, {\"content\": \"User gives fixed bikes to kids in the neighbourhood who need one\", \"confidence\": 0.95, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User fixes old bikes in their spare time",
+          "User sometimes sells fixed bikes",
+          "User gives fixed bikes to kids in the neighbourhood who need one"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": [
+          "User fixes old bikes in their spare time"
+        ]
+      },
+      "learned": [
+        "User fixes old bikes in their spare time"
+      ],
+      "filed": {
+        "filed": [
+          "User sometimes sells fixed bikes",
+          "User gives fixed bikes to kids in the neighbourhood who need one"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 1,
+        "extra": 0,
+        "false_memories": []
+      }
+    },
+    {
+      "id": "p28",
+      "parsed": true,
+      "malformed": 0,
+      "reply": "{\"profile\": {}, \"facts\": [{\"content\": \"User used to teach piano on Saturdays\", \"confidence\": 0.9, \"kind\": \"fact\"}, {\"content\": \"User stopped teaching piano last month\", \"confidence\": 0.9, \"kind\": \"fact\"}]}",
+      "proposed": {
+        "filed": [
+          "User used to teach piano on Saturdays",
+          "User stopped teaching piano last month"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User used to teach piano on Saturdays"
+        ]
+      },
+      "learned": [
+        "User teaches piano on Saturdays"
+      ],
+      "filed": {
+        "filed": [
+          "User used to teach piano on Saturdays",
+          "User stopped teaching piano last month"
+        ],
+        "expected": 1,
+        "met": 1,
+        "allowed": 0,
+        "extra": 0,
+        "false_memories": [
+          "User used to teach piano on Saturdays"
+        ]
+      }
+    }
+  ],
+  "temperature": 0.2
+}

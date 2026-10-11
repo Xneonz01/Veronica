@@ -1,0 +1,115 @@
+.demoStage {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+}
+
+.subject {
+  display: grid;
+  place-items: center;
+  width: 100%;
+}
+
+/* ————————————————————————————————— unfold */
+
+.card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: min(100%, 280px);
+  padding: var(--space-sm) var(--space-md);
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-subtle);
+  animation: var(--anim-unfold);
+}
+
+.cardTitle {
+  font-size: var(--text-md);
+  font-weight: var(--weight-medium);
+}
+
+.cardMeta {
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+/* ————————————————————————————————— pop */
+
+.popWrap {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-xs);
+  width: 180px;
+}
+
+.anchor {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--muted-strong);
+}
+
+.pop {
+  display: grid;
+  gap: 8px;
+  width: 100%;
+  padding: 12px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-elevated-bg);
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-glass);
+  transform-origin: top left;
+  animation: var(--anim-pop-in);
+  animation-timing-function: var(--ease-spring);
+}
+
+.popLine {
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--muted-strong);
+}
+
+.popLine:nth-child(2) {
+  width: 72%;
+}
+
+.popLine:nth-child(3) {
+  width: 54%;
+}
+
+/* ————————————————————————————————— rise */
+
+.list {
+  display: grid;
+  gap: 6px;
+  width: min(100%, 260px);
+  padding: 0;
+  list-style: none;
+}
+
+.rise {
+  padding: 8px 12px;
+  border-radius: var(--radius-md);
+  background: var(--muted);
+  font-size: var(--text-md);
+  animation: var(--anim-rise-in);
+}
+
+/* ————————————————————————————————— breathe */
+
+.breatheStage {
+  display: grid;
+  place-items: center;
+  min-height: 150px;
+}
+
+.breathe {
+  display: inline-grid;
+  animation: var(--anim-breathe);
+}

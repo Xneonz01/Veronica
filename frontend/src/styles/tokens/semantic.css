@@ -1,0 +1,176 @@
+/*
+ * Layer 2: semantic tokens. What a colour is FOR, not what it is.
+ *
+ * Every value is written once as light-dark(light, dark). `color-scheme` on the
+ * root (or on any element carrying [data-theme]) decides which half applies, so
+ * a single element can be previewed in the other theme.
+ *
+ * THE ACCENT RULE
+ *   emerald  Veronica's own presence: the composer's focus, thinking, voice,
+ *            focus rings, her mark, the primary action, and a finished action.
+ *   blue     information you explore: links, citations, data, selection in data.
+ *   amber    attention: a caveat, a warning, something that needs you.
+ *   red      refusal or failure, never decoration.
+ * One dominant accent per context; a component showing emerald, blue and amber
+ * at once has not decided what it is saying.
+ *
+ * Contrast figures below were measured with the WCAG formula on the page and
+ * the lightest surface of each theme (method and numbers in DESIGN.md).
+ */
+
+:root {
+  color-scheme: light dark;
+}
+
+/* A token that reads another is resolved where it is declared, so these are
+   declared again on any element with [data-palette]: an element that swaps the
+   primitive ramps (the design page's light-theme study) gets semantic tokens
+   built from its own ramps, not the root's. */
+:root,
+[data-palette] {
+  /* ——————————————————————————————— surfaces
+
+     Light: a celadon page, a lighter porcelain sheet for content, and the
+     quiet planes a step down. Elevation goes toward white, which is how a light
+     theme says "nearer". Dark: the slate ramp, lighter as it rises. */
+  --background: light-dark(var(--porcelain-50), var(--neutral-950));
+  --foreground: light-dark(var(--porcelain-900), oklch(0.95 0.004 var(--hue-neutral)));
+  --surface: light-dark(var(--porcelain-25), var(--neutral-925));
+  --surface-muted: light-dark(var(--porcelain-150), var(--neutral-900));
+  --surface-elevated: light-dark(var(--porcelain-0), oklch(0.216 0.005 var(--hue-neutral)));
+  --card: var(--surface-elevated);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-elevated);
+  --popover-foreground: var(--foreground);
+
+  /* fills: quiet planes for controls and rows */
+  --muted: light-dark(var(--porcelain-100), var(--neutral-875));
+  --muted-strong: light-dark(var(--porcelain-200), var(--neutral-850));
+  --muted-stronger: light-dark(var(--porcelain-300), var(--neutral-800));
+  --secondary: var(--muted);
+  --secondary-foreground: var(--foreground);
+
+  /* ——————————————————————————————— text
+     Light, on the page / on the sheet: ink 16.9 / 18.0, muted 7.7 / 8.2,
+     subtle 5.0 / 5.4. Dark, on the sheet: 16.2, 9.7, 6.0. */
+  --muted-foreground: light-dark(var(--porcelain-700), oklch(0.79 0.006 var(--hue-neutral)));
+  --subtle-foreground: light-dark(var(--porcelain-600), oklch(0.66 0.008 var(--hue-neutral)));
+  /* Decoration only — list markers, a chevron beside its own label, a resting
+     dot. It measures about 2.3:1, below AA for text at every size: text that
+     should be quieter than --subtle-foreground wants a smaller size or less
+     weight, not this. */
+  --faint-foreground: light-dark(var(--porcelain-400), oklch(0.44 0.008 var(--hue-neutral)));
+
+  /* ——————————————————————————————— lines */
+  /* A line drawn in the page's own hue disappears into it the way a crease in
+     glazed porcelain does; a grey line on a tinted page reads as a foreign mark. */
+  --border: light-dark(oklch(0.3 0.02 var(--hue-porcelain) / 0.1), oklch(1 0 0 / 0.075));
+  --border-strong: light-dark(oklch(0.3 0.02 var(--hue-porcelain) / 0.18), oklch(1 0 0 / 0.13));
+  --border-highlight: light-dark(oklch(0.995 0.005 245 / 0.72), oklch(1 0 0 / 0.09));
+  --input: var(--border-strong);
+  --scrim: light-dark(oklch(0.2 0.02 200 / 0.32), oklch(0.05 0 0 / 0.6));
+
+  /* ——————————————————————————————— emerald: Veronica */
+  --primary: light-dark(var(--emerald-700), var(--emerald-500));
+  --primary-hover: light-dark(var(--emerald-800), var(--emerald-400));
+  /* White on the dark theme's emerald-500 measures 2.3:1, a fail on the most
+     prominent control in the product, so dark takes emerald's own near-black
+     (7.7:1). Light is white on emerald-700: 5.25:1. */
+  --primary-foreground: light-dark(oklch(0.99 0 0), oklch(0.2 0.04 165));
+  --assistant: light-dark(var(--emerald-700), var(--emerald-400));
+  --assistant-soft: light-dark(oklch(0.51 0.11 165 / 0.1), oklch(0.8 0.14 163 / 0.16));
+  --assistant-soft-2: light-dark(oklch(0.51 0.11 165 / 0.18), oklch(0.8 0.14 163 / 0.26));
+  --assistant-glow: light-dark(oklch(0.6 0.13 164 / 0.24), oklch(0.72 0.15 163 / 0.3));
+  /* A non-text indicator, so WCAG 1.4.11 wants 3:1 against what it sits on:
+     light measures 3.9 on the page, dark 5.8. */
+  --ring: light-dark(oklch(0.51 0.11 165 / 0.86), oklch(0.8 0.14 163 / 0.7));
+
+  /* ——————————————————————————————— accents on their own tint
+
+     A tint and the accent that names it are a pair, and the pair has to pass on
+     its own ground, so the text half is a step darker in light and the lifted
+     stop in dark. Measured 5.6–6.2:1 in light, 6.6–9.0:1 in dark. */
+  --success-on-soft: light-dark(var(--emerald-800), var(--emerald-400));
+  --info-on-soft: light-dark(var(--blue-700), var(--blue-400));
+  --warning-on-soft: light-dark(var(--amber-900), var(--amber-400));
+  --destructive-on-soft: light-dark(var(--red-700), var(--red-400));
+  --assistant-on-soft: light-dark(var(--emerald-800), var(--emerald-400));
+
+  /* ——————————————————————————————— emerald again: done */
+  --success: light-dark(var(--emerald-700), var(--emerald-400));
+  --success-strong: light-dark(var(--emerald-800), var(--emerald-500));
+  --success-soft: light-dark(oklch(0.55 0.12 160 / 0.12), oklch(0.8 0.14 163 / 0.14));
+  --success-foreground: oklch(0.99 0 0);
+
+  /* ——————————————————————————————— blue: information (4.9:1 on the light sheet) */
+  --info: light-dark(var(--blue-600), var(--blue-400));
+  --info-hover: light-dark(var(--blue-700), oklch(0.85 0.09 248));
+  --info-solid: light-dark(var(--blue-600), var(--blue-500));
+  --info-soft: light-dark(oklch(0.54 0.19 252 / 0.09), oklch(0.79 0.11 248 / 0.14));
+  --info-soft-2: light-dark(oklch(0.54 0.19 252 / 0.16), oklch(0.79 0.11 248 / 0.22));
+  --info-foreground: oklch(0.99 0 0);
+
+  /* ——————————————————————————————— state
+
+     Attention is a dark amber ink in light (6.1:1) and a light amber in dark.
+     Amber is never used for anything but attention, and red is never used for
+     anything but refusal and failure (6.5:1 in light). */
+  --warning: light-dark(var(--amber-800), var(--amber-400));
+  --warning-dot: light-dark(var(--amber-600), var(--amber-500));
+  --warning-soft: light-dark(oklch(0.8 0.14 80 / 0.22), oklch(0.85 0.12 80 / 0.13));
+  --destructive: light-dark(var(--red-700), var(--red-400));
+  --destructive-solid: oklch(0.55 0.2 27);
+  --destructive-soft: light-dark(oklch(0.57 0.2 27 / 0.1), oklch(0.76 0.14 25 / 0.14));
+  --destructive-foreground: oklch(0.99 0 0);
+
+  /* ——————————————————————————————— radius */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-pill: 999px;
+  --radius: var(--radius-md);
+
+  /* ——————————————————————————————— space (4px base) */
+  --space-3xs: 2px;
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+  --space-4xl: 96px;
+
+  /* ——————————————————————————————— stacking, named so nothing reaches for 9999 */
+  --z-sticky: 10;
+  --z-nav: 20;
+  --z-dropdown: 30;
+  --z-toast: 60;
+  --z-tooltip: 70;
+
+  /* ——————————————————————————————— layout */
+  --sidebar-w: 240px;
+  --rail-w: 72px;
+  --page-max: 760px;
+  --page-wide: 1040px;
+  --conversation-max: 760px;
+  /* A readable measure: 65–75 characters. */
+  --measure: 68ch;
+  --measure-tight: 52ch;
+  /* Nothing interactive is smaller than this under a finger. */
+  --tap-min: 44px;
+}
+
+/* A theme can be forced on the root or on any element, which is what lets the
+   design page show both themes at once. */
+[data-theme='light'] {
+  color-scheme: light;
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+}

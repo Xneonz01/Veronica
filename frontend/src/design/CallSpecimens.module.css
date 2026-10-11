@@ -1,0 +1,14 @@
+.stage {
+  display: grid;
+  place-items: center;
+  min-height: 200px;
+}
+
+/* The dock at the sidebar's own width, on the sidebar's ground. */
+.dock {
+  width: 240px;
+  padding: 8px 8px 8px 10px;
+  margin-inline: auto;
+  border-radius: var(--radius-lg);
+  background: var(--background);
+}

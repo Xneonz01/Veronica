@@ -1,0 +1,32 @@
+{"id": "a01", "kind": "fact", "question": "What is the capital of Australia?", "must": ["canberra"]}
+{"id": "a02", "kind": "fact", "question": "How many sides does a hexagon have?", "must": ["6"]}
+{"id": "a03", "kind": "fact", "question": "Who wrote Pride and Prejudice?", "must": ["austen"]}
+{"id": "a04", "kind": "fact", "question": "What is 17 times 23?", "must": ["391"]}
+{"id": "a05", "kind": "fact", "question": "At sea level, what temperature does water boil at in Celsius?", "must": ["100"]}
+{"id": "a06", "kind": "fact", "question": "Which planet is known as the Red Planet?", "must": ["mars"]}
+{"id": "a07", "kind": "fact", "question": "In what year did the Berlin Wall fall?", "must": ["1989"]}
+{"id": "a08", "kind": "fact", "question": "What is the chemical symbol for gold?", "must": ["au"]}
+{"id": "a09", "kind": "fact", "question": "A train leaves at 14:40 and the journey takes 2 hours 35 minutes. What time does it arrive?", "must": [], "any_of": [["17:15", "5:15"]]}
+{"id": "a10", "kind": "fact", "question": "How many minutes are there in three and a half hours?", "must": ["210"]}
+{"id": "g01", "kind": "grounded", "documents": [["boiler-manual.pdf", "Model V2 boiler. To reset it, hold the red button for 10 seconds. If the pressure drops below 1 bar, top up using the filling loop under the boiler."], ["house-notes.md", "The stopcock is under the kitchen sink. The fuse box is in the hall cupboard."]], "question": "How do I reset my boiler?", "must": ["red", "button"], "any_of": [["10"]], "cite": [1]}
+{"id": "g02", "kind": "grounded", "documents": [["boiler-manual.pdf", "Model V2 boiler. To reset it, hold the red button for 10 seconds. If the pressure drops below 1 bar, top up using the filling loop under the boiler."], ["house-notes.md", "The stopcock is under the kitchen sink. The fuse box is in the hall cupboard."]], "question": "Where is the stopcock?", "must": ["kitchen", "sink"], "cite": [2]}
+{"id": "g03", "kind": "grounded", "documents": [["boiler-manual.pdf", "Model V2 boiler. To reset it, hold the red button for 10 seconds. If the pressure drops below 1 bar, top up using the filling loop under the boiler."], ["house-notes.md", "The stopcock is under the kitchen sink. The fuse box is in the hall cupboard."]], "question": "What should I do if the boiler pressure is below 1 bar?", "must": ["filling", "loop"], "cite": [1]}
+{"id": "g04", "kind": "grounded", "documents": [["roof-quotes.md", "Ash & Sons quoted 2,400 pounds and can start on the 30th. Morgan Roofing quoted 2,150 pounds and can start on the 7th."]], "question": "Which roofer is cheaper, and when can they start?", "must": ["morgan", "7th"], "cite": [1]}
+{"id": "g05", "kind": "grounded", "documents": [["trip.md", "Flight to Lisbon departs Friday at 07:15 from Gatwick. Hotel check-in is from 15:00."]], "question": "What time is my flight to Lisbon?", "must": [], "any_of": [["07:15", "7:15"]], "cite": [1]}
+{"id": "g06", "kind": "grounded", "documents": [["banana-bread.md", "Banana bread: 3 bananas, 250 g flour, bake for 55 minutes at 170 C."]], "question": "How long does the banana bread bake for?", "must": ["55"], "cite": [1]}
+{"id": "g07", "kind": "grounded", "documents": [["boiler-manual.pdf", "Model V2 boiler. To reset it, hold the red button for 10 seconds. If the pressure drops below 1 bar, top up using the filling loop under the boiler."], ["house-notes.md", "The stopcock is under the kitchen sink. The fuse box is in the hall cupboard."]], "question": "What colour is my front door?", "no_answer": true, "subject": ["door"]}
+{"id": "g08", "kind": "grounded", "documents": [["trip.md", "Flight to Lisbon departs Friday at 07:15 from Gatwick. Hotel check-in is from 15:00."]], "question": "How much did the hotel cost?", "no_answer": true, "subject": ["hotel"]}
+{"id": "g09", "kind": "grounded", "documents": [["home-insurance.md", "Kestrel home contents insurance: the excess is 250 euros per claim, and accidental damage is covered up to 1,500 euros."]], "question": "What is the excess on my car insurance?", "no_answer": true, "subject": ["car"]}
+{"id": "g10", "kind": "grounded", "documents": [["trip.md", "Flight to Lisbon departs Friday at 07:15 from Gatwick. Hotel check-in is from 15:00."]], "question": "What time is our flight home from Lisbon?", "no_answer": true, "subject": ["home", "return"]}
+{"id": "g11", "kind": "grounded", "documents": [["birthdays.md", "Rowan's birthday is on 12 March. Sam's is on 30 August."]], "question": "When is Morgan's birthday?", "no_answer": true, "subject": ["morgan"]}
+{"id": "p01", "kind": "memory", "profile": {"name": "Rowan"}, "recalled": ["Rowan's sister is Morgan, who lives in Leeds."], "question": "Where does my sister live?", "must": ["leeds"]}
+{"id": "p02", "kind": "memory", "profile": {}, "recalled": ["Prefers tea to coffee.", "Is vegetarian."], "question": "Suggest a dinner for me tonight, in one sentence.", "must": [], "forbid": ["chicken", "beef", "pork", "lamb", "bacon", "fish", "steak", "sausage", "salmon", "tuna", "prawn", "shrimp"]}
+{"id": "p03", "kind": "memory", "profile": {}, "recalled": ["Has a dentist appointment on Thursday at 10:30."], "question": "When is my dentist appointment?", "must": ["thursday"], "any_of": [["10:30"]]}
+{"id": "p04", "kind": "memory", "profile": {"name": "Rowan", "address_by_name": "never"}, "recalled": [], "question": "Can you give me a quick tip for staying focused?", "name": "rowan", "max_name": 0}
+{"id": "p05", "kind": "memory", "profile": {"name": "Rowan", "address_by_name": "sparingly"}, "recalled": [], "question": "Tell me something interesting about bees.", "name": "rowan", "max_name": 1}
+{"id": "i01", "kind": "instruction", "question": "In exactly one sentence, what is photosynthesis?", "check": {"sentences": 1}}
+{"id": "i02", "kind": "instruction", "question": "Give me exactly three bullet points on why sleep matters. Nothing else.", "check": {"bullets": 3}}
+{"id": "i03", "kind": "instruction", "question": "What is 12 squared? Reply with only the number.", "check": {"only": "144"}}
+{"id": "i04", "kind": "instruction", "question": "Answer yes or no: is the Pacific the largest ocean?", "check": {"starts": ["yes"]}}
+{"id": "i05", "kind": "instruction", "question": "Describe the sea in under 15 words.", "check": {"max_words": 14}}
+{"id": "i06", "kind": "instruction", "question": "List the first four planets from the Sun, separated by commas, and nothing else.", "check": {"must": ["mercury", "venus", "earth", "mars"], "max_words": 6}}

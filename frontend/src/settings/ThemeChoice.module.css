@@ -1,0 +1,158 @@
+.choices {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  gap: var(--space-sm);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choice {
+  display: grid;
+  gap: var(--space-xs);
+  cursor: pointer;
+}
+
+/* The picture is the control you see. Chosen is blue, as for every setting:
+   information you picked, not Veronica acting. */
+.preview {
+  position: relative;
+  display: grid;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-sm);
+  box-shadow: 0 0 0 1px var(--border-strong);
+  overflow: hidden;
+  transition: box-shadow var(--motion-fast) var(--ease-standard);
+}
+
+.preview > * {
+  grid-area: 1 / 1;
+}
+
+@media (hover: hover) {
+  .choice:hover .preview {
+    box-shadow: 0 0 0 1px var(--subtle-foreground);
+  }
+}
+
+.choice:has(.input:checked) .preview {
+  box-shadow: 0 0 0 2px var(--info-solid);
+}
+
+.choice:has(.input:focus-visible) .preview {
+  outline: 2px solid var(--ring);
+  outline-offset: 3px;
+}
+
+.name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-md);
+  color: var(--muted-foreground);
+}
+
+.choice:has(.input:checked) .name {
+  color: var(--foreground);
+  font-weight: var(--weight-medium);
+}
+
+.check {
+  color: var(--info);
+  opacity: 0;
+}
+
+.choice:has(.input:checked) .check {
+  opacity: 1;
+}
+
+/* ——— the picture, drawn with the theme's own tokens */
+
+.window {
+  display: grid;
+  grid-template-columns: 24% 1fr;
+  gap: 5px;
+  padding: 5px;
+  background: var(--background);
+}
+
+/* System: dark on the right half, over light. */
+.split {
+  clip-path: inset(0 0 0 50%);
+}
+
+.rail {
+  display: grid;
+  align-content: start;
+  gap: 4px;
+  padding: 4px 2px;
+}
+
+.rail::before,
+.rail::after {
+  content: '';
+  height: 4px;
+  border-radius: var(--radius-pill);
+  background: var(--muted-strong);
+}
+
+.rail::after {
+  width: 70%;
+}
+
+.sheet {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  gap: 5px;
+  padding: 7px;
+  border-radius: 5px;
+  background: var(--surface);
+  box-shadow: var(--shadow-subtle);
+}
+
+.question {
+  justify-self: end;
+  width: 42%;
+  height: 7px;
+  border-radius: var(--radius-pill);
+  background: var(--muted-strong);
+}
+
+.answer {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.mark {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--assistant);
+}
+
+.lines {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+}
+
+.lines::before,
+.lines::after {
+  content: '';
+  height: 3px;
+  border-radius: var(--radius-pill);
+  background: var(--faint-foreground);
+}
+
+.lines::after {
+  width: 64%;
+}
+
+.composer {
+  height: 9px;
+  border-radius: var(--radius-pill);
+  background: var(--surface-elevated);
+  box-shadow: 0 0 0 1px var(--border-strong);
+}

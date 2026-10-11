@@ -1,0 +1,12 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Core permissions for both windows. Shortcuts, tray and autostart are driven from Rust behind app-defined commands, which are not ACL-gated from a local origin \u2014 so no plugin permissions are needed here.",
+  "windows": [
+    "main",
+    "companion"
+  ],
+  "permissions": [
+    "core:default"
+  ]
+}

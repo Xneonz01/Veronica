@@ -1,0 +1,26 @@
+/* A placeholder row, shaped like a settings row: two lines of text on the left, a
+   badge on the right. */
+.skeleton {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  min-height: var(--tap-min);
+}
+
+.lines {
+  display: grid;
+  flex: 1;
+  gap: var(--space-2xs);
+  min-width: 0;
+}
+
+/* When it was checked: a footnote to the rows, not one of them. */
+.when {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
+}
+
+.ready {
+  color: var(--success);
+}

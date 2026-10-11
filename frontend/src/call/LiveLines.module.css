@@ -1,0 +1,71 @@
+.lines {
+  display: grid;
+  gap: var(--space-md);
+  margin: 0;
+  padding: var(--space-md) var(--space-lg);
+  border-radius: var(--radius-xl);
+  background: var(--surface-muted);
+  box-shadow: inset 0 0 0 1px var(--border);
+}
+
+.line {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  align-items: baseline;
+  gap: var(--space-sm);
+}
+
+.who {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--subtle-foreground);
+}
+
+.her {
+  color: var(--assistant);
+}
+
+.said {
+  margin: 0;
+  font-size: var(--text-base);
+  line-height: var(--leading-normal);
+  overflow-wrap: anywhere;
+}
+
+/* Heard but not settled yet: it can still change as you finish the sentence. */
+.hearing {
+  color: var(--muted-foreground);
+}
+
+.waiting {
+  color: var(--subtle-foreground);
+}
+
+/* Not her words: what her reply said she did and she didn't. Secondary text with
+   attention's mark, as under a chat answer; the icon box is one line tall. */
+.caveat {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-xs);
+  margin-top: var(--space-xs);
+  font-size: var(--text-md);
+  line-height: var(--leading-normal);
+  color: var(--muted-foreground);
+  animation: var(--anim-fade-in);
+}
+
+.caveatIcon {
+  flex: none;
+  height: calc(var(--text-md) * var(--leading-normal));
+  color: var(--warning);
+}
+
+.caret {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-inline-start: 5px;
+  border-radius: 50%;
+  background: var(--assistant);
+  animation: var(--anim-pulse);
+}

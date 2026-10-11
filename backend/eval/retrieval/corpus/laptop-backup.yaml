@@ -1,0 +1,21 @@
+# Nightly laptop backup to the storage box (the shelf share).
+# Runs at 02:30, after the router's own quiet hours start.
+schedule: "30 2 * * *"
+source:
+  - ~/Documents
+  - ~/Pictures
+  - ~/Projects
+exclude:
+  - node_modules
+  - .cache
+  - "*.tmp"
+target: smb://shelf/backups/laptop
+retention:
+  daily: 14
+  weekly: 8
+compression:
+  algorithm: zstd
+  level: 9
+# A failed run sends a notification to the phone; two failures in a row also email.
+notify_on_failure: true
+max_runtime_minutes: 90

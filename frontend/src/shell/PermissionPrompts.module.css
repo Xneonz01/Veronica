@@ -1,0 +1,114 @@
+/* Centred low in the content sheet, where the eye already is during a
+   conversation, and above any page. */
+.dock {
+  position: absolute;
+  left: 50%;
+  bottom: var(--space-lg);
+  z-index: var(--z-toast);
+  display: grid;
+  gap: var(--space-xs);
+  width: min(520px, calc(100% - 2 * var(--space-md)));
+  translate: -50% 0;
+  pointer-events: none;
+}
+
+.prompt {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  padding: var(--space-md);
+  border-radius: var(--radius-xl);
+  background: var(--glass-elevated-bg);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  /* Attention, not alarm: a warm edge on the usual glass. */
+  box-shadow:
+    inset 0 0 0 1px color-mix(in oklab, var(--warning-dot) 45%, transparent),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-elevated);
+  animation: var(--anim-rise-in);
+}
+
+.icon {
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  background: var(--warning-soft);
+  color: var(--warning);
+}
+
+.text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.title {
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-ui);
+}
+
+.summary {
+  font-size: var(--text-base);
+  overflow-wrap: anywhere;
+}
+
+/* The kernel writes the request as it would be logged ("write 31 characters to
+   …"); on the card it reads as a sentence. */
+.summary::first-letter {
+  text-transform: uppercase;
+}
+
+.meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+  font-size: var(--text-sm);
+  color: var(--subtle-foreground);
+}
+
+/* With a badge beside it, the label broke inside its words ("Remember / something");
+   the row wraps between them instead. */
+.meta > * {
+  white-space: nowrap;
+}
+
+.side {
+  display: grid;
+  justify-items: end;
+  gap: var(--space-sm);
+  flex: none;
+}
+
+.clock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  color: var(--warning);
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+@media (max-width: 640px) {
+  .prompt {
+    flex-wrap: wrap;
+  }
+
+  .side {
+    width: 100%;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    justify-items: stretch;
+  }
+}

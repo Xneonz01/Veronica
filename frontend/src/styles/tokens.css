@@ -1,0 +1,19 @@
+/*
+ * Veronica's design tokens, in five layers:
+ *
+ *   primitives  raw ramps, read only by the semantic layer
+ *   semantic    what a colour is for: background, surface, primary, ring, status
+ *   material    glass, elevation, glow
+ *   type        one family, one scale
+ *   motion      three durations, four curves, the shared animations
+ *
+ * Components read the semantic, material, type and motion layers and never a
+ * literal, so a theme or an accent decision is an edit here and nowhere else.
+ * DESIGN.md is the specification these implement.
+ */
+
+@import './tokens/primitives.css';
+@import './tokens/semantic.css';
+@import './tokens/material.css';
+@import './tokens/type.css';
+@import './tokens/motion.css';

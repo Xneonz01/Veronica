@@ -1,0 +1,27 @@
+.recorder {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.time {
+  min-width: 52px;
+  font-size: var(--text-md);
+  color: var(--muted-foreground);
+}
+
+.track {
+  flex: 1;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--muted-strong);
+  overflow: hidden;
+}
+
+.bar {
+  display: block;
+  height: 100%;
+  background: var(--assistant);
+  transform: scaleX(0);
+  transform-origin: left;
+}

@@ -1,0 +1,37 @@
+/* The keyframes are local to this module on purpose: CSS Modules renames a local
+   name together with its keyframes, so it keeps working. */
+
+.ring {
+  rotate: -90deg;
+  color: inherit;
+}
+
+.track,
+.arc {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.track {
+  opacity: 0.18;
+}
+
+.arc {
+  stroke-linecap: round;
+  stroke-dasharray: 100;
+  animation: deplete linear forwards;
+}
+
+@keyframes deplete {
+  to {
+    stroke-dashoffset: 100;
+  }
+}
+
+/* Reduced motion gets a still, full ring; the words beside it keep the time. */
+@media (prefers-reduced-motion: reduce) {
+  .arc {
+    animation: none;
+  }
+}

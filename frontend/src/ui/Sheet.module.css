@@ -1,0 +1,205 @@
+.dialog {
+  /* A modal <dialog> is centred by the browser's own `margin: auto` against
+     `inset: 0`. The global `* { margin: 0 }` reset takes that away, and without
+     this line every sheet opens pinned to the top-left corner. The narrow-window
+     rule below overrides it back to a bottom sheet. */
+  margin: auto;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--foreground);
+  max-width: none;
+  max-height: none;
+  overflow: visible;
+  opacity: 1;
+  transition:
+    opacity var(--motion-default) var(--ease-standard),
+    display var(--motion-default) allow-discrete,
+    overlay var(--motion-default) allow-discrete;
+}
+
+.dialog:not([open]) {
+  opacity: 0;
+}
+
+@starting-style {
+  .dialog[open] {
+    opacity: 0;
+  }
+}
+
+/* A plain scrim, no blur: a blurred layer the size of the window costs the GPU
+   every painted pixel, and the material rules allow none. */
+.dialog::backdrop {
+  background: var(--scrim);
+  transition:
+    background-color var(--motion-default) var(--ease-standard),
+    display var(--motion-default) allow-discrete,
+    overlay var(--motion-default) allow-discrete;
+}
+
+.dialog:not([open])::backdrop {
+  background: transparent;
+}
+
+@starting-style {
+  .dialog[open]::backdrop {
+    background: transparent;
+  }
+}
+
+.panel {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(var(--sheet-w), calc(100vw - 32px));
+  max-height: min(86dvh, 760px);
+  border-radius: var(--radius-2xl);
+  background: var(--glass-elevated-bg);
+  -webkit-backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  backdrop-filter: blur(var(--blur-lg)) saturate(var(--glass-saturate));
+  box-shadow:
+    inset 0 0 0 1px var(--glass-edge),
+    inset 0 1px 0 0 var(--glass-top),
+    var(--shadow-elevated);
+  overflow: hidden;
+  transition: transform var(--motion-slow) var(--ease-sheet);
+}
+
+@starting-style {
+  .dialog[open] .panel {
+    transform: translateY(8px) scale(0.985);
+  }
+}
+
+/* Leaving is quicker and travels less than arriving. */
+.dialog:not([open]) .panel {
+  transform: translateY(4px) scale(0.99);
+  transition-duration: var(--motion-fast);
+}
+
+.sm {
+  --sheet-w: 400px;
+}
+
+.md {
+  --sheet-w: 520px;
+}
+
+.lg {
+  --sheet-w: 680px;
+}
+
+.grabber {
+  display: none;
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  padding: var(--space-lg) var(--space-lg) var(--space-sm);
+}
+
+.headerBare {
+  padding-block-end: 0;
+}
+
+.titles {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.title {
+  font-size: var(--text-lg);
+}
+
+.description {
+  color: var(--muted-foreground);
+  font-size: var(--text-md);
+}
+
+.close {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-block-start: -4px;
+  margin-inline-end: -6px;
+  border-radius: var(--radius-pill);
+  color: var(--subtle-foreground);
+  background: var(--muted);
+  transition: background-color var(--motion-fast) var(--ease-standard);
+}
+
+@media (hover: hover) {
+  .close:hover {
+    background: var(--muted-strong);
+    color: var(--foreground);
+  }
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--space-xs) var(--space-lg) var(--space-lg);
+}
+
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+  border-top: 1px solid var(--border);
+}
+
+/* A narrow window gets a sheet from the bottom edge, full width. */
+@media (max-width: 767px) {
+  .dialog {
+    margin: auto 0 0;
+    width: 100%;
+  }
+
+  .panel {
+    width: 100%;
+    max-height: 92dvh;
+    border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  @starting-style {
+    .dialog[open] .panel {
+      transform: translateY(24px);
+    }
+  }
+
+  .dialog:not([open]) .panel {
+    transform: translateY(24px);
+  }
+
+  .grabber {
+    display: block;
+    width: 36px;
+    height: 5px;
+    margin: 8px auto 0;
+    border-radius: var(--radius-pill);
+    background: var(--muted-stronger);
+  }
+
+  .header {
+    padding-block-start: var(--space-sm);
+  }
+
+  .footer {
+    flex-direction: column-reverse;
+  }
+
+  .footer > * {
+    width: 100%;
+  }
+}

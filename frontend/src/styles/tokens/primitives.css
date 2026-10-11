@@ -1,0 +1,82 @@
+/*
+ * Layer 1: primitives. Raw ramps with numbers for names.
+ *
+ * Nothing outside tokens/semantic.css may read these. A component that names a
+ * ramp stop has hard-coded a colour and given it a number for a purpose, which
+ * is the thing the semantic layer exists to prevent.
+ *
+ * Dark runs on a cool slate ramp (hue 240): the blue-black Veronica has always
+ * lived on, and the ground emerald reads best against.
+ *
+ * Light has a ramp of its own, porcelain. It is not the slate with the lights
+ * turned up: it carries a trace of celadon (hue 172, the green that sits beside
+ * emerald) at the light end and sheds it toward the ink, turning cool as it
+ * goes, so a page reads as glazed porcelain while the text on it stays
+ * near-black rather than green. The two ramps never mix; every semantic token
+ * picks one of them per theme half.
+ */
+
+:root {
+  --hue-neutral: 240;
+  --hue-porcelain: 172;
+
+  /* slate, light end to dark end */
+  --neutral-0: oklch(1 0 0);
+  --neutral-25: oklch(0.987 0.002 var(--hue-neutral));
+  --neutral-50: oklch(0.974 0.003 var(--hue-neutral));
+  --neutral-100: oklch(0.955 0.004 var(--hue-neutral));
+  --neutral-200: oklch(0.925 0.006 var(--hue-neutral));
+  --neutral-300: oklch(0.885 0.008 var(--hue-neutral));
+  --neutral-400: oklch(0.72 0.01 var(--hue-neutral));
+  --neutral-500: oklch(0.6 0.012 var(--hue-neutral));
+  --neutral-600: oklch(0.52 0.012 var(--hue-neutral));
+  --neutral-700: oklch(0.42 0.012 var(--hue-neutral));
+  --neutral-800: oklch(0.305 0.007 var(--hue-neutral));
+  --neutral-850: oklch(0.262 0.006 var(--hue-neutral));
+  --neutral-875: oklch(0.228 0.005 var(--hue-neutral));
+  --neutral-900: oklch(0.205 0.005 var(--hue-neutral));
+  --neutral-925: oklch(0.183 0.004 var(--hue-neutral));
+  --neutral-950: oklch(0.152 0.004 var(--hue-neutral));
+
+  /* porcelain, light theme only. Chroma is lower than a warm ramp would carry:
+     green is seen at a lower chroma than yellow, and at 0.015 the page stops
+     reading as porcelain and starts reading as mint. */
+  --porcelain-0: oklch(0.997 0.003 var(--hue-porcelain));
+  --porcelain-25: oklch(0.991 0.005 var(--hue-porcelain));
+  --porcelain-50: oklch(0.968 0.01 var(--hue-porcelain));
+  --porcelain-100: oklch(0.948 0.01 var(--hue-porcelain));
+  --porcelain-150: oklch(0.941 0.011 var(--hue-porcelain));
+  --porcelain-200: oklch(0.915 0.012 var(--hue-porcelain));
+  --porcelain-300: oklch(0.872 0.013 175);
+  --porcelain-400: oklch(0.74 0.012 180);
+  --porcelain-600: oklch(0.52 0.012 195);
+  --porcelain-700: oklch(0.42 0.012 205);
+  --porcelain-900: oklch(0.19 0.01 220);
+
+  /* emerald: Veronica herself — presence, thinking, voice, focus, the primary
+     action. A finished action is her own yes, so success is emerald too. */
+  --emerald-300: oklch(0.87 0.09 165);
+  --emerald-400: oklch(0.8 0.14 163);
+  --emerald-500: oklch(0.72 0.15 163);
+  --emerald-600: oklch(0.6 0.13 164);
+  --emerald-700: oklch(0.51 0.11 165);
+  --emerald-800: oklch(0.44 0.095 166);
+
+  /* blue: information — links, citations, data you explore */
+  --blue-400: oklch(0.79 0.11 248);
+  --blue-500: oklch(0.72 0.15 250);
+  --blue-600: oklch(0.54 0.19 252);
+  --blue-700: oklch(0.47 0.18 254);
+
+  /* amber: attention. red: refusal and failure */
+  --amber-400: oklch(0.85 0.12 80);
+  --amber-500: oklch(0.8 0.14 78);
+  --amber-600: oklch(0.6 0.13 68);
+  --amber-700: oklch(0.53 0.12 66);
+  --amber-800: oklch(0.5 0.11 62);
+  --amber-900: oklch(0.47 0.1 58);
+  --red-400: oklch(0.76 0.14 25);
+  --red-500: oklch(0.68 0.18 26);
+  --red-600: oklch(0.57 0.2 27);
+  --red-700: oklch(0.5 0.19 27);
+}
