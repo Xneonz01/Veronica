@@ -42,6 +42,9 @@ logger = logging.getLogger(__name__)
 # word for word from what she read. Surfaces say so on the prompt. Only then: a call
 # that asks anyway, a file write to a path a search found, needs no explaining.
 FROM_READING = "from_reading"
+# And for one whose turn read the web, copied or not: a page's instruction reworded by
+# the model gets past the copy check (ADR 0003).
+AFTER_WEB = "after_web"
 
 
 class CapabilityKernel:
@@ -80,7 +83,8 @@ class CapabilityKernel:
             return False
         mode = self._policy.mode_for(capability)
         return mode is PolicyMode.confirm or (
-            mode is PolicyMode.auto_allow and self._provenance(capability, req) is not None
+            mode is PolicyMode.auto_allow
+            and (self._provenance(capability, req) is not None or _after_web(capability, req))
         )
 
     def _provenance(self, capability: Capability, req: CapabilityRequest) -> Tainted | None:
@@ -154,6 +158,8 @@ class CapabilityKernel:
             if mode is PolicyMode.auto_allow:
                 mode = PolicyMode.confirm  # whatever the tier: a person decides
                 why = FROM_READING
+        if mode is PolicyMode.auto_allow and _after_web(capability, req):
+            mode, why = PolicyMode.confirm, AFTER_WEB
         asked: str | None = None  # what the prompt names, when the preflight says
         if mode is PolicyMode.confirm and capability.preflight is not None:
             checked = await check(
@@ -263,6 +269,11 @@ class CapabilityKernel:
         return await self._records.completed(
             capability, args, actor, decision, result, started, confirm_via
         )
+
+
+def _after_web(capability: Capability, req: CapabilityRequest) -> bool:
+    """An action that changes something, in a turn that read the web."""
+    return req.taint is not None and capability.risk is not RiskTier.safe and req.taint.read("web")
 
 
 def _not_approved(outcome: ConfirmOutcome) -> tuple[Code, str]:

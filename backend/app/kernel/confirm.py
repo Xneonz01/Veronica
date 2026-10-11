@@ -66,7 +66,7 @@ class PendingView:
     risk: str
     actor: str
     expires_in_ms: int
-    # Why it asks when its policy wouldn't have: `kernel.FROM_READING`, or None.
+    # Why it asks when its policy wouldn't have: `kernel.FROM_READING`, `kernel.AFTER_WEB`, or None.
     why: str | None = None
     # The id its request carried (`CapabilityRequest.request_id`), for the surface
     # that asked to find its own prompt by.

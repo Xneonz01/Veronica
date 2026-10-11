@@ -54,6 +54,12 @@ describe('answering a permission request', () => {
     await waitFor(() => expect(result.current.pending.map((item) => [item.token, item.fromReading])).toEqual([['r', true], ['u', false]]))
   })
 
+  it('knows when a request came after reading the web', async () => {
+    const { result } = renderHook(() => useConfirmations())
+    act(() => lane.handlers.onConfirmRequired?.({ token: 'w', capability: 'memory.save', summary: 'remember x', why: 'after_web' }))
+    await waitFor(() => expect(result.current.pending.map((item) => [item.afterWeb, item.fromReading])).toEqual([[true, false]]))
+  })
+
   it('keeps a request that arrived while the list was being fetched', async () => {
     let finish: (value: Response) => void = () => undefined
     fetchMock.mockImplementation(() => new Promise<Response>((resolve) => (finish = resolve)))

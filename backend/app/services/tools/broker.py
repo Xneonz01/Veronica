@@ -191,8 +191,15 @@ def after_round(taint: Taint | None, outcomes: Iterable[ToolOutcome]) -> Taint |
     if taint is None:
         return None
     done = list(outcomes)
-    taint = taint.adding("tool_result", [outcome.text for outcome in done])
+    web = [outcome.text for outcome in done if _from_web(outcome)]
+    rest = [outcome.text for outcome in done if not _from_web(outcome)]
+    taint = taint.adding("web", web).adding("tool_result", rest)
     for outcome in done:
         if outcome.capability is not None and outcome.cleared:
             taint = taint.keeping(outcome.capability, outcome.cleared)
     return taint
+
+
+def _from_web(outcome: ToolOutcome) -> bool:
+    """A result fetched from the internet (`web.*`), which the kernel holds apart."""
+    return (outcome.capability or "").startswith("web.")

@@ -35,6 +35,9 @@ logger = logging.getLogger(__name__)
 # Said first when a call asks because of what she read (`kernel.FROM_READING`): where
 # the words came from, which is what the check knows, and not who wanted it done.
 _FROM_READING = "The words for this came from something I read, not from you."
+# And when it asks because the turn read the web (`kernel.AFTER_WEB`).
+_AFTER_WEB = "I read something on the web just before this, so I'm checking with you."
+_WHY = {"from_reading": _FROM_READING, "after_web": _AFTER_WEB}
 
 
 @dataclass
@@ -58,11 +61,13 @@ def spoken_summary(capability: str, summary: str, why: str | None = None) -> str
     C:\\long\\path\\notes.md"). Aloud, a full path is unusable and a character count is
     noise; the filename is the part a person can act on.
 
-    With `why`, the kernel asked because an argument came from something she read,
-    for an action that would otherwise have run unasked; the question says so first.
+    With `why`, the kernel asked for an action that would otherwise have run unasked:
+    an argument came from something she read, or the turn read the web. The question
+    says which first.
     """
     question = _question(capability, summary)
-    return f"{_FROM_READING} {question}" if why else question
+    reason = _WHY.get(why or "", _FROM_READING) if why else ""
+    return f"{reason} {question}" if reason else question
 
 
 def _question(capability: str, summary: str) -> str:

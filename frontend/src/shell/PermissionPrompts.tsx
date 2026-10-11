@@ -18,6 +18,7 @@ import { useToasts } from './toast'
 // Said when she asks because of what she read: where the words came from, which is all
 // the check knows, and not who wanted it done.
 const FROM_READING = 'The words for this came from something I read, not from you.'
+const AFTER_WEB = "I read something on the web just before this, so I'm checking with you."
 
 export function PermissionPrompts() {
   const { pending, answer } = useConfirmations()
@@ -71,7 +72,8 @@ function Prompt({
   const request = confirmation.summary || capabilityRequest(confirmation.capability)
   // Announced whole when the card can't take the keyboard: the warning lives in its
   // description, which nobody hears unless the card is focused.
-  const heard = confirmation.fromReading ? `${request}. ${FROM_READING}` : request
+  const why = confirmation.fromReading ? FROM_READING : confirmation.afterWeb ? AFTER_WEB : ''
+  const heard = why ? `${request}. ${why}` : request
 
   // A layout effect, so its cleanup runs while the card is still in the page: the
   // keyboard goes back to where it was instead of falling to the page body when
@@ -120,7 +122,7 @@ function Prompt({
         <p id={bodyId} className={styles.summary}>
           {request}
           <span className="visually-hidden">
-            {`. ${confirmation.fromReading ? `${FROM_READING} ` : ''}`}
+            {`. ${why ? `${why} ` : ''}`}
             If you don't answer within {Math.round(confirmation.expiresInMs / 1000)} seconds, I won't.
           </span>
         </p>
@@ -129,6 +131,11 @@ function Prompt({
           {confirmation.fromReading && (
             <Badge tone="warning" size="sm">
               From something I read
+            </Badge>
+          )}
+          {confirmation.afterWeb && (
+            <Badge tone="warning" size="sm">
+              After reading the web
             </Badge>
           )}
           {dangerous && (

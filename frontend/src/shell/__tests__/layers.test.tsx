@@ -29,6 +29,7 @@ beforeEach(() => {
       expiresInMs: 45000,
       expiresAt: Date.now() + 45000,
       fromReading: false,
+      afterWeb: false,
     },
   ]
 })
@@ -66,6 +67,16 @@ describe('permission prompt', () => {
     expect(prompt.getAttribute('aria-describedby')).toBeTruthy()
     const described = document.getElementById(prompt.getAttribute('aria-describedby') ?? '')
     expect(described?.textContent).toContain('The words for this came from something I read, not from you.')
+  })
+
+  it('says when it asks because she read the web', () => {
+    confirmations.pending = [{ ...confirmations.pending[0], capability: 'memory.save', afterWeb: true }]
+    renderPrompts()
+    const prompt = screen.getByRole('alertdialog', { name: 'Can I go ahead?' })
+    expect(prompt.textContent).toContain('After reading the web')
+    expect(prompt.textContent).not.toContain('From something I read')
+    const described = document.getElementById(prompt.getAttribute('aria-describedby') ?? '')
+    expect(described?.textContent).toContain("I read something on the web just before this, so I'm checking with you.")
   })
 
   it('announces where the words came from when the card cannot take the keyboard', () => {

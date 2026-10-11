@@ -34,7 +34,9 @@ fillers. Otherwise a payload that reads the same would compare unequal to the ar
 copied out of it.
 
 It matches the text the turn already carried. It reads no meaning, so a paraphrase is
-not caught, and a check that guessed at meaning would be a second, worse model.
+not caught, and a check that guessed at meaning would be a second, worse model. That is
+why text from the web (`web`) is kept apart: a turn that read any makes every action
+that isn't safe ask first, copied or not (`kernel.AFTER_WEB`, ADR 0003).
 """
 
 from __future__ import annotations
@@ -52,7 +54,7 @@ from app.services.memory.normalize import normalize
 
 # The kinds of untrusted text a turn carries. Reported as an argument's source, so a
 # poisoned document can be told from a poisoned memory without the text being kept.
-Source = Literal["memory", "document", "tool_result"]
+Source = Literal["memory", "document", "tool_result", "web"]
 
 # Categories that never show as a letter of their own: formatting, unassigned, and
 # combining marks (checked after NFKC has composed every accent that has a form).
@@ -100,6 +102,10 @@ class Taint:
             untrusted=tuple((kind, key) for kind, text in untrusted if (key := _padded(text))),
             trusted=tuple(key for text in trusted if (key := _padded(text))),
         )
+
+    def read(self, source: Source) -> bool:
+        """Whether the turn read any text of `source`."""
+        return any(kind == source for kind, _key in self.untrusted)
 
     def adding(self, source: Source, texts: Iterable[str]) -> Taint:
         """This taint, plus more untrusted text: the last round's tool results."""

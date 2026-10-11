@@ -20,6 +20,9 @@ export interface Confirmation {
   /** She asks because something she read suggested it, not you: an action that would
    *  otherwise have run without asking. */
   fromReading: boolean
+  /** She asks because she read the web this turn: an action that would otherwise have
+   *  run without asking. */
+  afterWeb: boolean
 }
 
 // The server's expiry event normally clears the card; this grace period keeps the
@@ -46,6 +49,7 @@ function toConfirmation(raw: WireConfirm): Confirmation | null {
     expiresInMs,
     expiresAt: Date.now() + expiresInMs,
     fromReading: raw.why === 'from_reading',
+    afterWeb: raw.why === 'after_web',
   }
 }
 
