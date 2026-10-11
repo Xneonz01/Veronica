@@ -499,7 +499,9 @@ budgets from the ledger of what each model costs. The steps are proposed in
 
 **3. Connected.** Web search, an MCP client for local tool servers, and computer use,
 all behind the capability kernel, with an allow-list for outbound network access and
-the same treatment of fetched content as untrusted data.
+the same treatment of fetched content as untrusted data. Accepted in
+[ADR 0003](docs/adr/0003-connected.md): web search first, then the MCP client; computer
+use waits for Sight.
 
 **4. Sight.** A vision-language model managed by the GPU manager, so attached images and
 the screen can be understood. Needs work on sharing VRAM with the speech models.

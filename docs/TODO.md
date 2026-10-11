@@ -15,6 +15,8 @@ that finishes it, and update `ROADMAP.md` and `CHANGELOG.yaml` with it.
 - [ ] **Bug 43: a multilingual reranker** (a model download) for documents in other
   languages and rewordings with no word in common.
 - [ ] **Go-ahead for model choice** (ADR 0002, below).
+- [x] **Accept ADR 0003 (Connected)** (2026-10-11), and with it the rule that a turn which read web or
+  MCP content makes every action that isn't safe ask first.
 - [ ] **The answer-accuracy evaluation asks with a prompt chat never sends**
   (`tools_enabled=False` in `eval/accuracy/answers.py`): make it ask as a chat turn
   does, with the chat's tools, and decide how a round that calls a tool is scored.
@@ -58,14 +60,14 @@ Other:
 - [ ] Re-run the evaluations per model (`python -m scripts.model_eval`).
 - [ ] Take memory budgets from the GPU ledger of what each model costs.
 
-## 3. Connected
+## 3. Connected ([ADR 0003](adr/0003-connected.md), accepted)
 
 All behind the capability kernel (policy, confirmation, audit), with an allow-list for
 outbound network access and fetched content treated as untrusted data.
 
 - [ ] Web search.
 - [ ] An MCP client for local tool servers.
-- [ ] Computer use.
+- [ ] Computer use (waits for Sight, per ADR 0003).
 
 ## 4. Sight
 
