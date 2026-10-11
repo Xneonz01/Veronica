@@ -43,6 +43,8 @@ _WIRE: dict[str, str] = {
     "problems.changed": "problems_changed",
     # A recovery key was made or used: Settings reads its state again.
     "recovery.updated": "recovery_updated",
+    # The web's settings changed (ADR 0003): every Settings screen follows.
+    "connected.changed": "connected_changed",
 }
 
 

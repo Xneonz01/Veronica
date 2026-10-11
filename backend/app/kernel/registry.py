@@ -59,6 +59,10 @@ class Capability:
     # (`capabilities/memory_args.py`), so a yes changes exactly that rather than what a
     # second look finds later; the handler still checks that it is there.
     preflight: Preflight | None = None
+    # Whether it is offered to the model right now, read every turn: a capability the
+    # user switches on and off in Settings (the web) is registered once and offered
+    # only while on. None: always.
+    available: Callable[[], bool] | None = None
 
     @property
     def tool_name(self) -> str:
@@ -131,6 +135,11 @@ class CapabilityRegistry:
         return [to_tool_schema(cap) for cap in (capabilities if capabilities is not None else self)]
 
     def offered(self, *, call: bool) -> list[Capability]:
-        """What a turn offers the model: every capability, or on a call only those marked
-        `voice_exposed`. One rule for the product and the evaluations that measure it."""
-        return [cap for cap in self if cap.voice_exposed or not call]
+        """What a turn offers the model: every capability that is available, or on a
+        call only those marked `voice_exposed`. One rule for the product and the
+        evaluations that measure it."""
+        return [
+            cap
+            for cap in self
+            if (cap.voice_exposed or not call) and (cap.available is None or cap.available())
+        ]

@@ -55,10 +55,17 @@ class PersonaService:
         # once chat's tools are known (`startup.hold_persona_to_window`); until then,
         # and without memory, which chat needs, only the length is checked.
         self._fits_window: Callable[[str], bool] | None = None
+        # Off until the web's settings are open (`web_with`).
+        self._web_on: Callable[[], bool] = lambda: False
 
     @property
     def personality(self) -> str:
         return self._personality
+
+    def web_with(self, web_on: Callable[[], bool]) -> None:
+        """From now on, read whether web search is on per prompt (ADR 0003): her line
+        about what stays on this computer follows the switch."""
+        self._web_on = web_on
 
     def check_window_with(self, fits: Callable[[str], bool]) -> None:
         """From now on, refuse a personality whose chat prompt `fits` turns down."""
@@ -76,7 +83,10 @@ class PersonaService:
 
     def system_prompt(self, surface: Surface, *, tools_enabled: bool = False) -> str:
         return build_prompt(
-            self._personality, spoken=surface is Surface.voice, tools_enabled=tools_enabled
+            self._personality,
+            spoken=surface is Surface.voice,
+            tools_enabled=tools_enabled,
+            web=self._web_on(),
         )
 
     def provider(self, surface: Surface, *, tools_enabled: bool = False) -> Callable[[], str]:
@@ -102,7 +112,7 @@ class PersonaService:
             )
         # Within the length, a text of emoji or of a rare script can still fill the
         # window: saved, it would send every chat message back.
-        chat_prompt = build_prompt(cleaned, spoken=False, tools_enabled=True)
+        chat_prompt = build_prompt(cleaned, spoken=False, tools_enabled=True, web=self._web_on())
         if self._fits_window is not None and not self._fits_window(chat_prompt):
             raise PersonaRejected(
                 Code.persona_fills_window,

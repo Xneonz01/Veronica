@@ -13,16 +13,20 @@ import secrets
 from pathlib import Path
 from typing import Any, Literal, get_origin
 
+import httpx
 import pytest
 
+from app.adapters.web.fetch import PageFetcher
 from app.capabilities import register_capabilities
 from app.core.config import Settings
 from app.core.config_capabilities import CapabilitySettings
 from app.core.event_bus import InProcessEventBus
-from app.core.logging import QUIET_AT_DEBUG
+from app.core.logging import QUIET_AT_DEBUG, QUIET_URLS, quiet_libraries
 from app.kernel.capability import CapabilityRequest
 from app.kernel.registry import Capability
 from app.kernel.runtime import build_kernel_runtime
+from app.services.connected.runtime import ConnectedRuntime
+from app.services.connected.store import ConnectedSettings, ConnectedStore
 from app.telemetry import install, uninstall
 from app.telemetry.blackbox import BlackBox
 from app.telemetry.hooks import CrashHooks
@@ -53,6 +57,23 @@ def _poisoned(capability: Capability, workdir: Path) -> dict[str, Any]:
     return args
 
 
+async def _web(bus: InProcessEventBus, root: Path) -> ConnectedRuntime:
+    """Web search switched on, against a search engine that answers with the query: the
+    canary comes back in the result as well as going out."""
+
+    def echo(request: httpx.Request) -> httpx.Response:
+        query = request.url.params.get("q", "")
+        hit = {"title": query, "url": "https://example.org/", "content": query}
+        return httpx.Response(200, json={"results": [hit]})
+
+    store = ConnectedStore(bus, root / "connected.json", None)
+    await store.update(ConnectedSettings(web_search=True))
+    client = httpx.AsyncClient(transport=httpx.MockTransport(echo))
+    return ConnectedRuntime(
+        store, client, PageFetcher(client, max_bytes=10_000, blocked=store.blocked)
+    )
+
+
 def _sweep(root: Path) -> str:
     return "".join(
         path.read_bytes().decode("utf-8", errors="ignore")
@@ -65,10 +86,10 @@ async def test_a_secret_in_every_argument_reaches_no_telemetry_audit_or_log(
     tmp_path: Path, caplog: pytest.LogCaptureFixture
 ) -> None:
     caplog.set_level(logging.DEBUG)
-    # As `setup_logging` does: payload-logging libraries stay at INFO even at DEBUG.
-    quiet = {name: logging.getLogger(name).level for name in QUIET_AT_DEBUG}
-    for name in quiet:
-        logging.getLogger(name).setLevel(logging.INFO)
+    # As `setup_logging` does: libraries that log payloads or addresses are held above
+    # the app's level, even at DEBUG.
+    quiet = {name: logging.getLogger(name).level for name in (*QUIET_AT_DEBUG, *QUIET_URLS)}
+    quiet_libraries(logging.DEBUG)
     telemetry = tmp_path / "telemetry"
     workdir = tmp_path / "files"
     workdir.mkdir()
@@ -96,7 +117,9 @@ async def test_a_secret_in_every_argument_reaches_no_telemetry_audit_or_log(
             )
         )
         runtime = build_kernel_runtime(settings, bus, store)
-        register_capabilities(runtime.registry, settings, memory=memory)
+        register_capabilities(
+            runtime.registry, settings, memory=memory, web=await _web(bus, tmp_path)
+        )
         await runtime.init()
         for capability in runtime.registry:
             covered.append(capability.name)
@@ -127,6 +150,8 @@ async def test_a_secret_in_every_argument_reaches_no_telemetry_audit_or_log(
         "files.search",
         "files.write",
         "apps.open",
+        "web.search",
+        "web.read",
     ]
     audit = json.dumps(rows, default=str)
     assert len(rows) == len(covered) + 1

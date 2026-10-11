@@ -98,6 +98,7 @@ def serve(
     app.state.chat_store = stores.chat
     app.state.attachment_store = stores.attachments
     app.state.project_store = stores.projects
+    app.state.connected = stores.web
     # Walked in the background: a long log takes a moment, and a start must not wait on
     # it. After the upgrade, which may give an older chain its head first.
     track(background, check_audit(app, stores.kernel.integrity))

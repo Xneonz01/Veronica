@@ -32,6 +32,7 @@ from app.paths import anchored
 from app.services.chat.attachments import AttachmentStore
 from app.services.chat.projects import ProjectStore
 from app.services.chat.store import ChatStore
+from app.services.connected.runtime import ConnectedRuntime, build_connected
 from app.services.memory import at_rest, cipher, migrations, upgrade_copy
 from app.services.memory.migrations import DatabaseTooNewError
 from app.services.memory.runtime import MemoryRuntime, build_memory_runtime
@@ -50,6 +51,7 @@ class Stores:
     chat: ChatStore
     attachments: AttachmentStore
     projects: ProjectStore
+    web: ConnectedRuntime
     problems: list[Problem] = field(default_factory=list)
 
 
@@ -93,7 +95,9 @@ async def open_stores(
     memory = build_memory_runtime(settings, bus, manager, opened_with)
     # The kernel's audit store borrows the memory store's connection.
     kernel = build_kernel_runtime(settings, bus, memory.store, policy_path=data_dir / "policy.json")
-    register_capabilities(kernel.registry, settings, memory=memory)
+    # The web's settings and its one client; its key sealed with the data key.
+    web = build_connected(settings.capabilities, bus, data_dir, key)
+    register_capabilities(kernel.registry, settings, memory=memory, web=web)
     try:
         await memory.init()
         await kernel.init()
@@ -112,13 +116,15 @@ async def open_stores(
         with suppress(Exception):
             await kernel.aclose()
         with suppress(Exception):
+            await web.aclose()
+        with suppress(Exception):
             await memory.store.close()
         raise
     # Only now, the file open and whole: a start that finds it damaged or too new keeps
     # every copy, since one of them is the way back. What can't go now goes next time.
     with suppress(OSError):
         upgrade_copy.remove_old(anchored(settings.memory.db_path))
-    return Stores(memory, kernel, chat, attachments, projects, problems)
+    return Stores(memory, kernel, chat, attachments, projects, web, problems)
 
 
 def memory_problem(error: Exception) -> Problem | None:

@@ -35,3 +35,8 @@ class CapabilitySettings(BaseModel):
     # once it is this many words: one word is too short to be anyone's sentence, and
     # "No allergies." is enough to change a memory that matters.
     taint_min_words: int = Field(default=2, ge=1)
+    # The web (ADR 0003): whether it is used, and through which provider, is set live in
+    # Settings (`services/connected/`); these bound what one request may cost.
+    web_results: int = Field(default=5, ge=1, le=20)
+    web_max_page_bytes: int = Field(default=2_000_000, ge=10_000)
+    web_timeout_s: float = Field(default=10.0, gt=0)

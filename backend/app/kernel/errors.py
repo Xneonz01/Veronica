@@ -41,6 +41,13 @@ class Code(StrEnum):
     memory_unavailable = "memory_unavailable"
     sensitive_content = "sensitive_content"
     too_many_matches = "too_many_matches"
+    # The web (ADR 0003)
+    network_disabled = "network_disabled"  # web search is off in Settings
+    host_not_allowed = "host_not_allowed"  # a private address, or a host the user blocked
+    fetch_failed = "fetch_failed"
+    fetch_too_large = "fetch_too_large"
+    not_a_page = "not_a_page"
+    search_unavailable = "search_unavailable"
     # Persona
     persona_too_long = "persona_too_long"
     persona_fills_window = "persona_fills_window"

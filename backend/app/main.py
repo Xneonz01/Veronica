@@ -20,6 +20,7 @@ from app.api.host_guard import HostGuard
 from app.api.routes_audit import router as audit_router
 from app.api.routes_capabilities import router as capabilities_router
 from app.api.routes_chat import router as chat_router
+from app.api.routes_connected import router as connected_router
 from app.api.routes_events import router as events_router
 from app.api.routes_health import router as health_router
 from app.api.routes_memory import router as memory_router
@@ -141,6 +142,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         else:
             learning_task = startup.serve(app, stores, voice_runtime, settings, background)
             startup.hold_persona_to_window(persona, stores.kernel, settings.llm)
+            persona.web_with(stores.web.store.web_on)
         absent = await startup.check_models(app, settings)
         # Not for a memory she started without, or a model that isn't there to load.
         if stores is not None and settings.memory.warm_on_start and MEMORY_MODEL not in absent:
@@ -172,6 +174,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         if stores is not None:
             with suppress(Exception):
                 await stores.kernel.aclose()
+            with suppress(Exception):
+                await stores.web.aclose()
         if voice_runtime is not None:
             voice_runtime.calls.close()  # no release of the speech models mid-shutdown
             with suppress(Exception):
@@ -229,6 +233,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(memory_router)
     app.include_router(rag_router)
     app.include_router(capabilities_router)
+    app.include_router(connected_router)
     app.include_router(audit_router)
     app.include_router(recovery_router)
     app.include_router(persona_router)
