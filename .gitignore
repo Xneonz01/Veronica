@@ -58,6 +58,13 @@ CLAUDE.md
 scratchpad/
 VERONICA_MASTER_PLAN.md
 AUDIT_2026-07-28.md
+AGENTS.md
+
+# Developer docs, kept off the public repo
+ENGINEERING_STANDARDS.md
+DESIGN.md
+ROADMAP.md
+docs/TODO.md
 
 # Sync / FUSE artifacts
 .fuse_hidden*

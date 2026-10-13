@@ -25,8 +25,8 @@ What exists today, read from the code on 2026-10-11:
   uvicorn uses under `--reload` (bug 14).
 - Untrusted text is fenced and labelled (`services/tools/render.py`), and an action whose
   argument was copied from it asks first (`kernel/taint.py`). The copy check reads words,
-  not meaning: a planted instruction reworded by the model gets past it (the open
-  decision in `docs/TODO.md`; `r07` in the injection evaluation ran unasked in 3 of 9
+  not meaning: a planted instruction reworded by the model gets past it (still an open
+  decision; `r07` in the injection evaluation ran unasked in 3 of 9
   chat runs since 0.30.0).
 - Tool schemas cost prompt tokens on every turn; `tests/test_llm.py` holds them inside a
   floor, and a call offers every tool marked `voice_exposed` (all nine today).

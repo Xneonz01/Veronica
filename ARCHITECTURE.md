@@ -13,11 +13,8 @@ Related documents:
 | File | What it covers |
 |---|---|
 | `README.md` | What Veronica is, how to run it |
-| `ROADMAP.md` | Feature status and what comes next |
 | `CHANGELOG.yaml` | Release history (patch notes), newest first |
 | `SECURITY.md` | Threat model and how to report a problem |
-| `DESIGN.md` | The UI design tokens |
-| `ENGINEERING_STANDARDS.md` | Coding rules for contributors |
 
 ---
 
@@ -4235,7 +4232,7 @@ changing it:
 
 - The front end is React 19 + TypeScript + Vite. It reaches the backend at a fixed
   `http://localhost:8000` and `ws://localhost:8000`.
-- The interface follows `DESIGN.md`. The tokens live in `frontend/src/styles/` (five
+- The interface is built from design tokens. They live in `frontend/src/styles/` (five
   layers plus a base) and every component is a CSS module that reads them. Tailwind 4 is
   still imported, under the modules, but no screen uses a utility class. In development
   builds `#/design` renders every token, material, control and conversation state, and

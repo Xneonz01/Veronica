@@ -79,17 +79,13 @@ cd frontend
 npm run lint && npx tsc -b --noEmit && npm test && npm run build
 ```
 
-The backend tests run on fakes, so they need neither a GPU nor Ollama. Coding agents
-should read [AGENTS.md](AGENTS.md) first.
+The backend tests run on fakes, so they need neither a GPU nor Ollama.
 
 ## Docs
 
 - [ARCHITECTURE.md](ARCHITECTURE.md): how it works
-- [ROADMAP.md](ROADMAP.md): status, known bugs, what's next
-- [docs/TODO.md](docs/TODO.md): open work
 - [CHANGELOG.yaml](CHANGELOG.yaml): release notes
 - [SECURITY.md](SECURITY.md): threat model
-- [DESIGN.md](DESIGN.md) and [ENGINEERING_STANDARDS.md](ENGINEERING_STANDARDS.md)
 
 ## Limitations
 

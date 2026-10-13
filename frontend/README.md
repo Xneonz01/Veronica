@@ -29,7 +29,7 @@ public/audio/   the AudioWorklet that captures the microphone at 16 kHz
 src-tauri/      Rust shell: tray, global hotkeys, companion window, start at login
 ```
 
-Styling uses the tokens in [DESIGN.md](../DESIGN.md), wired into Tailwind in
+Styling uses the design tokens in `src/styles/`, wired into Tailwind in
 `src/index.css`. Error text shown to the user comes from `src/lib/api.ts`, never straight
 from the server.
 
