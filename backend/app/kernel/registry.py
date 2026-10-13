@@ -9,13 +9,24 @@ is given the underscored form (`files_read`) because it calls those more reliabl
 
 from __future__ import annotations
 
+import re
 from collections.abc import Awaitable, Callable, Iterable, Iterator
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel
 
 from app.kernel.capability import CapabilityResult, RiskTier
+
+# Where a capability's effect lands. `local`: this computer. `network`: a request to a
+# host on the internet, which carries its arguments out with it, so the egress gate
+# reads them (`kernel/egress.py`) whatever its risk tier says about local harm.
+Reach = Literal["local", "network"]
+# A dotted id: a lowercase family, then one to three parts that may keep a tool's own
+# case (`mcp.notes.getUser`). Anything else is refused at registration, before a bad
+# name can reach a policy file, an audit row or a prompt.
+_NAME = re.compile(r"[a-z][a-z0-9_]*(\.[A-Za-z0-9_-]+){1,3}")
+_MAX_NAME = 200
 
 # The argument is an instance of the capability's own `args_model`: the kernel validates
 # with that model before calling. Typing the pairing would need a generic Capability,
@@ -61,8 +72,13 @@ class Capability:
     preflight: Preflight | None = None
     # Whether it is offered to the model right now, read every turn: a capability the
     # user switches on and off in Settings (the web) is registered once and offered
-    # only while on. None: always.
+    # only while on. None: always. The kernel refuses a call made while it is false,
+    # so a tool list built before the switch can't reach it.
     available: Callable[[], bool] | None = None
+    reach: Reach = "local"
+    # Arguments that are addresses: one the user didn't write and no search returned
+    # asks before it is requested (`kernel/egress.py`).
+    url_fields: frozenset[str] = frozenset()
 
     @property
     def tool_name(self) -> str:
@@ -103,6 +119,12 @@ class CapabilityRegistry:
         self._by_tool_name: dict[str, Capability] = {}
 
     def register(self, capability: Capability) -> None:
+        # Whole: `$` lets a final line break through, into a tool name the model reads.
+        if len(capability.name) > _MAX_NAME or not _NAME.fullmatch(capability.name):
+            raise ValueError(f"not a capability name: {capability.name[:_MAX_NAME]!r}")
+        missing = capability.url_fields - set(capability.args_model.model_fields)
+        if missing:
+            raise ValueError(f"{capability.name}: no such argument for url_fields: {missing}")
         if capability.name in self._by_name:
             raise ValueError(f"capability already registered: {capability.name}")
         if capability.tool_name in self._by_tool_name:

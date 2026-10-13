@@ -292,13 +292,14 @@ async def test_a_model_it_never_used_is_left_alone() -> None:
 #: (chat 5,059 tokens, call 3,011), qwen3:8b 4.11 and 4.29; again on 2026-09-25,
 #: qwen3.5:9b 3.92 in chat, 3.95 on a call and 4.19 for learning; and on 2026-09-27,
 #: with learning's largest prompt a later part's (the turns before it framed), 3.94,
-#: 3.95 and 4.20; the call's at 0.34.13, its style naming the actions (bug 50), 3.96.
+#: 3.95 and 4.20; the call's at 0.34.13, its style naming the actions (bug 50), 3.96;
+#: and on 2026-10-13 with web search on, its rules and tools (0.35.0), 3.96, 3.98, 4.20.
 #: Set just under the lowest reading, so the estimate never comes out below the
 #: server's own count.
 CHARS_PER_TOKEN = 3.85
 
 #: What each lane's largest prompt measured on the server, for the tripwire below.
-MEASURED_TOKENS = {"chat": 5467, "call": 3380, "learning": 5272}
+MEASURED_TOKENS = {"chat": 5691, "call": 3524, "learning": 5272}
 
 
 def test_the_largest_prompt_fits_the_window_with_the_longest_reply_to_spare() -> None:
@@ -314,6 +315,20 @@ def test_the_largest_prompt_fits_the_window_with_the_longest_reply_to_spare() ->
             "re-size LlmSettings.num_ctx"
         )
         assert tokens + LlmSettings().reply_tokens <= LlmSettings().num_ctx, (lane, tokens)
+
+
+def test_the_largest_prompt_is_the_one_with_web_search_on() -> None:
+    """Its rules and its tools make each lane's prompt its largest: measured without
+    them, the window's floor left no room for a message once it was on (mutations: drop
+    the web's tools; drop its rules)."""
+    prompts = window.largest(get_settings())
+    offered = {
+        lane: {tool["function"]["name"] for tool in prompts[lane][1]} for lane in ("chat", "call")
+    }
+
+    assert {"web_search", "web_read"} <= offered["chat"] and "web_search" in offered["call"]
+    for lane in ("chat", "call"):
+        assert "You can search the web" in prompts[lane][0][0]["content"]
 
 
 def test_the_smallest_window_allowed_holds_her_longest_persona_and_a_message() -> None:

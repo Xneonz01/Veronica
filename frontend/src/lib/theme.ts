@@ -3,8 +3,8 @@
 // the tokens' light-dark() values read it. Every open window follows a change at
 // once: the companion hears it through the storage event.
 //
-// index.html applies the stored choice before the first paint with a copy of
-// `applyTheme`; the key and the attribute here must stay in step with it.
+// public/theme-init.js applies the stored choice before the first paint with a copy
+// of `applyTheme`; the key and the attribute here must stay in step with it.
 
 import { useSyncExternalStore } from 'react'
 import { readPreference, writePreference } from './preference'
@@ -24,16 +24,18 @@ export function applyTheme(theme: Theme, root: HTMLElement = document.documentEl
 }
 
 // Without this, every surface with a colour transition would fade to the new
-// theme at its own speed, and the page would ripple instead of switching.
+// theme at its own speed, and the page would ripple instead of switching. A class
+// whose rule is in base.css, not a <style> made here: the page's policy refuses those.
+export const SWITCHING = 'theme-switching'
+
 function withoutTransitions(change: () => void): void {
-  const pause = document.createElement('style')
-  pause.textContent = '*,*::before,*::after{transition:none!important}'
-  document.head.appendChild(pause)
+  const root = document.documentElement
+  root.classList.add(SWITCHING)
   change()
   // Reading a computed style makes the browser apply the change while the pause
   // is still in place.
   void getComputedStyle(document.body).color
-  window.setTimeout(() => pause.remove(), 0)
+  window.setTimeout(() => root.classList.remove(SWITCHING), 0)
 }
 
 function adopt(theme: Theme): void {

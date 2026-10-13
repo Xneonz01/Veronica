@@ -28,6 +28,7 @@ from typing import Any
 
 import aiosqlite
 
+from app.core.logging import log_failure
 from app.kernel.audit_chain import GENESIS, HASHED_COLUMNS, TEXT_COLUMNS, chain_hash
 from app.kernel.capability import CapabilityResult, Decision
 from app.kernel.redaction import redact_args, redact_detail
@@ -131,10 +132,11 @@ class AuditStore:
                         "confirm_via": confirm_via,
                     },
                 )
-        except Exception:
+        except Exception as exc:
             # The side effect may already have happened; misreporting it as a failure
-            # would be worse than an unrecorded row. Log loudly and carry on.
-            logger.exception("AUDIT WRITE FAILED for %s (%s)", capability, decision.value)
+            # would be worse than an unrecorded row. Log loudly and carry on, by its type
+            # and place: its message can quote the arguments the row was keeping.
+            log_failure(logger, f"AUDIT WRITE FAILED for {capability} ({decision.value})", exc)
 
     def record_detached(
         self,

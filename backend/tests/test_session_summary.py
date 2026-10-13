@@ -29,7 +29,7 @@ async def test_a_model_away_or_not_installed_is_one_line_not_a_traceback(
     (mutation: let the catch-all take it)."""
     memory = await build_fake_memory_runtime(tmp_path, InProcessEventBus())
     session = SimpleNamespace(
-        memory=memory, runtime=SimpleNamespace(llm=llm), settings=get_settings()
+        memory=memory, runtime=SimpleNamespace(llm=llm), settings=get_settings(), carried=[]
     )
 
     with caplog.at_level(logging.WARNING):
@@ -44,7 +44,7 @@ async def test_a_recap_is_kept_as_a_summary(tmp_path: Path) -> None:
     memory = await build_fake_memory_runtime(tmp_path, InProcessEventBus())
     llm = FakeLLM(["You asked to be reminded about the ferns."])
     session = SimpleNamespace(
-        memory=memory, runtime=SimpleNamespace(llm=llm), settings=get_settings()
+        memory=memory, runtime=SimpleNamespace(llm=llm), settings=get_settings(), carried=[]
     )
 
     await summarize_session(session, HISTORY)  # type: ignore[arg-type]
@@ -77,7 +77,10 @@ async def test_the_instructions_example_is_never_the_recap(
     example for a call that never touched it (mutation: store any summary)."""
     memory = await build_fake_memory_runtime(tmp_path, InProcessEventBus())
     session = SimpleNamespace(
-        memory=memory, runtime=SimpleNamespace(llm=FakeLLM([summary])), settings=get_settings()
+        memory=memory,
+        runtime=SimpleNamespace(llm=FakeLLM([summary])),
+        settings=get_settings(),
+        carried=[],
     )
 
     await summarize_session(session, history)  # type: ignore[arg-type]

@@ -18,13 +18,12 @@ Windows), there is none: the clips stay plain and new ones are written plain.
 from __future__ import annotations
 
 import logging
-import os
 from pathlib import Path
 from typing import BinaryIO
 
 from app.core.data_key import Locked, open_key
 from app.core.file_lock import held, lock_path
-from app.core.sealed import MAGIC, is_sealed, seal, unseal
+from app.core.sealed import MAGIC, is_sealed, seal, seal_in_place, unseal
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +69,7 @@ class Clips:
             try:
                 clip.with_name(clip.name + _SEALING).unlink(missing_ok=True)
                 if not is_sealed(clip):
-                    _seal_in_place(clip, key)
+                    seal_in_place(clip, key, marker=_SEALING)
                     sealed += 1
             except OSError as error:  # left as it is, still opened; tried again next time
                 logger.warning("a voice clip stays plain for now (%s)", type(error).__name__)
@@ -106,22 +105,3 @@ def _sealed(clip: Path) -> bool:
         return False
     except OSError:
         return True
-
-
-def _seal_in_place(clip: Path, key: bytes) -> None:
-    plain = clip.read_bytes()
-    sealed = seal(plain, key, clip.name)
-    if unseal(sealed, key, clip.name) != plain:  # never: AES-GCM opens what it sealed
-        raise OSError("the sealed clip doesn't open back to the same bytes")
-    temp = clip.with_name(clip.name + _SEALING)
-    try:
-        with temp.open("xb") as handle:
-            handle.write(sealed)
-            handle.flush()
-            os.fsync(handle.fileno())
-        if clip.read_bytes() != plain:  # written to meanwhile: its newer bytes stay
-            raise OSError("the clip changed while it was sealed")
-        os.replace(temp, clip)
-    except OSError:
-        temp.unlink(missing_ok=True)
-        raise

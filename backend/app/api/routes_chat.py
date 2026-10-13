@@ -8,7 +8,6 @@ pull every message ever sent.
 from __future__ import annotations
 
 import logging
-import tempfile
 from contextlib import suppress
 from pathlib import Path
 from typing import Annotated, Any
@@ -18,7 +17,8 @@ from pydantic import BaseModel, Field
 
 from app.api.ids import RowId
 from app.api.refusals import Refusal
-from app.api.uploads import read_or_refuse
+from app.api.uploads import private_copy, read_or_refuse
+from app.core.logging import log_failure
 from app.services.chat.attachments import AttachmentStore, classify
 from app.services.chat.store import ChatStore
 from app.services.memory.rag import RagError, RagService
@@ -129,19 +129,14 @@ async def add_attachment(
         return {"attachment": attachment.model_dump(mode="json")}
 
     rag = _rag_service(request)
-    suffix = Path(name).suffix or ".txt"
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as handle:
-        handle.write(data)
-        tmp = Path(handle.name)
     try:
-        document = await rag.index_file(tmp, title=Path(name).stem)
+        with private_copy(request, data, name if Path(name).suffix else f"{name}.txt") as tmp:
+            document = await rag.index_file(tmp, title=Path(name).stem)
     except RagError as exc:
         raise Refusal(422, exc.code, str(exc)) from exc
     except Exception as exc:  # a corrupt file must not surface as a parser trace
-        logger.exception("attachment index failed")
+        log_failure(logger, "attachment index failed", exc)  # a message can quote the file
         raise Refusal(422, "unreadable_file", "That file could not be read.") from exc
-    finally:
-        tmp.unlink(missing_ok=True)
 
     try:
         attachment = await store.add(

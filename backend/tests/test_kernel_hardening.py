@@ -75,15 +75,41 @@ def test_each_render_uses_a_fresh_tag() -> None:
 
 
 def test_two_capabilities_cannot_collapse_to_one_tool_name() -> None:
-    """`files.read` and `files_read` are distinct ids with the same wire name.
+    """`files.read_x` and `files_read.x` are distinct ids with the same wire name.
 
     Overwriting silently would route the model's call to one handler while policy
-    and the audit log named the other.
+    and the audit log named the other. (Undotted ids such as `files_read` are refused
+    by the name rule before this check is reached.)
     """
     registry = CapabilityRegistry()
-    registry.register(_cap("files.read"))
+    registry.register(_cap("files.read_x"))
     with pytest.raises(ValueError, match="already taken"):
-        registry.register(_cap("files_read"))
+        registry.register(_cap("files_read.x"))
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "files_read",
+        "Files.read",
+        "files.",
+        ".read",
+        "a.b.c.d.e",
+        "files.re ad",
+        "x" * 201,
+        "mcp.notes.get" + chr(10),  # a line break after it (mutation: `match` with `$`)
+    ],
+)
+def test_a_name_outside_the_rule_is_refused_before_it_reaches_policy(name: str) -> None:
+    """A dotted, lowercase family and one to three parts, or nothing is registered: a
+    name is written into policy files, audit rows and prompts (mutation: drop the check)."""
+    with pytest.raises(ValueError, match="not a capability name"):
+        CapabilityRegistry().register(_cap(name))
+
+
+def test_a_tool_may_keep_its_own_case_after_the_family() -> None:
+    """MCP tool names are case-sensitive (`getUser`); the rule lets them through."""
+    CapabilityRegistry().register(_cap("mcp.notes.getUser"))
 
 
 # -- policy durability ---------------------------------------------------------

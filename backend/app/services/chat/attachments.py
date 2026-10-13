@@ -9,11 +9,16 @@ Two kinds, handled differently:
   than implying it was.
 
 Files live under `attachments/` in her data folder (`data_dir`), named by id, so a
-user-supplied filename never becomes part of a path.
+user-supplied filename never becomes part of a path. They are sealed with her data key
+(`core/sealed.py`, AES-256-GCM bound to the file's own name) where there is one, as her
+voice clips are, and a plain one from before is sealed in place at start-up: a photo of
+a document is as private as the document. Without a data key (not Windows) they stay
+plain, and nothing reads them back that would need the key.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import mimetypes
 from datetime import datetime
@@ -22,11 +27,13 @@ from pathlib import Path
 import aiosqlite
 from pydantic import BaseModel
 
+from app.core.sealed import is_sealed, seal, seal_in_place
 from app.services.memory.models import _now
 from app.services.memory.rag import CODE_SUFFIXES
 from app.services.memory.store import MemoryStore
 
 logger = logging.getLogger(__name__)
+_SEALING = ".sealing"  # a sealed copy being written beside its plain file
 
 _ATTACHMENT_SCHEMA = """
 CREATE TABLE IF NOT EXISTS chat_attachments (
@@ -94,9 +101,10 @@ def _to_attachment(row: aiosqlite.Row) -> Attachment:
 class AttachmentStore:
     """Attachment records on the shared memory connection; bytes on disk."""
 
-    def __init__(self, memory: MemoryStore, root: Path) -> None:
+    def __init__(self, memory: MemoryStore, root: Path, key: bytes | None = None) -> None:
         self._memory = memory
         self._root = root
+        self._key = key
 
     @property
     def _db(self) -> aiosqlite.Connection:
@@ -105,6 +113,21 @@ class AttachmentStore:
     async def init_schema(self) -> None:
         async with self._memory.transaction() as db:
             await db.executescript(_ATTACHMENT_SCHEMA)
+        if self._key is not None:
+            await asyncio.to_thread(self._seal_existing, self._key)
+
+    def _seal_existing(self, key: bytes) -> None:
+        """Seal what an earlier version left plain; what can't be now is tried next start."""
+        if not self._root.is_dir():
+            return
+        for file in self._root.iterdir():
+            if not file.is_file() or file.name.endswith(_SEALING):
+                continue
+            try:
+                if not is_sealed(file):
+                    seal_in_place(file, key, marker=_SEALING)
+            except OSError as error:
+                logger.warning("an attachment stays plain for now (%s)", type(error).__name__)
 
     def path_for(self, attachment_id: int, name: str) -> Path:
         """`<id><suffix>` — the user's filename never becomes part of the path."""
@@ -154,7 +177,8 @@ class AttachmentStore:
             if data is not None:
                 self._root.mkdir(parents=True, exist_ok=True)
                 stored = self.path_for(attachment_id, name)
-                stored.write_bytes(data)
+                kept = data if self._key is None else seal(data, self._key, stored.name)
+                stored.write_bytes(kept)
                 await db.execute(
                     "UPDATE chat_attachments SET stored_path = ? WHERE id = ?",
                     (str(stored), attachment_id),

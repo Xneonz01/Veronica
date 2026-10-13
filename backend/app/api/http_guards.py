@@ -12,6 +12,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.api.refusals import Refusal
+from app.core.logging import log_failure
 from app.core.origins import is_trusted_origin
 
 logger = logging.getLogger(__name__)
@@ -77,12 +78,13 @@ def install(app: FastAPI) -> None:
 
     @app.exception_handler(Exception)
     async def on_unexpected(_request: Request, exc: Exception) -> JSONResponse:
-        """Last resort: log the traceback, hand the client a code it can map.
+        """Last resort: log where it failed, hand the client a code it can map.
 
         Without this the client gets a `text/plain` "Internal Server Error" body with
-        no code, which the frontend cannot map to copy.
+        no code, which the frontend cannot map to copy. Never the exception's message:
+        an encoding error quotes the string it failed on, a search key among them.
         """
-        logger.exception("unhandled error: %r", exc)
+        log_failure(logger, "unhandled error", exc)
         return JSONResponse(
             status_code=500,
             content={

@@ -103,7 +103,7 @@ async def open_stores(
         await kernel.init()
         chat = ChatStore(memory.store)
         await chat.init_schema()
-        attachments = AttachmentStore(memory.store, data_dir / "attachments")
+        attachments = AttachmentStore(memory.store, data_dir / "attachments", key)
         await attachments.init_schema()
         # After ChatStore: ProjectStore adds a column to chat_conversations.
         projects = ProjectStore(memory.store)

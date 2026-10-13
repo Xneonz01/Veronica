@@ -17,6 +17,8 @@ from httpx import ASGITransport, AsyncClient
 
 from app.api.routes_memory import router as memory_router
 from app.api.routes_rag import router as rag_router
+from app.api.uploads import UPLOADS_DIR
+from app.core.config import get_settings
 from app.core.event_bus import InProcessEventBus
 from app.schemas.events import Event
 from app.services.memory.models import MemoryCreate, MemoryKind
@@ -27,6 +29,8 @@ from tests.fakes import build_fake_memory_runtime
 def _app(runtime: MemoryRuntime) -> FastAPI:
     app = FastAPI()
     app.state.memory_runtime = runtime
+    # An upload's copy for its parser goes in her data folder (`api/uploads.py`).
+    app.state.settings = get_settings()
     app.include_router(memory_router)
     app.include_router(rag_router)
     return app
@@ -213,6 +217,7 @@ async def test_an_uploaded_document_keeps_no_trace_of_its_temp_file(tmp_path: Pa
     for document in (added.json(), *listed):
         assert document["source_path"] is None
         assert not any(isinstance(v, str) and temp_dir in v.lower() for v in document.values())
+    assert not list((get_settings().data_path() / UPLOADS_DIR).iterdir())
 
 
 async def test_documents_add_text_list_delete(tmp_path: Path) -> None:

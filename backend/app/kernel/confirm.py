@@ -16,22 +16,25 @@ import asyncio
 import logging
 import secrets
 import time
-from collections.abc import Callable
 from dataclasses import dataclass
 from typing import Any
 
 from pydantic import BaseModel
 
 from app.core.event_bus import EventBus
+from app.kernel.display import prompt
+from app.kernel.errors import Code
 from app.kernel.registry import Capability
 from app.schemas.events import Event
 
 logger = logging.getLogger(__name__)
 
 _DEFAULT_TIMEOUT_S = 45.0
-
-# Redacts an args dict before it is shown in a prompt (the audit store supplies it).
-RedactFn = Callable[[dict[str, Any]], dict[str, Any]]
+# Arguments longer than this are shown off the event loop: the line and the card scan
+# a file body or a query whole for secrets and reveal it. On this machine, 256 KB took
+# 240 ms for the card and 440 ms with the line built from it too; 4 KB took 4 ms. A
+# call would stutter through it.
+_DESCRIBE_INLINE = 4096
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,6 +44,18 @@ class ConfirmOutcome:
     via: str | None = None
     # The prompt couldn't be published: nobody was asked, so nobody said no either.
     unasked: bool = False
+
+    def refusal(self) -> tuple[Code, str]:
+        """The code and the words for an answer that wasn't a yes. A prompt that couldn't
+        be published was said as "You declined that", though nobody was asked."""
+        if self.unasked:
+            return Code.confirm_unavailable, "I couldn't ask you about that, so I didn't do it."
+        if self.timed_out:
+            return (
+                Code.confirm_timeout,
+                "That timed out waiting for your approval, so I didn't do it.",
+            )
+        return Code.confirm_denied, "You declined that, so I didn't do it."
 
 
 @dataclass(slots=True)
@@ -54,6 +69,9 @@ class _Pending:
     future: asyncio.Future[tuple[bool, str]]
     why: str | None = None
     request_id: str | None = None
+    # What the prompt shows, and every argument in full for whoever answers it (`display`).
+    display: dict[str, Any] | None = None
+    full: dict[str, str] | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -71,6 +89,8 @@ class PendingView:
     # The id its request carried (`CapabilityRequest.request_id`), for the surface
     # that asked to find its own prompt by.
     request_id: str | None = None
+    # Where it goes and its arguments, revealed and clipped (`kernel/display.py`).
+    display: dict[str, Any] | None = None
 
 
 class ConfirmationBroker:
@@ -81,11 +101,9 @@ class ConfirmationBroker:
         bus: EventBus,
         *,
         timeout_s: float = _DEFAULT_TIMEOUT_S,
-        redact: RedactFn | None = None,
     ) -> None:
         self._bus = bus
         self._timeout_s = timeout_s
-        self._redact = redact
         self._pending: dict[str, _Pending] = {}
         self._resolved_tasks: set[asyncio.Task[None]] = set()
 
@@ -105,23 +123,27 @@ class ConfirmationBroker:
         token = secrets.token_urlsafe(16)
         loop = asyncio.get_running_loop()
         future: asyncio.Future[tuple[bool, str]] = loop.create_future()
-        summary = summary or capability.summarize(args)
+        # The line too: a 256 KB query was summed up on the event loop (found in the
+        # review of 0.35.0).
+        if sum(len(str(value)) for value in args.model_dump().values()) > _DESCRIBE_INLINE:
+            line, display, full = await asyncio.to_thread(prompt, capability, args, summary)
+        else:
+            line, display, full = prompt(capability, args, summary)
         pending = _Pending(
             token=token,
             capability=capability.name,
-            summary=summary,
+            summary=line,
             risk=capability.risk.value,
             actor=actor,
             expires_at=time.monotonic() + self._timeout_s,
             future=future,
             why=why,
             request_id=request_id,
+            display=display,
+            full=full,
         )
         self._pending[token] = pending
 
-        preview = args.model_dump()
-        if self._redact is not None:
-            preview = self._redact(preview)
         # One `finally` covers everything after the insert. Publishing suspends while
         # subscribers run, so a cancellation can land there, and `except Exception`
         # won't catch it (CancelledError is a BaseException). A narrower scope would
@@ -135,12 +157,12 @@ class ConfirmationBroker:
                         payload={
                             "token": token,
                             "capability": capability.name,
-                            "summary": summary,
+                            "summary": line,
                             "risk": capability.risk.value,
                             "actor": actor,
-                            "args_preview": preview,
                             "expires_in_ms": int(self._timeout_s * 1000),
                             "why": why,
+                            "display": display,
                         },
                     )
                 )
@@ -200,9 +222,16 @@ class ConfirmationBroker:
                 expires_in_ms=max(0, int((item.expires_at - now) * 1000)),
                 why=item.why,
                 request_id=item.request_id,
+                display=item.display,
             )
             for item in self._pending.values()
         ]
+
+    def full(self, token: str) -> dict[str, str] | None:
+        """Every argument of a pending request in full (Show all): revealed, blanked only
+        in a field named for a secret. Fetched on request, never published with the event."""
+        pending = self._pending.get(token)
+        return pending.full if pending is not None else None
 
     async def aclose(self) -> None:
         """Shutdown denies everything outstanding rather than leaving it hanging."""

@@ -1,11 +1,11 @@
 {
   "name": "frontend",
   "private": true,
-  "version": "0.34.14",
+  "version": "0.35.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build && node scripts/check-animations.ts",
+    "build": "tsc -b && vite build && node scripts/check-animations.ts && node scripts/check-page.ts",
     "lint": "oxlint",
     "preview": "vite preview",
     "test": "vitest run",
@@ -17,7 +17,7 @@
     "lucide-react": "^1.48.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
-    "react-router-dom": "^7.18.0"
+    "react-router-dom": "^7.18.4"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.1",

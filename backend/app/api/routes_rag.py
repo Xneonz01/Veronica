@@ -8,7 +8,6 @@ live. Unsupported, empty or unreadable files return a typed 422, never a parser 
 from __future__ import annotations
 
 import logging
-import tempfile
 from pathlib import Path
 from typing import Annotated, Any
 
@@ -18,7 +17,8 @@ from pydantic import BaseModel, ValidationError
 
 from app.api.ids import RowId
 from app.api.refusals import Refusal
-from app.api.uploads import read_body_capped, read_or_refuse
+from app.api.uploads import private_copy, read_body_capped, read_or_refuse
+from app.core.logging import log_failure
 from app.services.memory.models import RagDocument
 from app.services.memory.rag import MAX_TEXT_BYTES, TEXT_TOO_LONG, RagError, RagService
 
@@ -55,20 +55,16 @@ async def list_documents(request: Request) -> dict[str, Any]:
 async def add_document(request: Request, file: Annotated[UploadFile, File()]) -> RagDocument:
     rag = _rag(request)
     data = await read_or_refuse(file)
-    suffix = Path(file.filename or "doc").suffix or ".txt"
+    name = file.filename or "doc"
     title = Path(file.filename or "Document").stem
-    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as handle:
-        handle.write(data)
-        tmp = Path(handle.name)
     try:
-        return await rag.index_file(tmp, title=title)
+        with private_copy(request, data, name if Path(name).suffix else f"{name}.txt") as tmp:
+            return await rag.index_file(tmp, title=title)
     except RagError as exc:
         raise Refusal(422, exc.code, str(exc)) from exc
     except Exception as exc:  # a corrupt file / parser failure -> safe message, not a trace
-        logger.exception("document index failed")
+        log_failure(logger, "document index failed", exc)  # a message can quote the file
         raise Refusal(422, "unreadable_file", "That file could not be read.") from exc
-    finally:
-        tmp.unlink(missing_ok=True)
 
 
 @router.post("/text")

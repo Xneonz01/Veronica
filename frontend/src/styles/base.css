@@ -198,6 +198,14 @@ svg {
   }
 }
 
+/* While the theme switches, every surface changes at once instead of each fading at
+   its own speed (lib/theme.ts). */
+.theme-switching *,
+.theme-switching *::before,
+.theme-switching *::after {
+  transition: none !important;
+}
+
 /* Reduced motion keeps every state change and drops the travel: transitions and
    entrances collapse to an instant, spinners and pulses stop. */
 @media (prefers-reduced-motion: reduce) {

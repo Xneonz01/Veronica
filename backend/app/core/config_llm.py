@@ -9,10 +9,11 @@ from pydantic import BaseModel, Field, model_validator
 #: What a reply is given of the window when `num_predict` sets no limit.
 UNLIMITED_REPLY_TOKENS = 2048
 #: The least the window must leave the prompt beside the reply: the longest persona,
-#: every tool, memory and documents at their budgets, and a message. The chat window
-#: estimates tokens from above (`adapters/llm/tokens.py`); `tests/test_llm.py` holds
-#: this to that estimate.
-MIN_PROMPT_TOKENS = 5632
+#: every tool, memory and documents at their budgets, and a message, with web search on
+#: (its rules and tools; 5,632 before 0.35.0, which held them without it). The chat
+#: window estimates tokens from above (`adapters/llm/tokens.py`); `tests/test_llm.py`
+#: holds this to that estimate.
+MIN_PROMPT_TOKENS = 5888
 
 
 class LlmSettings(BaseModel):
@@ -33,10 +34,11 @@ class LlmSettings(BaseModel):
     think: bool = False  # qwen3 reasons by default; off for low-latency voice
     keep_alive: str = "30m"  # pin the model in VRAM between turns
     # Sent, not left at Ollama's 4,096, which drops the front of a long prompt (the
-    # persona, the tool rules) without an error. The largest prompt, chat's, measures
-    # 5,306 tokens (`scripts/prompt_probe.py`); with the longest reply beside it 7,354,
-    # rounded up to 8,192. The cache is VRAM the speech models need. `tests/test_llm.py`
-    # fails if the prompt outgrows it. A larger model on a larger card can be given more.
+    # persona, the tool rules) without an error. The largest prompt, chat's with web
+    # search on, measures 5,691 tokens (`scripts/prompt_probe.py`, 0.35.0); with the
+    # longest reply beside it 7,739, inside 8,192. The cache is VRAM the speech models
+    # need. `tests/test_llm.py` fails if the prompt outgrows it. A larger model on a
+    # larger card can be given more.
     num_ctx: int = Field(default=8192, ge=MIN_PROMPT_TOKENS)
     # The runaway guard: a reply that reaches it is logged as cut short. 0: no limit.
     num_predict: int = Field(default=2048, ge=0)

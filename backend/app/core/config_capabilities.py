@@ -40,3 +40,10 @@ class CapabilitySettings(BaseModel):
     web_results: int = Field(default=5, ge=1, le=20)
     web_max_page_bytes: int = Field(default=2_000_000, ge=10_000)
     web_timeout_s: float = Field(default=10.0, gt=0)
+    # How often a capability may run (`kernel/budget.py`): a page asking her to read
+    # fifty more is refused past these. Per turn, by capability, and every call of a turn.
+    turn_budget: dict[str, int] = Field(default_factory=lambda: {"web.search": 4, "web.read": 6})
+    turn_total: int = Field(default=12, ge=1)
+    minute_budget: dict[str, int] = Field(
+        default_factory=lambda: {"web.search": 15, "web.read": 30}
+    )

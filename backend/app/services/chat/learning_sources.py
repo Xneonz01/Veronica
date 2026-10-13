@@ -4,8 +4,10 @@ are kept until read). The worker (`learning_worker.py`) treats both alike: it ta
 one due, reads the part of it one extraction takes, and says how that went.
 
 It reads only what was said. Tool rows stay out, and so does a chat reply that quoted a
-document (a cited one): the extractor can't tell a document's content from the user
-talking about themselves. A call keeps only its spoken turns to begin with.
+document (a cited one) or followed a tool that returned content (a page, a file, a
+recall): the extractor can't tell that content from the user talking about themselves,
+and a page's line she passed on would be filed as the user's own. A call keeps only its
+spoken turns to begin with, without the ones that carried the web (`session_tasks.py`).
 
 A part after the first comes with the last turns read before it (`Part.earlier`), so
 that "she's vegetarian" after a pause has someone to be (bug 40). They are context:
@@ -20,6 +22,7 @@ from typing import NamedTuple, Protocol, TypeVar
 from app.services.chat.learning_queue import Due, LearningQueue
 from app.services.chat.store import ChatStore, StoredMessage
 from app.services.memory.call_queue import CallDue, CallQueue
+from app.services.tools.sources import CONTENT_TOOLS
 
 _PAGE = 200  # messages read per extraction, at most
 _LABEL = 12  # what the transcript adds to a turn: "User: " or "Veronica: " and a newline
@@ -126,16 +129,50 @@ def beside(before: Said, first: str | None, max_chars: int) -> Said:
     return before
 
 
-def unread(messages: list[StoredMessage], max_chars: int) -> tuple[Said, int]:
+def unread(
+    messages: list[StoredMessage], max_chars: int, *, after_content: bool = False
+) -> tuple[Said, int]:
     """What one extraction reads of a conversation's `messages` (`pack`), and the id of
     the message it read through."""
-    return pack(((m.id, m.role, m.content if _said(m) else "") for m in messages), max_chars)
+    said = heard(messages, after_content=after_content)
+    return pack(((m.id, m.role, m.content if m.id in said else "") for m in messages), max_chars)
 
 
-def _said(message: StoredMessage) -> bool:
-    if not message.content.strip():
-        return False
-    return message.role == "user" or (message.role == "assistant" and not message.citations)
+def heard(messages: Sequence[StoredMessage], *, after_content: bool = False) -> set[int]:
+    """The ids of the `messages` learning reads, in order: what the user said, and her
+    replies that neither quoted a document nor followed a tool that returned content.
+    `after_content`: the rows before them ended on such a tool, so the first reply
+    follows it."""
+    said: set[int] = set()
+    for m in messages:
+        if m.role == "tool":
+            after_content = after_content or m.tool_name in CONTENT_TOOLS
+            continue
+        if m.content.strip() and (
+            m.role == "user" or (m.role == "assistant" and not m.citations and not after_content)
+        ):
+            said.add(m.id)
+        if m.role in ("user", "assistant"):
+            after_content = False
+    return said
+
+
+def ends_on_content(read: Sequence[StoredMessage]) -> bool:
+    """Whether `read` ends on a tool that returned content, no turn after it. A part
+    can stop between such a tool and her reply to it (`pack` moves past the rows that
+    hold no words), and that reply must not open the next part as her own words."""
+    after = False
+    for m in read:
+        if m.role == "tool":
+            after = after or m.tool_name in CONTENT_TOOLS
+        elif m.role in ("user", "assistant"):
+            after = False
+    return after
+
+
+def _earlier_of(read: Sequence[StoredMessage], max_chars: int) -> Said:
+    said = heard(read)
+    return earlier([(m.role, m.content) for m in read if m.id in said], max_chars)
 
 
 class ChatSource:
@@ -152,18 +189,21 @@ class ChatSource:
         messages = await self._chat.messages_after(
             due.conversation_id, due.learned_through, limit=_PAGE
         )
-        first = next((m.content for m in messages if _said(m)), None)
-        before = beside(await self._earlier(due, max_chars), first, max_chars) if first else []
-        turns, through = unread(messages, max_chars - size(before))
+        read = await self._read(due)
+        seed = ends_on_content(read)
+        said = heard(messages, after_content=seed)
+        first = next((m.content for m in messages if m.id in said), None)
+        before = beside(_earlier_of(read, max_chars), first, max_chars) if first else []
+        turns, through = unread(messages, max_chars - size(before), after_content=seed)
         return Part(turns, through or due.learned_through, before)
 
-    async def _earlier(self, due: Due, max_chars: int) -> Said:
+    async def _read(self, due: Due) -> list[StoredMessage]:
+        """The last rows already read, `_READ_ROWS` at most; none before the first part."""
         if not due.learned_through:
-            return []  # nothing read yet
-        read = await self._chat.messages_through(
+            return []
+        return await self._chat.messages_through(
             due.conversation_id, due.learned_through, limit=_READ_ROWS
         )
-        return earlier([(m.role, m.content) for m in read if _said(m)], max_chars)
 
     async def kept(self, due: Due) -> bool:
         # Deleted while the model read it: nothing of it is filed.

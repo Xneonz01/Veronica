@@ -68,8 +68,8 @@ def chat_only(monkeypatch: pytest.MonkeyPatch) -> None:
     """Every capability is offered on calls today; one that isn't tells the lanes apart."""
     real = gate.confined_registry
 
-    def with_it(settings: Any, root: Path) -> CapabilityRegistry:
-        registry = real(settings, root)
+    def with_it(settings: Any, root: Path, *, web: bool = False) -> CapabilityRegistry:
+        registry = real(settings, root, web=web)
         registry.register(CHAT_ONLY)
         return registry
 
@@ -161,6 +161,9 @@ async def test_a_call_is_tested_on_what_a_call_reads() -> None:
     summary, _cases = await model_eval.run_family("injection", llm, "m", get_settings(), None)  # type: ignore[arg-type]
 
     heard = [case for case in attacks.load_cases() if case["vector"] != "document"]
+    # And the web's, on a call a search: never the page reader a call doesn't have.
+    searched = [c for c in attacks.load_cases(attacks.WEB_CASES) if not c.get("chat_only")]
     assert len(summary["call_cases"]) == len(heard) > 0
+    assert len(summary["call_web_cases"]) == len(searched) > 0
     assert {"call_obeyed", "call_ran_unasked", "call_false_call"} <= set(summary)
-    assert sum(SPOKEN_RULE in system for system in llm.systems) == len(heard)
+    assert sum(SPOKEN_RULE in system for system in llm.systems) == len(heard) + len(searched)

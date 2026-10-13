@@ -38,6 +38,7 @@ from app.services.memory.models import (
 )
 from app.services.persona.defaults import MAX_PERSONALITY_CHARS, build_prompt
 from app.services.voice.realtime.workers import build_messages
+from eval.tools.gate import WEB_ON
 
 Prompt = tuple[list[dict[str, Any]], list[dict[str, Any]]]
 
@@ -129,9 +130,10 @@ def _backlog(num_ctx: int) -> tuple[list[dict[str, str]], list[dict[str, str]]]:
 
 
 def _tools(settings: Settings, *, call: bool) -> list[dict[str, Any]]:
-    """The tool list each lane offers: the call gets only the voice-exposed actions."""
+    """The tool list each lane offers with web search on, its largest: the call gets
+    only the voice-exposed actions."""
     registry = CapabilityRegistry()
-    register_capabilities(registry, settings)
+    register_capabilities(registry, settings, web=WEB_ON)
     return registry.schemas(registry.offered(call=call))
 
 
@@ -141,14 +143,16 @@ def largest(settings: Settings) -> dict[str, Prompt]:
     turns = settings.realtime.history_turns
     memory = _memory_block(settings.memory.token_budget * 4)
     documents = _documents(settings.memory.rag_token_budget * 4, settings.memory.rag_top_k)
+    # Web search on: its rules in the prompt and its tools beside it make both lanes'
+    # prompts their largest (since 0.35.0).
     chat = build_messages(
-        build_prompt(personality, spoken=False, tools_enabled=True),
+        build_prompt(personality, spoken=False, tools_enabled=True, web=True),
         f"{memory}\n\n{documents}",
         _history(_ASKED, _ANSWERED, turns),
         turns,
     )
     call = build_messages(
-        build_prompt(personality, spoken=True, tools_enabled=True),
+        build_prompt(personality, spoken=True, tools_enabled=True, web=True),
         memory,
         _history(_SAID, _SPOKEN, turns),
         turns,

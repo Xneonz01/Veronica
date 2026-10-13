@@ -13,6 +13,7 @@ import secrets
 import unicodedata
 from typing import TYPE_CHECKING, Any, Literal, NamedTuple
 
+from app.core.text_safety import clean_untrusted
 from app.kernel.taint import Source
 from app.services.memory.chunking import PATH_SEPARATOR
 from app.services.memory.rag_fts import identifiers, names
@@ -217,17 +218,22 @@ async def assemble(
     citations: list[dict[str, Any]] = []
     for hit in cited:
         index = len(citations) + 1
-        label = hit.chunk.heading_path or hit.document_title
-        lines.append(document_fence(index, label, hit.chunk.text, nonce))
+        # A document can come from anywhere: what renders as nothing (an instruction
+        # written in tag characters, a bidi override in a title) is dropped before the
+        # model reads it or a chip shows it. The label is cleaned by `safe_title`.
+        title = clean_untrusted(hit.document_title)
+        text = clean_untrusted(hit.chunk.text)
+        label = hit.chunk.heading_path or title
+        lines.append(document_fence(index, label, text, nonce))
         citations.append(
             {
                 "n": index,
-                "title": hit.document_title,
+                "title": title,
                 "ordinal": hit.chunk.ordinal,
                 # The quoted chunk is stored with the citation so the chip can show the
                 # text the model was given. Fetching it later by id would fail once the
                 # document is deleted, and a reopened conversation should still show it.
-                "text": hit.chunk.text[:_CITATION_PREVIEW_CHARS],
+                "text": text[:_CITATION_PREVIEW_CHARS],
             }
         )
     return TurnContext(block, "\n".join(lines), citations, tuple(missed))

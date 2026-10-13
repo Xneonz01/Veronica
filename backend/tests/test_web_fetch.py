@@ -11,7 +11,7 @@ from collections.abc import Callable
 import httpx
 import pytest
 
-from app.adapters.web.fetch import FetchRefused, PageFetcher, is_public
+from app.adapters.web.fetch import FetchRefused, Here, PageFetcher, is_public
 from app.adapters.web.page_text import readable
 
 PUBLIC = "93.184.215.14"
@@ -36,9 +36,15 @@ def _fetcher(
             raise OSError("no such host")
         return names[host]
 
-    client = httpx.AsyncClient(transport=httpx.MockTransport(handler))
+    def clients() -> httpx.AsyncClient:
+        return httpx.AsyncClient(transport=httpx.MockTransport(handler))
+
     return PageFetcher(
-        client, max_bytes=max_bytes, blocked=lambda: blocked or [], resolver=resolver
+        clients,
+        max_bytes=max_bytes,
+        blocked=lambda: blocked or [],
+        resolver=resolver,
+        place=lambda: Here(frozenset()),
     )
 
 
@@ -92,10 +98,10 @@ async def test_a_page_is_fetched_from_the_checked_address_and_read_as_text() -> 
 @pytest.mark.parametrize(
     ("url", "names"),
     [
-        ("http://localhost:8000/health", {"localhost": ["127.0.0.1"]}),
+        ("http://localhost/health", {"localhost": ["127.0.0.1"]}),
         ("http://192.168.1.1/admin", {"192.168.1.1": ["192.168.1.1"]}),
         ("http://rebind.example/", {"rebind.example": [PUBLIC, "10.0.0.2"]}),
-        ("http://[::1]:8000/", {"::1": ["::1"]}),
+        ("http://[::1]/", {"::1": ["::1"]}),
     ],
 )
 async def test_an_address_on_this_computer_or_its_network_is_refused(

@@ -32,6 +32,7 @@ from app.api.routes_system import router as system_router
 from app.api.routes_voices import router as voices_router
 from app.api.routes_ws_chat import router as ws_chat_router
 from app.api.routes_ws_voice import router as ws_voice_router
+from app.api.uploads import sweep_uploads
 from app.core import data_acl
 from app.core.changelog import ChangelogError, latest
 from app.core.config import Settings, get_settings
@@ -94,6 +95,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     # included; what was done is recorded once the black box is up.
     data_dir = settings.data_path()
     kept = await data_acl.keep_private(data_dir)
+    await asyncio.to_thread(sweep_uploads, data_dir)  # copies a crash left behind
     # First, so everything after it, including a failed start-up, is recorded.
     telemetry = start_telemetry(settings.telemetry, asyncio.get_running_loop())
     app.state.telemetry = telemetry

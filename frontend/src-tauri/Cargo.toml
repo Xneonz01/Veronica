@@ -1,6 +1,6 @@
 [package]
 name = "app"
-version = "0.34.14"
+version = "0.35.0"
 description = "Veronica desktop shell: tray, global hotkeys and the companion window"
 license = "PolyForm-Noncommercial-1.0.0"
 edition = "2021"

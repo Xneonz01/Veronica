@@ -13,6 +13,7 @@ import { Composer } from '../conversation/Composer'
 import { Transcript } from '../conversation/Transcript'
 import { Welcome } from '../conversation/Welcome'
 import { useNotifications } from '../notify/useNotifications'
+import { useWebSettings } from '../settings/useWebSettings'
 import { Notice, Skeleton } from '../ui/Feedback'
 import { Button } from '../ui/Button'
 import { useChatSession, useWorkspace } from '../workspace/context'
@@ -25,12 +26,17 @@ const FINEPRINT: Record<LaneState, string> = {
   offline: 'Reconnecting to Veronica. Keep writing; you can send once she is back.',
   unavailable: "Chat is paused while her memory can't be opened. The notice above says what to do.",
 }
+// With web search on, the promise is narrower, as her persona's is (ADR 0003); while
+// the setting is still loading, only what is true either way.
+const WEB_ON = 'Veronica runs on this computer. What she looks up on the web goes to your search service.'
+const WEB_UNKNOWN = 'Veronica runs on this computer.'
 
 export function Chat() {
   const chat = useChatSession()
   const { conversations, projects, activeProjectId } = useWorkspace()
   const attachments = useAttachments(chat.conversationId)
   const { history, undo } = useNotifications()
+  const web = useWebSettings().settings
   const field = useRef<HTMLTextAreaElement | null>(null)
   const [draft, setDraft] = useState('')
   const [stoppedAfter, setStoppedAfter] = useState<number | null>(null)
@@ -149,7 +155,7 @@ export function Chat() {
         fieldRef={field}
       />
       <p className={styles.fineprint} role="status">
-        {FINEPRINT[chat.lane]}
+        {chat.lane !== 'open' ? FINEPRINT[chat.lane] : web === null ? WEB_UNKNOWN : web.on ? WEB_ON : FINEPRINT.open}
       </p>
     </div>
   )

@@ -26,6 +26,8 @@ class Code(StrEnum):
     confirm_unavailable = "confirm_unavailable"  # the prompt couldn't reach anyone
     capability_timeout = "capability_timeout"
     capability_failed = "capability_failed"
+    unavailable = "unavailable"  # switched off or withdrawn since it was offered
+    budget_exceeded = "budget_exceeded"  # done as often as a turn or a minute allows
     # Paths / files
     path_invalid = "path_invalid"
     path_outside_roots = "path_outside_roots"

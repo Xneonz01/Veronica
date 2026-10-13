@@ -111,6 +111,10 @@ class RealtimeSession(RealtimeEmitter):
         # Entries of `history` that carried what she read (a file read out, the opener's
         # recap of the last call): later turns read them as untrusted (`kernel/taint.py`).
         self.carried: list[tuple[Source, dict[str, Any]]] = []
+        # What the turn's tools may have put in its reply (`tools/sources.py`), kept as
+        # each one finishes so a reply cut short is marked too; and what searches returned.
+        self.turn_sources: set[Source] = set()
+        self.urls: frozenset[str] = frozenset()
         self.chunker = SentenceChunker(
             settings.realtime.chunk_max_chars,
             clause_chunking=settings.realtime.clause_chunking,

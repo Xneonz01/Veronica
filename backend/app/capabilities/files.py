@@ -21,6 +21,7 @@ from app.capabilities.files_write import register_write
 from app.capabilities.paths import PathRefused, resolve_roots, resolve_within
 from app.capabilities.protected import Protected
 from app.core.config_capabilities import CapabilitySettings
+from app.core.text_safety import clean_local
 from app.kernel.capability import CapabilityResult, RiskTier
 from app.kernel.errors import Code
 from app.kernel.registry import Capability, CapabilityRegistry
@@ -114,7 +115,9 @@ def register_files(
                     ok=False, code=Code.binary_file, detail="That looks like a binary file."
                 )
             rest = handle.read()
-        text = (head + rest).decode("utf-8", errors="replace")
+        # Only what exists to hide goes (`clean_local`): a carriage return or a private-use
+        # glyph survives a read-then-write edit, an instruction in tag characters doesn't.
+        text = clean_local((head + rest).decode("utf-8", errors="replace"))
         return CapabilityResult(
             ok=True, detail=f"Read {path.name} ({size} bytes).", data={"content": text}
         )
@@ -253,5 +256,5 @@ def _content_hit(path: Path, needle: str, max_bytes: int) -> dict[str, object] |
     text = (head + rest).decode("utf-8", errors="replace")
     for number, line in enumerate(text.splitlines(), start=1):
         if needle in line.lower():
-            return {"path": str(path), "line": number, "excerpt": line.strip()[:160]}
+            return {"path": str(path), "line": number, "excerpt": clean_local(line.strip())[:160]}
     return None

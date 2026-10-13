@@ -1,8 +1,9 @@
-"""The pipeline: resolve -> validate -> policy -> taint -> [preflight, confirm] -> run -> audit.
+"""The pipeline: resolve -> validate -> verdict -> [preflight, confirm] -> run -> audit.
 
-Kept out of `capability.py` so that file stays a pure contract other modules import
-without pulling the whole kernel in. What each ending writes down is `records.py`, and
-the capability's own check before anyone is asked runs through `preflight.py`.
+What to do with a request is decided once, in `verdict.py`, from the capability, its
+policy, the turn's budget and what the turn read. This module only carries a verdict
+out. What each ending writes down is `records.py`, and the capability's own check before
+anyone is asked runs through `preflight.py`.
 
 Two invariants:
   * `CancelledError` propagates. Barge-in cancels the reply task, which cancels the
@@ -20,6 +21,8 @@ import time
 from pydantic import BaseModel, ValidationError
 
 from app.core.event_bus import EventBus
+from app.core.logging import log_failure
+from app.kernel.budget import Budget
 from app.kernel.capability import (
     AuditSink,
     CapabilityRequest,
@@ -31,20 +34,12 @@ from app.kernel.confirm import ConfirmationBroker, ConfirmOutcome, PendingView
 from app.kernel.errors import Code, safe_validation_detail
 from app.kernel.policy import PolicyMode, PolicyStore
 from app.kernel.preflight import as_code, check
-from app.kernel.records import Records
+from app.kernel.records import Records, note
 from app.kernel.registry import Capability, CapabilityRegistry
-from app.kernel.taint import Tainted, find
-from app.telemetry import current_blackbox
+from app.kernel.verdict import AFTER_WEB, FROM_READING, Action, Verdict, decide
 
 logger = logging.getLogger(__name__)
-
-# Why a prompt was raised for a call its policy would have let run: an argument came
-# word for word from what she read. Surfaces say so on the prompt. Only then: a call
-# that asks anyway, a file write to a path a search found, needs no explaining.
-FROM_READING = "from_reading"
-# And for one whose turn read the web, copied or not: a page's instruction reworded by
-# the model gets past the copy check (ADR 0003).
-AFTER_WEB = "after_web"
+_SPENT = "I've done that as many times as I can for now, so I stopped there."
 
 
 class CapabilityKernel:
@@ -59,12 +54,14 @@ class CapabilityKernel:
         bus: EventBus,
         *,
         taint_min_words: int = 2,
+        budget: Budget | None = None,
     ) -> None:
         self._registry = registry
         self._policy = policy
         self._confirm = confirmations
         self._records = Records(registry, audit, bus)
         self._taint_min = taint_min_words
+        self._budget = budget
 
     def pending_confirmations(self) -> list[PendingView]:
         """Outstanding prompts (any surface may render or speak them)."""
@@ -75,33 +72,28 @@ class CapabilityKernel:
         return self._confirm.resolve(token, approved, via=via)
 
     def requires_confirmation(self, req: CapabilityRequest) -> bool:
-        """Whether this request would currently park on a human answer: its policy
-        asks, or an argument came from what she read. A call has to know before the
-        kernel waits, so the question can be spoken while it does."""
+        """Whether this request would currently park on a human answer. A call has to
+        know before the kernel waits, so the question can be spoken while it does; the
+        answer is the verdict `execute` acts on, never a second opinion."""
+        found = self.verdict(req)
+        return found is not None and found.action is Action.ask
+
+    def verdict(self, req: CapabilityRequest) -> Verdict | None:
+        """The verdict `execute` would act on now, and why; None for a request refused
+        before any verdict (a capability it lacks, arguments it can't read)."""
         capability = self._registry.get(req.name)
         if capability is None:
-            return False
-        mode = self._policy.mode_for(capability)
-        return mode is PolicyMode.confirm or (
-            mode is PolicyMode.auto_allow
-            and (self._provenance(capability, req) is not None or _after_web(capability, req))
-        )
-
-    def _provenance(self, capability: Capability, req: CapabilityRequest) -> Tainted | None:
-        """The argument that came word for word from what she read, if one did.
-
-        Not for a safe capability: a read changes nothing, and checking one would ask
-        about every file opened from a search result.
-        """
-        if req.taint is None or capability.risk is RiskTier.safe:
             return None
-        return find(
-            req.args,
-            capability.args_model,
-            req.taint,
-            capability=capability.name,
-            min_words=self._taint_min,
-            selectors=capability.selectors,
+        try:
+            args = capability.args_model.model_validate(req.args)
+        except ValidationError:
+            return None
+        return self._decide(capability, args, req)
+
+    def _decide(self, capability: Capability, args: BaseModel, req: CapabilityRequest) -> Verdict:
+        mode = self._policy.mode_for(capability)
+        return decide(
+            capability, args, req, mode, budget=self._budget, taint_min_words=self._taint_min
         )
 
     async def execute(self, req: CapabilityRequest) -> CapabilityResult:
@@ -118,7 +110,6 @@ class CapabilityKernel:
                 Decision.failed,
                 started,
             )
-
         try:
             args = capability.args_model.model_validate(req.args)
         except ValidationError as exc:
@@ -131,37 +122,57 @@ class CapabilityKernel:
                 Decision.failed,
                 started,
             )
-
         await self._records.emit(
             "capability.requested", {"capability": req.name, "actor": req.actor}
         )
-
-        mode = self._policy.mode_for(capability)
-        if mode is PolicyMode.deny:
+        verdict = self._decide(capability, args, req)
+        note(capability, verdict)
+        if verdict.action is Action.refuse:
+            code = verdict.code or Code.policy_denied
             return await refuse(
                 req.name,
                 args.model_dump(),
                 req.actor,
-                Code.policy_denied,
-                "That action is switched off.",
+                code,
+                verdict.detail,
                 Decision.denied,
                 started,
             )
-        tainted = self._provenance(capability, req)
-        why: str | None = None
-        if tainted is not None:
-            # The field, its source and its length, never the text: it may be the
-            # attacker's own sentence.
-            current_blackbox().record(
-                "info", "capability.from_reading", capability=req.name, **tainted.as_fields()
+        confirm_via: str | None = None
+        decision = Decision.allowed
+        if verdict.action is Action.ask:
+            outcome = await self._ask(capability, args, req, verdict, started)
+            if isinstance(outcome, CapabilityResult):
+                return outcome
+            confirm_via, decision = outcome.via, Decision.confirmed
+        taint = req.taint
+        if self._budget is not None and not self._budget.take(
+            capability.name, taint.turn if taint is not None else None
+        ):
+            return await refuse(
+                req.name,
+                args.model_dump(),
+                req.actor,
+                Code.budget_exceeded,
+                _SPENT,
+                Decision.denied,
+                started,
+                confirm_via=confirm_via,
             )
-            if mode is PolicyMode.auto_allow:
-                mode = PolicyMode.confirm  # whatever the tier: a person decides
-                why = FROM_READING
-        if mode is PolicyMode.auto_allow and _after_web(capability, req):
-            mode, why = PolicyMode.confirm, AFTER_WEB
+        return await self._run(capability, args, req.actor, decision, confirm_via, started)
+
+    async def _ask(
+        self,
+        capability: Capability,
+        args: BaseModel,
+        req: CapabilityRequest,
+        verdict: Verdict,
+        started: float,
+    ) -> ConfirmOutcome | CapabilityResult:
+        """A person's answer, or the refusal that ends the request without one."""
+        refuse = self._records.refused
         asked: str | None = None  # what the prompt names, when the preflight says
-        if mode is PolicyMode.confirm and capability.preflight is not None:
+        if capability.preflight is not None:
             checked = await check(
                 capability,
                 capability.preflight,
@@ -181,43 +192,36 @@ class CapabilityKernel:
                     started,
                 )
             asked = checked.detail or None
-
-        confirm_via: str | None = None
-        decision = Decision.allowed
-        if mode is PolicyMode.confirm:
-            try:
-                outcome = await self._confirm.request(
-                    capability,
-                    args,
-                    req.actor,
-                    summary=asked,
-                    why=why,
-                    request_id=req.request_id,
-                )
-            except asyncio.CancelledError:
-                # Cut off while waiting for an answer. It was asked, so it is on the
-                # record like every request; this path used to leave no row at all.
-                self._records.cancelled(
-                    req.name, args, req.actor, started, None, "Cancelled before an answer."
-                )
-                raise
-            if not outcome.approved:
-                code, detail = _not_approved(outcome)
-                return await refuse(
-                    req.name,
-                    args.model_dump(),
-                    req.actor,
-                    code,
-                    detail,
-                    # Nobody was asked: the gate failed, no person said no.
-                    Decision.failed if outcome.unasked else Decision.denied,
-                    started,
-                    confirm_via=outcome.via,
-                )
-            confirm_via = outcome.via
-            decision = Decision.confirmed
-
-        return await self._run(capability, args, req.actor, decision, confirm_via, started)
+        try:
+            outcome = await self._confirm.request(
+                capability,
+                args,
+                req.actor,
+                summary=asked,
+                why=verdict.why,
+                request_id=req.request_id,
+            )
+        except asyncio.CancelledError:
+            # Cut off while waiting for an answer. It was asked, so it is on the record
+            # like every request; this path used to leave no row at all.
+            self._records.cancelled(
+                req.name, args, req.actor, started, None, "Cancelled before an answer."
+            )
+            raise
+        if outcome.approved:
+            return outcome
+        code, detail = outcome.refusal()
+        return await refuse(
+            req.name,
+            args.model_dump(),
+            req.actor,
+            code,
+            detail,
+            # Nobody was asked: the gate failed, no person said no.
+            Decision.failed if outcome.unasked else Decision.denied,
+            started,
+            confirm_via=outcome.via,
+        )
 
     async def _run(
         self,
@@ -254,8 +258,9 @@ class CapabilityKernel:
             )
             raise
         except Exception as exc:  # a provider bug must never reach the user raw
-            logger.exception("capability %s failed", capability.name)
-            logger.debug("capability failure detail: %r", exc)
+            # The type and where it was raised, never the message: a message can quote
+            # an argument, a page or a key (an encoding error quotes the string).
+            log_failure(logger, f"capability {capability.name} failed", exc)
             return await self._records.refused(
                 capability.name,
                 args.model_dump(),
@@ -271,22 +276,9 @@ class CapabilityKernel:
         )
 
 
-def _after_web(capability: Capability, req: CapabilityRequest) -> bool:
-    """An action that changes something, in a turn that read the web."""
-    return req.taint is not None and capability.risk is not RiskTier.safe and req.taint.read("web")
-
-
-def _not_approved(outcome: ConfirmOutcome) -> tuple[Code, str]:
-    """The code and the words for a confirmation that didn't end in a yes. A prompt that
-    couldn't be published was said as "You declined that", though nobody was asked."""
-    if outcome.unasked:
-        return Code.confirm_unavailable, "I couldn't ask you about that, so I didn't do it."
-    if outcome.timed_out:
-        return Code.confirm_timeout, "That timed out waiting for your approval, so I didn't do it."
-    return Code.confirm_denied, "You declined that, so I didn't do it."
-
-
 __all__ = [
+    "AFTER_WEB",
+    "FROM_READING",
     "AuditSink",
     "CapabilityKernel",
     "ConfirmOutcome",

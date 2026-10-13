@@ -13,7 +13,7 @@ beforeEach(() => {
   localStorage.clear()
   delete document.documentElement.dataset.theme
   // A switch in the test before may still hold its pause on real timers.
-  document.head.querySelectorAll('style').forEach((style) => style.remove())
+  document.documentElement.className = ''
 })
 
 afterEach(() => {
@@ -47,12 +47,13 @@ describe('the theme', () => {
 
   it('pauses transitions for the switch, so surfaces change together', async () => {
     vi.useFakeTimers()
-    const { setTheme } = await loadTheme()
+    const { SWITCHING, setTheme } = await loadTheme()
     setTheme('dark')
-    const pause = [...document.head.querySelectorAll('style')].find((style) => style.textContent?.includes('transition:none'))
-    expect(pause).toBeDefined()
+    expect(document.documentElement.classList.contains(SWITCHING)).toBe(true)
+    // With no <style> of its own: the page's policy would refuse it.
+    expect(document.head.querySelector('style')).toBeNull()
     vi.runAllTimers()
-    expect(pause?.isConnected).toBe(false)
+    expect(document.documentElement.classList.contains(SWITCHING)).toBe(false)
     vi.useRealTimers()
   })
 

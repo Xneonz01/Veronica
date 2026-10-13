@@ -42,19 +42,25 @@ that isn't safe ask first, copied or not (`kernel.AFTER_WEB`, ADR 0003).
 from __future__ import annotations
 
 import re
+import secrets
 import unicodedata
 from collections.abc import Collection, Iterable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from functools import cache
 from typing import Literal, get_args, get_origin
 
 from pydantic import BaseModel
 
+from app.kernel.urls import normalized, urls_in
 from app.services.memory.normalize import normalize
 
 # The kinds of untrusted text a turn carries. Reported as an argument's source, so a
 # poisoned document can be told from a poisoned memory without the text being kept.
 Source = Literal["memory", "document", "tool_result", "web"]
+# What of it is the user's own and must not leave unasked: her memory of them, their
+# documents, and what a local tool read back (`kernel/egress.py`). The web's own text
+# is untrusted but not private.
+PRIVATE: frozenset[Source] = frozenset({"memory", "document", "tool_result"})
 
 # Categories that never show as a letter of their own: formatting, unassigned, and
 # combining marks (checked after NFKC has composed every accent that has a form).
@@ -95,33 +101,80 @@ class Taint:
     trusted: tuple[str, ...] = ()
     # Earlier arguments that ran, as (capability, key): trusted whole, for that capability.
     own: frozenset[tuple[str, str]] = frozenset()
+    # Addresses a page may be read at unasked: ones the user wrote, and ones a search
+    # returned in this conversation, normalised (`kernel/urls.py`).
+    urls: frozenset[str] = frozenset()
+    # Which turn this is, for the per-turn budget (`kernel/budget.py`): one id for every
+    # round of the turn, since each round's taint is built from the last.
+    turn: str = field(default_factory=lambda: secrets.token_hex(6))
 
     @classmethod
-    def of(cls, *, untrusted: Iterable[tuple[Source, str]], trusted: Iterable[str]) -> Taint:
+    def of(
+        cls,
+        *,
+        untrusted: Iterable[tuple[Source, str]],
+        trusted: Iterable[str],
+        urls: Iterable[str] = (),
+    ) -> Taint:
+        said = tuple(trusted)
         return cls(
             untrusted=tuple((kind, key) for kind, text in untrusted if (key := _padded(text))),
-            trusted=tuple(key for text in trusted if (key := _padded(text))),
+            trusted=tuple(key for text in said if (key := _padded(text))),
+            urls=normalized(urls) | urls_in(said),
         )
 
     def read(self, source: Source) -> bool:
         """Whether the turn read any text of `source`."""
         return any(kind == source for kind, _key in self.untrusted)
 
+    def private(self) -> tuple[str, ...]:
+        """The keys of what the turn read that is the user's own (`PRIVATE`)."""
+        return tuple(key for kind, key in self.untrusted if kind in PRIVATE)
+
+    def knows(self, url: str) -> bool:
+        """Whether `url`, already normalised, is one the user wrote or a search returned."""
+        return url in self.urls
+
     def adding(self, source: Source, texts: Iterable[str]) -> Taint:
         """This taint, plus more untrusted text: the last round's tool results."""
         more = tuple((source, key) for text in texts if (key := _padded(text)))
-        return Taint(self.untrusted + more, self.trusted, self.own) if more else self
+        return self._with(untrusted=self.untrusted + more) if more else self
 
     def trusting(self, texts: Iterable[str]) -> Taint:
         """This taint, plus words the user said since it was made: a request heard while
         a call waited on an answer, which the next round acts on."""
-        more = tuple(key for text in texts if (key := _padded(text)))
-        return Taint(self.untrusted, self.trusted + more, self.own) if more else self
+        said = tuple(texts)
+        more = tuple(key for text in said if (key := _padded(text)))
+        if not more:
+            return self
+        return self._with(trusted=self.trusted + more, urls=self.urls | urls_in(said))
 
     def keeping(self, capability: str, keys: Iterable[str]) -> Taint:
         """This taint, plus the arguments of a call of `capability` that ran (`declared`)."""
         more = frozenset((capability, key) for key in keys if key) - self.own
-        return Taint(self.untrusted, self.trusted, self.own | more) if more else self
+        return self._with(own=self.own | more) if more else self
+
+    def knowing(self, urls: Iterable[str]) -> Taint:
+        """This taint, plus addresses a search just returned (already normalised)."""
+        more = frozenset(urls) - self.urls
+        return self._with(urls=self.urls | more) if more else self
+
+    def _with(
+        self,
+        *,
+        untrusted: tuple[tuple[Source, str], ...] | None = None,
+        trusted: tuple[str, ...] | None = None,
+        own: frozenset[tuple[str, str]] | None = None,
+        urls: frozenset[str] | None = None,
+    ) -> Taint:
+        """A copy with some piles replaced; the turn stays the same turn."""
+        return Taint(
+            self.untrusted if untrusted is None else untrusted,
+            self.trusted if trusted is None else trusted,
+            self.own if own is None else own,
+            self.urls if urls is None else urls,
+            self.turn,
+        )
 
 
 @dataclass(frozen=True, slots=True)

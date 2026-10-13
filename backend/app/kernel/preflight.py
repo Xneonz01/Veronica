@@ -13,6 +13,7 @@ import logging
 
 from pydantic import BaseModel
 
+from app.core.logging import log_failure
 from app.kernel.capability import CapabilityResult
 from app.kernel.errors import Code
 from app.kernel.records import Records
@@ -52,8 +53,8 @@ async def check(
             capability.name, args, actor, started, None, "Cancelled before it was asked."
         )
         raise
-    except Exception:
-        logger.exception("the check before asking about %s failed", capability.name)
+    except Exception as exc:
+        log_failure(logger, f"the check before asking about {capability.name} failed", exc)
         return CapabilityResult(
             ok=False, code=Code.capability_failed.value, detail="That didn't work."
         )

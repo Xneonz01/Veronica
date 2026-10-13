@@ -19,10 +19,28 @@ It is designed to hold up against:
   origins; anything else is refused. Requests addressed to any host name other than
   `localhost`, `127.0.0.1` or `[::1]` are refused before they reach a route, which stops
   a page from re-pointing its own domain at your machine (DNS rebinding) to read your data.
-- **Text that tries to give orders.** Documents, files and tool results are passed to the
-  model as marked, quoted data, and the model is told not to follow instructions inside
-  them. Because that can never be airtight, every action that changes something
-  (writing a file, opening an app) needs your approval, and silence counts as no.
+- **Text that tries to give orders.** Documents, files, web pages and tool results are
+  passed to the model as marked, quoted data, and the model is told not to follow
+  instructions inside them. Text written in characters that don't show on screen is
+  removed before she reads it. Because that can never be airtight, every action that
+  changes something (writing a file, opening an app) needs your approval, and silence
+  counts as no; after she has read the web, so does saving a memory.
+- **Pages that try to get your data out.** With web search on, she reads a page unasked
+  only at an address you gave her or a search found, and asks before sending anything
+  that looks like a password or a key, or words from your notes and memory. She reads
+  only public addresses, never your own network or this computer, checked on every
+  redirect; a page is read with limits on its size, how long it takes and how much
+  work it can cause, and a search or a page read can happen only so often in a turn.
+- **A permission prompt that lies.** A prompt shows where an action really goes (the
+  site as it resolves, the file), marks characters that don't show on screen, says how
+  much of a long value it cut and shows the rest on request, and blanks out what looks
+  like a secret, saying how much it hid; asked to show all, it shows you everything,
+  so nothing can hide behind a secret.
+  Allow ignores clicks for its first half second.
+- **Markup in what she shows.** Answers, pages and file contents are shown as text,
+  never as markup, and a test fails on any code that would change that. The app's page
+  carries a Content-Security-Policy that runs only the app's own code and talks only to
+  her backend.
 - **The model overreaching.** It can only act through a small set of capabilities, each
   with a policy, confined to the folders and apps you allow, and every decision is written
   to an append-only audit log. Veronica's own data folder, `.env` and `.git` are off-limits
@@ -48,18 +66,32 @@ a key that opens any copy of her data folder without your Windows password, and 
 one you saved stops working. Her activity log records every one made and who asked
 (the app, or a program), every open window warns when a program made one, and Settings
 shows when the current one was made, to the minute. It does **not** protect against software already running
-as your user account, which can open the keys as she does; attachments and diagnostics
-under `data/` are not encrypted; and the audit log can be edited with a
+as your user account, which can open the keys as she does; not everything under `data/`
+is encrypted (her personality and diagnostics aren't; the files you attach in chat are,
+since 0.35.0); and the audit log can be edited with a
 SQLite shell by that same software: the next start finds such a change and the app says
 so, but someone who knows how the log works can rewrite it to walk clean. Nor does it
 keep other programs on the same computer, under any account, away from the backend while
 it runs: a request that carries no browser `Origin` is taken for a local tool, so such a
-program can read what the API returns (memories, conversations, the audit log) and ask
-for actions, which still need your approval, or mark a change to the audit log as
-reviewed. The data folder itself is private to your account; a key held only by the
+program can read what the API returns (memories, conversations, the audit log, what a
+permission prompt asks in full), ask for actions and answer their prompts itself, or
+mark a change to the audit log as reviewed. The data folder itself is private to your account; a key held only by the
 desktop app, which would close the API too, is planned. A symlink swapped between a path
-check and the file being opened is not caught. The desktop shell does not yet ship a
-Content-Security-Policy.
+check and the file being opened is not caught. The desktop shell's own permissions are
+broader than the app uses.
+
+With web search on, what you search for is seen by the search service, and a page she
+reads sees the request. The check on your words leaving reads words in order, so text
+that is encoded, reversed or translated gets past it, and in a search it then reaches
+the search service; what keeps it from a stranger's server is that she reads unasked
+only addresses you gave her or a search found. A page
+can still steer what she says: a line written to her that she passes on gets a note, a
+reworded one doesn't. The search service's address in Settings can be any address,
+including one on your own network, and any program that can call her backend can
+change it, as it can her other settings. On IPv6 she treats the /56 around this
+computer as your network, which is what most homes are given; a provider that gives a
+/48 leaves the rest of it looking public, as does a network that gives its computers
+public IPv4 addresses.
 
 [ARCHITECTURE.md §18](ARCHITECTURE.md#18-security-model) maps each defence to the code
 that implements it.
@@ -80,6 +112,9 @@ capabilities that don't exist, debug logging no longer copies database contents 
 console, uploads and the voice list stopped exposing file paths that contained the
 account name, the backend stopped trusting other localhost ports and started refusing
 requests for foreign host names (DNS rebinding), and the file tools stopped being able
-to read Veronica's private data or rewrite her own policy, settings and code. The patch
-notes in
+to read Veronica's private data or rewrite her own policy, settings and code. In 0.35.0,
+with web search, a network path read by the file tools stopped sending your Windows
+sign-in to another computer, the file tools stopped writing files Windows runs on its
+own, permission prompts stopped being able to hide what they approve, and attached
+images and uploaded documents stopped being kept unencrypted. The patch notes in
 [CHANGELOG.yaml](CHANGELOG.yaml) have the details.

@@ -3,25 +3,40 @@
 // and running out means no.
 //
 // It takes the keyboard only when nothing is being typed. An Enter meant for the
-// composer must never land on Allow.
+// composer must never land on Allow, and neither may a click already on its way when
+// the card appears under it: Allow wakes up after ARM_MS.
+//
+// What it shows can be an attacker's text, so it is shown as it is: characters that
+// render as nothing are marked where they sit, and an international address is named
+// as it really resolves.
 
 import { ShieldQuestionMark } from 'lucide-react'
 import { useCallback, useEffect, useId, useLayoutEffect, useRef, useState } from 'react'
-import { useConfirmations, type Confirmation } from '../kernel/useConfirmations'
+import { useConfirmations, type AskReason, type Confirmation } from '../kernel/useConfirmations'
 import { capabilityRequest } from '../lib/capabilities'
+import { REVEALED, reveal } from '../lib/reveal'
 import { Badge } from '../ui/Badge'
 import { Button } from '../ui/Button'
 import { Countdown } from '../ui/Countdown'
 import styles from './PermissionPrompts.module.css'
+import { PromptDetails } from './PromptDetails'
 import { useToasts } from './toast'
 
-// Said when she asks because of what she read: where the words came from, which is all
-// the check knows, and not who wanted it done.
-const FROM_READING = 'The words for this came from something I read, not from you.'
-const AFTER_WEB = "I read something on the web just before this, so I'm checking with you."
+export const ARM_MS = 500
+
+// Why she asks for something its setting would have let run. The words say where the
+// request came from, which is all the check knows, and not who wanted it done.
+const REASONS: Record<AskReason, { badge: string; said: string }> = {
+  from_reading: { badge: 'From something I read', said: 'The words for this came from something I read, not from you.' },
+  after_web: { badge: 'After reading the web', said: "I read something on the web just before this, so I'm checking with you." },
+  unfamiliar_link: { badge: 'Address not from you', said: "You didn't give me this address, and no search turned it up." },
+  sends_secret: { badge: 'Looks like a secret', said: 'This would send something that looks like a password or a key.' },
+  sends_private: { badge: 'Sends something of yours', said: 'This would send words from your files or from what I know about you.' },
+}
+const HIDDEN = "Some of this is written in characters that don't show on screen. I've marked them."
 
 export function PermissionPrompts() {
-  const { pending, answer } = useConfirmations()
+  const { pending, answer, fullValues } = useConfirmations()
   const toasts = useToasts()
   // A prompt that takes the keyboard is read out as the dialog it is. One that
   // arrives while you type can't take it, so it is announced here instead: never
@@ -43,6 +58,7 @@ export function PermissionPrompts() {
         <Prompt
           key={confirmation.token}
           confirmation={confirmation}
+          fullValues={fullValues}
           onUnseen={announce}
           onAnswer={(approved) => void reply(confirmation.token, approved)}
         />
@@ -53,10 +69,12 @@ export function PermissionPrompts() {
 
 function Prompt({
   confirmation,
+  fullValues,
   onUnseen,
   onAnswer,
 }: {
   confirmation: Confirmation
+  fullValues: (token: string) => Promise<Record<string, string> | null>
   onUnseen: (text: string) => void
   onAnswer: (approved: boolean) => void
 }) {
@@ -69,11 +87,17 @@ function Prompt({
   // has already used part of its time.
   const [elapsed] = useState(() => Math.max(0, confirmation.expiresInMs - (confirmation.expiresAt - Date.now())))
 
-  const request = confirmation.summary || capabilityRequest(confirmation.capability)
-  // Announced whole when the card can't take the keyboard: the warning lives in its
+  const armed = useArmed()
+
+  const request = reveal(confirmation.summary) || capabilityRequest(confirmation.capability)
+  const reason = confirmation.why ? REASONS[confirmation.why] : null
+  const hidden = REVEALED.test(request) || confirmation.details.some((detail) => REVEALED.test(detail.value))
+  const { target, targetReadAs } = confirmation
+  const address = targetReadAs ? `${targetReadAs} is an international name. Its real address is ${target}.` : ''
+  // Announced whole when the card can't take the keyboard: the warnings live in its
   // description, which nobody hears unless the card is focused.
-  const why = confirmation.fromReading ? FROM_READING : confirmation.afterWeb ? AFTER_WEB : ''
-  const heard = why ? `${request}. ${why}` : request
+  const warnings = [reason?.said, hidden ? HIDDEN : '', address].filter(Boolean).join(' ')
+  const heard = warnings ? `${request}. ${warnings}` : request
 
   // A layout effect, so its cleanup runs while the card is still in the page: the
   // keyboard goes back to where it was instead of falling to the page body when
@@ -119,23 +143,24 @@ function Prompt({
         <h2 id={titleId} className={styles.title}>
           Can I go ahead?
         </h2>
-        <p id={bodyId} className={styles.summary}>
-          {request}
+        <div id={bodyId} className={styles.body}>
+          <p className={styles.summary}>{request}</p>
+          {warnings && <p className={styles.warning}>{warnings}</p>}
           <span className="visually-hidden">
-            {`. ${why ? `${why} ` : ''}`}
             If you don't answer within {Math.round(confirmation.expiresInMs / 1000)} seconds, I won't.
           </span>
-        </p>
+        </div>
+        <PromptDetails confirmation={confirmation} fullValues={fullValues} />
         <div className={styles.meta}>
           <span>{capabilityRequest(confirmation.capability)}</span>
-          {confirmation.fromReading && (
+          {reason && (
             <Badge tone="warning" size="sm">
-              From something I read
+              {reason.badge}
             </Badge>
           )}
-          {confirmation.afterWeb && (
+          {hidden && (
             <Badge tone="warning" size="sm">
-              After reading the web
+              Hidden characters
             </Badge>
           )}
           {dangerous && (
@@ -154,13 +179,24 @@ function Prompt({
           <Button size="sm" variant="secondary" onClick={() => onAnswer(false)}>
             Don't allow
           </Button>
-          <Button size="sm" variant={dangerous ? 'danger' : 'primary'} onClick={() => onAnswer(true)}>
+          <Button size="sm" variant={dangerous ? 'danger' : 'primary'} disabled={!armed} onClick={() => onAnswer(true)}>
             Allow
           </Button>
         </div>
       </div>
     </div>
   )
+}
+
+/** False for the first ARM_MS after the card appears: a double click, or a click aimed
+ *  at what was there before, never lands on Allow. */
+function useArmed(): boolean {
+  const [armed, setArmed] = useState(false)
+  useEffect(() => {
+    const wake = window.setTimeout(() => setArmed(true), ARM_MS)
+    return () => window.clearTimeout(wake)
+  }, [])
+  return armed
 }
 
 /** Whole seconds until the deadline, ticking once a second, never below zero. */

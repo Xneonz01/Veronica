@@ -11,7 +11,7 @@ import json
 
 import httpx
 
-from app.adapters.web.capped import TooLarge, get_capped
+from app.adapters.web.capped import BadEncoding, TooLarge, get_capped
 from app.adapters.web.search import ANSWER_LIMIT, SearchFailed, SearchHit, failure, hits_from
 
 ENDPOINT = "https://api.search.brave.com/res/v1/web/search"
@@ -34,7 +34,10 @@ class BraveProvider:
                 params={"q": query, "count": min(count, _MAX_COUNT)},
                 headers={"Accept": "application/json", "X-Subscription-Token": self._key},
             )
-        except (httpx.HTTPError, TooLarge):
+        except UnicodeEncodeError:
+            # A key that isn't ASCII can't go in a header, and the error quotes it whole.
+            raise SearchFailed("bad_key") from None
+        except (httpx.HTTPError, TooLarge, BadEncoding):
             raise SearchFailed("unreachable") from None
         if (failed := failure(fetched.status)) is not None:
             raise failed

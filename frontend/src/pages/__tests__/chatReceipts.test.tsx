@@ -10,6 +10,10 @@ import { stubTopLayer } from '../../ui/__tests__/topLayer'
 import { ChatSessionContext } from '../../workspace/context'
 import { Chat } from '../Chat'
 
+// The page reads web search's setting for its fine print (chatFineprint.test.tsx); here
+// it stays unread, so nothing reaches for a backend.
+vi.mock('../../settings/useWebSettings', () => ({ useWebSettings: () => ({ settings: null }) }))
+
 function message(id: number, role: 'user' | 'assistant', content: string): ChatMessage {
   return { id, role, content, citations: [], tools: [] }
 }

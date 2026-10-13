@@ -8,10 +8,12 @@ the voice runtime's LLM client, the memory runtime, the kernel and the persona.
 from __future__ import annotations
 
 import logging
+from contextlib import suppress
 
 from fastapi import APIRouter, WebSocket
 
 from app.api.ws_guard import accept_trusted
+from app.core.logging import log_failure
 from app.services.chat.session import ChatSession
 
 logger = logging.getLogger(__name__)
@@ -41,8 +43,11 @@ async def chat_ws(websocket: WebSocket) -> None:
         await ChatSession(
             websocket, memory, runtime.llm, settings, kernel, persona, chat_store, project_store
         ).run()
-    except Exception:
-        logger.exception("ws/chat handler error")
-        raise
+    except Exception as exc:
+        # Closed here rather than raised: the server would log it again, message and
+        # all, and a message can quote what was said.
+        log_failure(logger, "ws/chat handler error", exc)
+        with suppress(Exception):  # the socket may be gone already
+            await websocket.close(code=1011)
     finally:
         logger.info("ws/chat closed")

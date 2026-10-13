@@ -20,7 +20,9 @@ router = APIRouter(prefix="/connected", tags=["connected"])
 
 
 class KeyUpdate(BaseModel):
-    key: str | None = Field(default=None, max_length=200)
+    # Printable ASCII only: a key travels in a header, and anything else (a zero-width
+    # space pasted with it) failed there with an error that quoted the whole key.
+    key: str | None = Field(default=None, max_length=200, pattern=r"^\s*[!-~]*\s*$")
 
 
 def _web(request: Request) -> ConnectedRuntime:

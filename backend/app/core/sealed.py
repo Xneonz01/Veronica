@@ -54,3 +54,26 @@ def is_sealed(path: Path) -> bool:
 
 def _bound(name: str) -> bytes:
     return MAGIC + name.encode("utf-8")
+
+
+def seal_in_place(path: Path, key: bytes, *, marker: str) -> None:
+    """Replace the plain file at `path` with its sealed form, never losing it: the sealed
+    copy is written beside it (`<name><marker>`), checked to open back to the same bytes
+    and flushed to disk before it replaces the file. A file written to meanwhile keeps
+    its newer bytes, plain, and is sealed next time."""
+    plain = path.read_bytes()
+    sealed = seal(plain, key, path.name)
+    if unseal(sealed, key, path.name) != plain:  # never: AES-GCM opens what it sealed
+        raise OSError("the sealed file doesn't open back to the same bytes")
+    temp = path.with_name(path.name + marker)
+    try:
+        with temp.open("xb") as handle:
+            handle.write(sealed)
+            handle.flush()
+            os.fsync(handle.fileno())
+        if path.read_bytes() != plain:
+            raise OSError("the file changed while it was sealed")
+        os.replace(temp, path)
+    except OSError:
+        temp.unlink(missing_ok=True)
+        raise

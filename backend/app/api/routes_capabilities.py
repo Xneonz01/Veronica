@@ -2,7 +2,9 @@
 
 `GET /capabilities/pending` lets a surface that reloaded (or connected late)
 re-render an outstanding prompt. Without it, a refresh mid-confirmation hides the
-request until it times out.
+request until it times out. A prompt carries each argument clipped; the whole of one
+is fetched from `GET /capabilities/pending/{token}` by the surface that shows it, so a
+long file body is never sent to every window.
 """
 
 from __future__ import annotations
@@ -14,6 +16,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel
 
+from app.api.refusals import Refusal
 from app.kernel.policy import PolicyMode, PolicyViolation
 from app.kernel.runtime import KernelRuntime
 
@@ -74,6 +77,16 @@ async def pending_confirmations(request: Request) -> dict[str, Any]:
     pending = _kernel(request).confirmations.pending()
     # `asdict`, not `__dict__`: PendingView is a slots dataclass with no instance dict.
     return {"pending": [asdict(item) for item in pending]}
+
+
+@router.get("/pending/{token}")
+async def pending_values(token: str, request: Request) -> dict[str, Any]:
+    """Every argument of one outstanding prompt in full (Show all): hidden characters
+    shown, nothing blanked but a field named for a secret (`kernel/display.py`)."""
+    values = _kernel(request).confirmations.full(token)
+    if values is None:
+        raise Refusal(404, "confirm_gone", "That request was already answered or ran out.")
+    return {"token": token, "values": values}
 
 
 @router.post("/confirm")

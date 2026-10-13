@@ -16,6 +16,7 @@ from app.kernel.capability import AuditSink, CapabilityResult, Decision
 from app.kernel.errors import Code
 from app.kernel.measure import measure, ms_since
 from app.kernel.registry import Capability, CapabilityRegistry
+from app.kernel.verdict import AFTER_WEB, FROM_READING, Verdict
 from app.schemas.events import Event
 from app.telemetry import current_blackbox
 
@@ -124,4 +125,21 @@ class Records:
             args=args.model_dump(),
             duration_ms=ms_since(started),
             confirm_via=confirm_via,
+        )
+
+
+def note(capability: Capability, verdict: Verdict) -> None:
+    """The black box's line for a request that asked because of what it read or would
+    send: the field, its source and its length, or the gate's reason, never the text or
+    an address, which may be the attacker's own (or the data being smuggled out)."""
+    if verdict.tainted is not None:
+        current_blackbox().record(
+            "info",
+            "capability.from_reading",
+            capability=capability.name,
+            **verdict.tainted.as_fields(),
+        )
+    elif verdict.why is not None and verdict.why not in (FROM_READING, AFTER_WEB):
+        current_blackbox().record(
+            "info", "capability.egress", capability=capability.name, why=verdict.why
         )

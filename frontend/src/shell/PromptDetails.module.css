@@ -1,0 +1,45 @@
+.details {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2xs);
+}
+
+/* A whole file body can be shown: it scrolls inside the card, the card stays put. */
+.list {
+  display: grid;
+  gap: var(--space-2xs);
+  width: 100%;
+  max-height: 40vh;
+  overflow: auto;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(3.5rem, auto) 1fr;
+  gap: var(--space-xs);
+  align-items: baseline;
+}
+
+.field {
+  font-size: var(--text-xs);
+  color: var(--subtle-foreground);
+}
+
+/* As it is: line breaks kept, and a long address broken anywhere rather than hidden
+   past the edge of the card. */
+.value {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.more {
+  color: var(--subtle-foreground);
+  font-family: var(--font-sans);
+}
+
+.failed {
+  font-size: var(--text-sm);
+  color: var(--warning);
+}

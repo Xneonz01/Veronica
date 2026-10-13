@@ -13,12 +13,21 @@ import re
 from dataclasses import dataclass
 from typing import Literal, Protocol
 
+from app.core.text_safety import clean_untrusted
+from app.kernel.urls import normalize_url
+
 Reason = Literal["unreachable", "refused", "json_off", "bad_key", "rate_limited", "bad_answer"]
 
 # A search answer is a page of short items: anything past this is not one.
 ANSWER_LIMIT = 1_000_000
-_TAG = re.compile(r"<[^>]+>")
+# A tag in a snippet (Brave marks matches with <strong>). No `<` inside, so a run of
+# them can't make the pattern try every split of it.
+_TAG = re.compile(r"<[^<>]*>")
 _SPACE = re.compile(r"\s+")
+# A result's link longer than this is left out, not cut: a shorter link is another page.
+_MAX_URL = 500
+# What of a title or snippet is looked at, before any pattern runs over it.
+_MAX_FIELD = 2000
 
 
 class SearchFailed(Exception):
@@ -52,10 +61,13 @@ def hits_from(items: object, snippet_key: str, count: int) -> list[SearchHit]:
         title, url, snippet = item.get("title"), item.get("url"), item.get(snippet_key)
         if not isinstance(title, str) or not isinstance(url, str):
             continue
-        if not url.startswith(("http://", "https://")):
+        # As the request would send it, percent-encoded: a path can carry text in
+        # characters that render as nothing, as a snippet can.
+        address = normalize_url(url) if len(url) <= _MAX_URL else None
+        if address is None or len(address) > _MAX_URL:
             continue
         text = snippet if isinstance(snippet, str) else ""
-        found.append(SearchHit(_plain(title, 200), url[:500], _plain(text, 400)))
+        found.append(SearchHit(_plain(title, 200), address, _plain(text, 400)))
         if len(found) >= count:
             break
     return found
@@ -73,4 +85,6 @@ def failure(status: int) -> SearchFailed | None:
 
 
 def _plain(text: str, limit: int) -> str:
-    return _SPACE.sub(" ", html.unescape(_TAG.sub("", text))).strip()[:limit]
+    """A result's text without markup or what renders as nothing, at most `limit`."""
+    plain = html.unescape(_TAG.sub("", text[:_MAX_FIELD]))
+    return _SPACE.sub(" ", clean_untrusted(plain)).strip()[:limit]

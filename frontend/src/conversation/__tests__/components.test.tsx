@@ -165,6 +165,26 @@ describe('Answer', () => {
     expect(screen.queryByText('Sources')).toBeNull()
   })
 
+  it('says an answer came from the web whenever a web tool ran, ahead of anything else', () => {
+    // (mutation: no web label; files first)
+    const browsed = message(6, 'assistant', 'Trams run every 12 minutes [1].', {
+      citations: cited.citations,
+      tools: [
+        { name: 'files_search', result: 'Found 1 file', ok: true, code: '' },
+        { name: 'web_read', result: 'Read a page on example.org.', ok: true, code: '' },
+      ],
+    })
+    const failed = message(7, 'assistant', 'I could not search.', {
+      tools: [{ name: 'web_search', result: 'The search service turned that down.', ok: false, code: 'search_unavailable' }],
+    })
+    const { unmount } = render(<Answer message={browsed} live={false} state="idle" onCite={() => undefined} />)
+    expect(screen.getByText('From the web')).toBeTruthy()
+    expect(screen.queryByText('From your files')).toBeNull()
+    unmount()
+    render(<Answer message={failed} live={false} state="idle" onCite={() => undefined} />)
+    expect(screen.queryByText('From the web')).toBeNull()
+  })
+
   it('names a failed action by what she could not do', () => {
     const failed = message(3, 'assistant', 'I could not look.', {
       tools: [{ name: 'files_list', result: "I couldn't open that folder.", ok: false, code: 'not_found' }],
@@ -263,6 +283,20 @@ describe('RichText', () => {
     expect(screen.getByRole('columnheader', { name: 'A' })).toBeTruthy()
     expect(container.querySelector('pre code')?.textContent).toBe('let a = 1')
     expect(screen.getByRole('button', { name: 'Copy' })).toBeTruthy()
+  })
+
+  it('marks what renders as nothing in code and addresses, and copies code as shown', async () => {
+    // (mutations: show code, inline code or an address as it came; copy the raw code)
+    const writeText = vi.fn(async (_text: string) => undefined)
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true })
+    const { container } = render(
+      <RichText source={"Run `ok\u200b()` from [the docs](https://exa\u200bmple.org/a).\n\n```js\nlet role = 'user\u202e'\n```"} />,
+    )
+    expect(container.querySelector('p code')?.textContent).toBe('ok⟪U+200B⟫()')
+    expect(container.textContent).toContain('(exa⟪U+200B⟫mple.org/a)')
+    expect(container.querySelector('pre code')?.textContent).toBe("let role = 'user⟪U+202E⟫'")
+    await userEvent.click(screen.getByRole('button', { name: 'Copy' }))
+    expect(writeText).toHaveBeenCalledWith("let role = 'user⟪U+202E⟫'")
   })
 
   it('never turns model text into markup', () => {

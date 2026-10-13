@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
@@ -37,7 +38,18 @@ logger = logging.getLogger(__name__)
 _FROM_READING = "The words for this came from something I read, not from you."
 # And when it asks because the turn read the web (`kernel.AFTER_WEB`).
 _AFTER_WEB = "I read something on the web just before this, so I'm checking with you."
-_WHY = {"from_reading": _FROM_READING, "after_web": _AFTER_WEB}
+# And when a call to the web would send out something it shouldn't unasked
+# (`kernel/egress.py`).
+_WHY = {
+    "from_reading": _FROM_READING,
+    "after_web": _AFTER_WEB,
+    "unfamiliar_link": "You didn't give me that address, and no search turned it up.",
+    "sends_secret": "It would send something that looks like a password or a key.",
+    "sends_private": "It would send words from your files or from what I know about you.",
+}
+# How a prompt shows a character that renders as nothing (`core/text_safety.reveal`):
+# on screen it is the warning, aloud it is noise.
+_REVEALED = re.compile(r"⟪U\+[0-9A-F]{4,6}⟫")
 
 
 @dataclass
@@ -62,11 +74,14 @@ def spoken_summary(capability: str, summary: str, why: str | None = None) -> str
     noise; the filename is the part a person can act on.
 
     With `why`, the kernel asked for an action that would otherwise have run unasked:
-    an argument came from something she read, or the turn read the web. The question
-    says which first.
+    an argument came from something she read, the turn read the web, or a call to the
+    web would send something it shouldn't. The question says which first; a reason
+    this doesn't know is left unsaid rather than said wrong.
     """
-    question = _question(capability, summary)
-    reason = _WHY.get(why or "", _FROM_READING) if why else ""
+    # A mark is said as a space, never a join: "pass⟪U+000B⟫word: x" was said as
+    # "password: x", a secret the card hadn't blanked (found in the review of 0.35.0).
+    question = _question(capability, " ".join(_REVEALED.sub(" ", summary).split()))
+    reason = _WHY.get(why or "", "")
     return f"{reason} {question}" if reason else question
 
 
@@ -81,8 +96,9 @@ def _question(capability: str, summary: str) -> str:
     if capability == "apps.open":
         target = summary.replace("open", "", 1).strip() or "that"
         return f"Shall I open {target}?"
-    if capability.startswith("memory."):
-        # Written to be said: "forget “User sees the dentist on Tuesdays”".
+    if capability.startswith(("memory.", "web.")):
+        # Written to be said: "forget “User sees the dentist on Tuesdays”", "read a page
+        # on example.org".
         return f"Shall I {summary}?"
     return f"Shall I go ahead with {capability.split('.')[-1]}?"
 

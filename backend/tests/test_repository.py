@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import os
 import re
+import unicodedata
 from functools import cache
 from pathlib import Path
 
@@ -148,3 +149,38 @@ def test_published_files_avoid_the_owners_private_terms() -> None:
     ]
     # Only locations are reported: printing the matched term would put it in CI logs.
     assert not offenders, f"private terms in published files at: {offenders}"
+
+
+# Written as themselves, these read as nothing: a bidi override can make code read as
+# something other than what it does ("Trojan Source"), and a reviewer can't see a
+# zero-width one. Text files may hold them only as escapes.
+_SOURCE = (".py", ".ts", ".tsx", ".js", ".css", ".html", ".md", ".yaml", ".toml", ".json")
+
+
+# Marks and letters that render as nothing too: the Hangul fillers, the grapheme
+# joiner, the Khmer inherent vowels, the Mongolian free variation selectors, and
+# variation selectors (`core/text_safety.py`).
+_BLANK = frozenset("\u115f\u1160\u3164\uffa0\u034f\u17b4\u17b5\u180b\u180c\u180d\u180f")
+
+
+def _unseen(char: str) -> bool:
+    category = unicodedata.category(char)
+    return (
+        category in ("Cf", "Co", "Cn", "Zl", "Zp")
+        or (category == "Cc" and char not in "\t\r\n")
+        or char in _BLANK
+        or "\ufe00" <= char <= "\ufe0f"
+        or "\U000e0100" <= char <= "\U000e01ef"
+    )
+
+
+def test_published_text_holds_no_character_that_renders_as_nothing() -> None:
+    """(mutation: write a bidi override into a test as itself)"""
+    offenders = [
+        f"{rel}:{_line(text, index)} U+{ord(char):04X}"
+        for rel, text in _texts()
+        if rel.endswith(_SOURCE)
+        for index, char in enumerate(text)
+        if _unseen(char)
+    ]
+    assert not offenders, f"write these as escapes: {offenders[:20]}"

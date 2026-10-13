@@ -88,6 +88,5 @@ def _keep_what_was_heard(s: RealtimeSession) -> None:
     elif content:
         kept = {"role": "assistant", "content": content}
         s.history.append(kept)
-        metrics = s.current_metrics
-        if metrics is not None and metrics.tool_calls:  # it may repeat what a tool returned
-            s.carried.append(("tool_result", kept))
+        for source in sorted(s.turn_sources):  # it may repeat what a tool returned
+            s.carried.append((source, kept))

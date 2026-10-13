@@ -208,7 +208,7 @@ def test_her_prompt_says_what_leaves_the_computer_only_while_web_search_is_on() 
     toolless = build_prompt(DEFAULT_PERSONALITY, spoken=False, tools_enabled=False, web=True)
 
     assert "Everything stays on this computer." in off and "web_search" not in off
-    assert "except what you search the web for" in chat and "web_read" in chat
+    assert "except what you look up on the web" in chat and "web_read" in chat
     assert "web_search" in call and "web_read" not in call
     assert "web_search" not in toolless and "Everything stays on this computer." in toolless
 

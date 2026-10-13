@@ -243,7 +243,7 @@ async def test_a_kept_call_that_cant_be_read_is_let_go(tmp_path: Path) -> None:
 async def test_the_end_of_a_call_keeps_it_for_learning(tmp_path: Path) -> None:
     """(mutation: learn at the call's end again, or keep nothing)"""
     mem, _chat = await _runtime(tmp_path)
-    session = SimpleNamespace(memory=mem)
+    session = SimpleNamespace(memory=mem, carried=[])
 
     await session_tasks.keep_for_learning(session, CALL)  # type: ignore[arg-type]
 
@@ -261,7 +261,7 @@ async def test_a_call_that_cant_be_kept_never_breaks_its_end(
 
     monkeypatch.setattr(mem.calls, "add", refused)
 
-    await session_tasks.keep_for_learning(SimpleNamespace(memory=mem), CALL)  # type: ignore[arg-type]
+    await session_tasks.keep_for_learning(SimpleNamespace(memory=mem, carried=[]), CALL)  # type: ignore[arg-type]
 
     assert "OSError" in caplog.text and "someone" not in caplog.text
     await mem.store.close()

@@ -1,9 +1,14 @@
 // An answer's text as React elements, from the tree blocks.ts and inline.ts
 // build. While it streams, a caret sits exactly where the next words will land.
+//
+// Code and addresses are shown with every character that renders as nothing marked
+// (`lib/reveal.ts`): a bidi control can make code read as something other than what it
+// does ("Trojan Source"), and an answer can carry one from a page she read.
 
 import { Check, Copy } from 'lucide-react'
 import { Fragment, useMemo, useState, type ReactNode } from 'react'
 import type { Citation } from '../chat/types'
+import { reveal } from '../lib/reveal'
 import { cx } from '../ui/cx'
 import { parseBlocks, type Block, type ListBlock } from './blocks'
 import { parseInline, type Inline } from './inline'
@@ -125,7 +130,7 @@ function InlineView({ piece, context }: { piece: Inline; context: Context }): Re
     case 'em':
       return <em>{piece.children.map((child, index) => <InlineView key={index} piece={child} context={context} />)}</em>
     case 'code':
-      return <code className={styles.code}>{piece.text}</code>
+      return <code className={styles.code}>{reveal(piece.text)}</code>
     case 'break':
       return <br />
     case 'keep':
@@ -145,7 +150,7 @@ function InlineView({ piece, context }: { piece: Inline; context: Context }): Re
       // shown rather than hidden behind a link that would do nothing.
       return (
         <Fragment>
-          {piece.text} <span className={styles.url}>({displayUrl(piece.url)})</span>
+          {reveal(piece.text)} <span className={styles.url}>({reveal(displayUrl(piece.url))})</span>
         </Fragment>
       )
   }
@@ -157,8 +162,11 @@ function displayUrl(url: string): string {
 
 function CodeBlock({ lang, code, tail }: { lang: string; code: string; tail: ReactNode }) {
   const [copied, setCopied] = useState(false)
+  // Copied as shown: pasted code with a hidden control in it would run as it reads, not
+  // as it looks; with the mark in place, it won't run until someone looks.
+  const shown = useMemo(() => reveal(code), [code])
   const copy = () => {
-    void navigator.clipboard?.writeText(code).then(
+    void navigator.clipboard?.writeText(shown).then(
       () => {
         setCopied(true)
         window.setTimeout(() => setCopied(false), 1600)
@@ -176,7 +184,7 @@ function CodeBlock({ lang, code, tail }: { lang: string; code: string; tail: Rea
         </button>
       </figcaption>
       <pre className={styles.pre}>
-        <code>{code}</code>
+        <code>{shown}</code>
         {tail}
       </pre>
     </figure>

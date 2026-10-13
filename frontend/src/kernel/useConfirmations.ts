@@ -9,6 +9,23 @@ import { useCallback, useEffect, useState } from 'react'
 import { useAppEvents } from '../audio/useAppEvents'
 import { apiFetch } from '../lib/api'
 
+/** Why she asks for an action its setting would have let run: an argument came word
+ *  for word from something she read, the turn read the web, or a call to the web would
+ *  send an address nobody gave her, a secret, or words of yours (`kernel/egress.py`). */
+export type AskReason = 'from_reading' | 'after_web' | 'unfamiliar_link' | 'sends_secret' | 'sends_private'
+const REASONS: readonly string[] = ['from_reading', 'after_web', 'unfamiliar_link', 'sends_secret', 'sends_private']
+
+/** One argument as the prompt shows it: hidden characters revealed, a secret blanked. */
+export interface ConfirmDetail {
+  field: string
+  value: string
+  /** Characters cut from `value`; the whole of it comes from `fullValues`. */
+  more: number
+  /** Characters blanked in `value` as a secret; `fullValues` has them, so nothing can
+   *  hide behind one from whoever answers. */
+  masked: number
+}
+
 export interface Confirmation {
   token: string
   capability: string
@@ -17,12 +34,14 @@ export interface Confirmation {
   expiresInMs: number
   /** Absolute deadline, so a resync mid-window resumes at the right point. */
   expiresAt: number
-  /** She asks because something she read suggested it, not you: an action that would
-   *  otherwise have run without asking. */
-  fromReading: boolean
-  /** She asks because she read the web this turn: an action that would otherwise have
-   *  run without asking. */
-  afterWeb: boolean
+  why: AskReason | null
+  /** Where it lands: the host a page is read from, as the request resolves it, or the
+   *  file it writes. */
+  target: string
+  /** That host as people read it, when it is an international name: `аpple.com` is
+   *  `xn--pple-43d.com`, not Apple's. Empty otherwise. */
+  targetReadAs: string
+  details: ConfirmDetail[]
 }
 
 // The server's expiry event normally clears the card; this grace period keeps the
@@ -36,11 +55,27 @@ interface WireConfirm {
   risk?: unknown
   expires_in_ms?: unknown
   why?: unknown
+  display?: { target?: unknown; target_read_as?: unknown; details?: unknown } | null
+}
+
+function count(raw: unknown): number {
+  return typeof raw === 'number' && raw > 0 ? raw : 0
+}
+
+function toDetails(raw: unknown): ConfirmDetail[] {
+  if (!Array.isArray(raw)) return []
+  return raw.flatMap((item: unknown) => {
+    if (!item || typeof item !== 'object') return []
+    const { field, value, more, masked } = item as Record<string, unknown>
+    if (typeof field !== 'string' || typeof value !== 'string') return []
+    return [{ field, value, more: count(more), masked: count(masked) }]
+  })
 }
 
 function toConfirmation(raw: WireConfirm): Confirmation | null {
   if (typeof raw.token !== 'string' || !raw.token) return null
   const expiresInMs = typeof raw.expires_in_ms === 'number' ? raw.expires_in_ms : 30000
+  const display = raw.display ?? {}
   return {
     token: raw.token,
     capability: String(raw.capability ?? ''),
@@ -48,8 +83,10 @@ function toConfirmation(raw: WireConfirm): Confirmation | null {
     risk: String(raw.risk ?? 'guarded'),
     expiresInMs,
     expiresAt: Date.now() + expiresInMs,
-    fromReading: raw.why === 'from_reading',
-    afterWeb: raw.why === 'after_web',
+    why: typeof raw.why === 'string' && REASONS.includes(raw.why) ? (raw.why as AskReason) : null,
+    target: typeof display.target === 'string' ? display.target : '',
+    targetReadAs: typeof display.target_read_as === 'string' ? display.target_read_as : '',
+    details: toDetails(display.details),
   }
 }
 
@@ -147,5 +184,21 @@ export function useConfirmations() {
     [drop],
   )
 
-  return { pending, answer }
+  /** Every argument of a request in full, screened as the prompt is. Fetched only for
+   *  the prompt on screen, so a long file body isn't sent to every window; null when it
+   *  can't be had (answered, run out, offline). */
+  const fullValues = useCallback(async (token: string): Promise<Record<string, string> | null> => {
+    try {
+      const response = await apiFetch(`/capabilities/pending/${encodeURIComponent(token)}`)
+      if (!response.ok) return null
+      const body = (await response.json()) as { values?: unknown }
+      if (!body.values || typeof body.values !== 'object') return null
+      const values = Object.entries(body.values).filter((entry): entry is [string, string] => typeof entry[1] === 'string')
+      return Object.fromEntries(values)
+    } catch {
+      return null
+    }
+  }, [])
+
+  return { pending, answer, fullValues }
 }

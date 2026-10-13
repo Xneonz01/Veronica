@@ -30,6 +30,7 @@ from typing import TYPE_CHECKING, Any
 
 from app.kernel.taint import Taint
 from app.services.tools import ToolBroker, ToolOutcome, after_round
+from app.services.tools.sources import read_sources
 from app.services.voice.realtime import spoken_confirm
 from app.services.voice.realtime.metrics import TurnMetrics
 from app.services.voice.realtime.reply_cap import ReplyBudget, read_reply
@@ -135,10 +136,24 @@ async def run_tool_rounds(
             # Once a round: two slow tools in a row said "One moment." twice.
             spoke_this_round = spoke_this_round or filled
         ran += outcomes
+        note_sources(s, outcomes)
         taint = after_round(taint, outcomes)
         if taint is not None:
             taint = taint.trusting(heard)
     return ran
+
+
+def note_sources(s: RealtimeSession, outcomes: list[ToolOutcome]) -> None:
+    """Keep what these calls may have put in the reply, and the addresses a search
+    returned, as they finish: a reply that fails or is cut off later is marked too."""
+    s.turn_sources |= read_sources(outcome.capability for outcome in outcomes)
+    s.urls = s.urls.union(url for outcome in outcomes for url in outcome.urls)
+
+
+def carry(s: RealtimeSession, entry: dict[str, Any]) -> None:
+    """Mark a reply in history with every source its turn's tools may have put in it."""
+    for source in sorted(s.turn_sources):
+        s.carried.append((source, entry))
 
 
 async def _run_one(

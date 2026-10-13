@@ -16,7 +16,7 @@ import pytest
 
 from app.core.config import get_settings
 from app.core.event_bus import InProcessEventBus
-from app.kernel import kernel as kernel_module
+from app.kernel import records as records_module
 from app.kernel.kernel import FROM_READING
 from app.kernel.taint import Taint
 from app.services.chat import context
@@ -139,7 +139,7 @@ async def test_the_black_box_notes_where_it_came_from_never_what_it_said(
         def record(self, level: str, event: str, **fields: Any) -> None:
             notes.append((event, fields))
 
-    monkeypatch.setattr(kernel_module, "current_blackbox", lambda: _Box())
+    monkeypatch.setattr(records_module, "current_blackbox", lambda: _Box())
     _memory, _kernel, tools = await _tools(tmp_path, confirm_timeout_s=0.05)
 
     await tools.execute("memory_save", {"content": PLANTED}, taint=_read(PLANTED))

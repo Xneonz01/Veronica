@@ -13,10 +13,10 @@ from app.core.config import Settings
 from app.core.event_bus import EventBus
 from app.kernel.audit import AuditStore
 from app.kernel.audit_integrity import AuditIntegrity
+from app.kernel.budget import Budget
 from app.kernel.confirm import ConfirmationBroker
 from app.kernel.kernel import CapabilityKernel
 from app.kernel.policy import PolicyStore
-from app.kernel.redaction import redact_args
 from app.kernel.registry import CapabilityRegistry
 from app.services.memory.store import MemoryStore
 
@@ -54,18 +54,19 @@ def build_kernel_runtime(
     policy = PolicyStore(bus, settings.capabilities.policy, path=policy_path)
     policy.load()  # saved choices layer over the config defaults
     audit = AuditStore(store)
-    # The confirmation prompt shows arguments, so it redacts with the same helper as
-    # the audit log: a secret must not appear on screen either.
-    confirmations = ConfirmationBroker(
-        bus, timeout_s=settings.capabilities.confirm_timeout_s, redact=redact_args
-    )
+    # The prompt screens what it shows itself (`kernel/display.py`).
+    confirmations = ConfirmationBroker(bus, timeout_s=settings.capabilities.confirm_timeout_s)
+    caps = settings.capabilities
     kernel = CapabilityKernel(
         registry,
         policy,
         confirmations,
         audit,
         bus,
-        taint_min_words=settings.capabilities.taint_min_words,
+        taint_min_words=caps.taint_min_words,
+        budget=Budget(
+            per_turn=caps.turn_budget, per_minute=caps.minute_budget, turn_total=caps.turn_total
+        ),
     )
     return KernelRuntime(
         registry=registry,

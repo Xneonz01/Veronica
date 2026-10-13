@@ -100,6 +100,7 @@ async def respond(s: RealtimeSession, user_text: str, marks: UtteranceMarks | No
     gen = s.audio_gen
     metrics = TurnMetrics(len(user_text), s.clock, marks or UtteranceMarks())
     s.current_metrics = metrics  # so a barge-in can record the interrupted turn
+    s.turn_sources = set()  # this turn's tools have read nothing yet
     s.begin_reply()
     first_audio = False
     try:
@@ -178,7 +179,7 @@ async def respond(s: RealtimeSession, user_text: str, marks: UtteranceMarks | No
                 speak=speak_text,
                 speak_held=speak_held,
                 budget=budget,
-                taint=Taint.of(untrusted=read, trusted=said),
+                taint=Taint.of(untrusted=read, trusted=said, urls=s.urls),
             )
         await speak_held()
         metrics.reply_capped = budget.capped
@@ -187,8 +188,7 @@ async def respond(s: RealtimeSession, user_text: str, marks: UtteranceMarks | No
         reply = s.chunker.spoken_text
         s.reply_entry = {"role": "assistant", "content": reply}
         s.history.append(s.reply_entry)
-        if ran:  # it may repeat what a tool returned
-            s.carried.append(("tool_result", s.reply_entry))
+        tool_loop.carry(s, s.reply_entry)  # it may repeat what a tool returned
         # The spoken "stop using my name" wrote the slot: a save, and a change of it.
         done = ("memory.save", "memory.correct") if corrected else ()
         await claim_caveat.settle(s, s.reply_entry, ran, done=done, memory=context)
@@ -255,6 +255,7 @@ def _keep_spoken_text(s: RealtimeSession) -> None:
     if spoken:
         s.reply_entry = {"role": "assistant", "content": f"{spoken}…"}
         s.history.append(s.reply_entry)
+        tool_loop.carry(s, s.reply_entry)  # what it said may be a page's words
 
 
 async def _speak(

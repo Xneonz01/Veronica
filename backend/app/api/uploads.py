@@ -10,6 +10,12 @@ route that bounds one reads it here instead.
 
 from __future__ import annotations
 
+import re
+import tempfile
+from collections.abc import Iterator
+from contextlib import contextmanager
+from pathlib import Path
+
 from fastapi import Request, UploadFile
 
 from app.api.refusals import Refusal
@@ -57,3 +63,38 @@ async def read_or_refuse(file: UploadFile) -> bytes:
     if data is None:
         raise Refusal(422, "file_too_large", TOO_LARGE)
     return data
+
+
+# Where an upload's copy lives while a parser reads it: inside her data folder, kept
+# private and swept at start-up, not the temp folder every program on the account
+# shares, where a crash left the copy for good.
+UPLOADS_DIR = "uploads"
+_SUFFIX = re.compile(r"^\.[A-Za-z0-9]{1,10}$")
+
+
+@contextmanager
+def private_copy(request: Request, data: bytes, name: str) -> Iterator[Path]:
+    """A file holding `data`, named with `name`'s suffix (the parser goes by it), that
+    exists only inside the `with` block."""
+    folder = request.app.state.settings.data_path() / UPLOADS_DIR
+    folder.mkdir(parents=True, exist_ok=True)
+    suffix = Path(name).suffix.lower()
+    with tempfile.NamedTemporaryFile(
+        dir=folder, delete=False, suffix=suffix if _SUFFIX.match(suffix) else ".bin"
+    ) as handle:
+        handle.write(data)
+    path = Path(handle.name)
+    try:
+        yield path
+    finally:
+        path.unlink(missing_ok=True)
+
+
+def sweep_uploads(data_dir: Path) -> None:
+    """Remove copies a crash left behind: they are copies of what was indexed, never the
+    only one of anything."""
+    folder = data_dir / UPLOADS_DIR
+    if folder.is_dir():
+        for leftover in folder.iterdir():
+            if leftover.is_file():
+                leftover.unlink(missing_ok=True)

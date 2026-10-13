@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any
 
 from app.kernel.taint import Source
 from app.services.tools import claims, relayed
+from app.services.tools.sources import read_sources, stored_source
 
 if TYPE_CHECKING:
     from app.services.chat.session import ChatSession
@@ -59,28 +60,42 @@ async def _open_failed(s: ChatSession, message: str) -> None:
     await s._fail("bad_conversation", message)
 
 
-def replayed(stored: list[StoredMessage]) -> tuple[list[dict[str, Any]], dict[int, Source]]:
-    """The model's history from stored rows, and which of its replies carried what she
-    read: a cited one, or one after a tool row.
+def replayed(
+    stored: list[StoredMessage],
+) -> tuple[list[dict[str, Any]], dict[int, frozenset[Source]]]:
+    """The model's history from stored rows, and what each of its replies may carry: a
+    cited one quotes a document, one after tool rows may repeat their results, the web's
+    among them when a web tool ran (`tools/sources.py`).
 
     Only user/assistant turns rejoin the history: tool rows are a record of what
     happened, and replaying them without their call ids confuses the model.
     """
     history: list[dict[str, Any]] = []
-    read: dict[int, Source] = {}
-    after_tool = False
+    read: dict[int, frozenset[Source]] = {}
+    after: set[Source] = set()
     for m in stored:
         if m.role == "tool":
-            after_tool = True
+            after.add(stored_source(m.tool_name))
         elif m.role in ("user", "assistant") and m.content:
-            if m.role == "assistant" and (m.citations or after_tool):
-                read[len(history)] = "document" if m.citations else "tool_result"
+            if m.role == "assistant" and (m.citations or after):
+                read[len(history)] = frozenset(after | ({"document"} if m.citations else set()))
             content = m.content
             if m.role == "assistant":  # as the user saw it, what it didn't do under it
                 content = claims.with_stored(content, m.caveats)
             history.append({"role": m.role, "content": content})
-            after_tool = False
+            after = set()
     return history, read
+
+
+def label(s: ChatSession, cited: bool) -> None:
+    """Mark the reply about to join history with what it may carry, and keep the
+    addresses this turn's searches returned for the rest of the conversation."""
+    sources = read_sources(outcome.capability for outcome in s._ran)
+    if cited:
+        sources |= {"document"}
+    if sources:
+        s._read[len(s._history)] = sources
+    s._urls = s._urls.union(url for outcome in s._ran for url in outcome.urls)
 
 
 def settle(s: ChatSession, reply: str, read: list[tuple[Source, str]]) -> list[dict[str, str]]:
@@ -96,13 +111,16 @@ def settle(s: ChatSession, reply: str, read: list[tuple[Source, str]]) -> list[d
 
 
 def reset_history(
-    s: ChatSession, history: list[dict[str, Any]], read: dict[int, Source] | None = None
+    s: ChatSession,
+    history: list[dict[str, Any]],
+    read: dict[int, frozenset[Source]] | None = None,
 ) -> None:
     """Swap the history and the index that points into it, together: `_read` kept
     from the conversation before would mark the new one's replies as quoting what
-    she read."""
+    she read. The addresses a search returned belong to their conversation too."""
     s._history = history
     s._read = read or {}
+    s._urls = frozenset()
 
 
 def carried(s: ChatSession, messages: list[dict[str, Any]]) -> list[tuple[Source, str]]:
@@ -112,6 +130,7 @@ def carried(s: ChatSession, messages: list[dict[str, Any]]) -> list[tuple[Source
     window = {id(message) for message in messages}
     return [
         (source, s._history[index]["content"])
-        for index, source in s._read.items()
+        for index, sources in s._read.items()
         if id(s._history[index]) in window
+        for source in sorted(sources)
     ]

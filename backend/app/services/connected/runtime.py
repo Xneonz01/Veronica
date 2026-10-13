@@ -1,13 +1,21 @@
-"""Her reach to the web: the live settings, one HTTP client and what uses it (ADR 0003).
+"""Her reach to the web: the live settings, the HTTP clients and what uses them (ADR 0003).
 
-One client for every request, built once and closed at shutdown, never following a
-redirect on its own: the page fetcher checks each one (`adapters/web/fetch.py`).
+The search provider has one client, built once and closed at shutdown. A page read gets
+a client of its own for every hop (`adapters/web/fetch.py`), so nothing a site leaves
+behind (a connection, a cookie) reaches another. None of them follows a redirect on its
+own, reads a proxy from the environment or keeps cookies, and they share one TLS
+context, built once: making one per client loads every certificate again, 128 ms on the
+event loop that calls run on.
 """
 
 from __future__ import annotations
 
+import ssl
+from collections.abc import Callable
 from dataclasses import dataclass
+from http.cookiejar import Cookie, CookieJar
 from pathlib import Path
+from typing import Any
 
 import httpx
 
@@ -40,15 +48,40 @@ class ConnectedRuntime:
         await self.client.aclose()
 
 
+class _NoCookies(CookieJar):
+    """A jar that keeps nothing: no site, and no search provider, can set a cookie."""
+
+    def set_cookie(self, cookie: Cookie) -> None:
+        return None
+
+    def extract_cookies(self, response: Any, request: Any) -> None:
+        return None
+
+
+def client_factory(
+    limits: CapabilitySettings, tls: ssl.SSLContext
+) -> Callable[[], httpx.AsyncClient]:
+    """A fresh client each call: no keep-alive, no cookies, no proxy, no redirects."""
+
+    def make() -> httpx.AsyncClient:
+        return httpx.AsyncClient(
+            timeout=httpx.Timeout(limits.web_timeout_s),
+            headers={"User-Agent": _USER_AGENT},
+            follow_redirects=False,
+            trust_env=False,
+            verify=tls,
+            cookies=_NoCookies(),
+            limits=httpx.Limits(max_keepalive_connections=0),
+        )
+
+    return make
+
+
 def build_connected(
     limits: CapabilitySettings, bus: EventBus, data_dir: Path, data_key: bytes | None
 ) -> ConnectedRuntime:
     store = ConnectedStore(bus, data_dir / "connected.json", data_key)
     store.load()
-    client = httpx.AsyncClient(
-        timeout=httpx.Timeout(limits.web_timeout_s),
-        headers={"User-Agent": _USER_AGENT},
-        follow_redirects=False,
-    )
-    fetcher = PageFetcher(client, max_bytes=limits.web_max_page_bytes, blocked=store.blocked)
-    return ConnectedRuntime(store, client, fetcher)
+    clients = client_factory(limits, httpx.create_ssl_context(trust_env=False))
+    fetcher = PageFetcher(clients, max_bytes=limits.web_max_page_bytes, blocked=store.blocked)
+    return ConnectedRuntime(store, clients(), fetcher)

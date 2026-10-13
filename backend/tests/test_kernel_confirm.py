@@ -209,27 +209,3 @@ async def test_a_prompt_carries_the_id_its_request_gave_and_the_record_does_not(
     broker.resolve(pending.token, approved=False)
     await task
     assert "call-7" not in str(audit.rows)
-
-
-async def test_the_prompt_redacts_secret_arguments() -> None:
-    bus = InProcessEventBus()
-    prompts: list[Any] = []
-
-    async def capture(event: Any) -> None:
-        prompts.append(event.payload)
-
-    bus.subscribe("capability.confirm_required", capture)
-
-    from app.kernel.redaction import redact_args
-
-    broker = ConfirmationBroker(bus, timeout_s=0.05, redact=redact_args)
-    capability = Capability(
-        name="test.secret",
-        description="x",
-        args_model=WriteArgs,
-        risk=RiskTier.guarded,
-        handler=lambda _a: asyncio.sleep(0),  # type: ignore[arg-type,return-value]
-    )
-    await broker.request(capability, WriteArgs(path="my password is hunter2"), "veronica")
-
-    assert "hunter2" not in str(prompts[0]["args_preview"])

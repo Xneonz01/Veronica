@@ -15,6 +15,7 @@ import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
 
+from app.core.text_safety import has_hidden
 from app.kernel.errors import Code
 
 # Windows device names: opening one talks to hardware, not a file (COM1 can block).
@@ -63,6 +64,16 @@ def resolve_within(
         raise PathRefused(Code.path_invalid, "I need a file path.")
     if not roots:
         raise PathRefused(Code.path_outside_roots, "I'm not allowed to open any folders yet.")
+    # Before anything touches the filesystem: resolving \\server\share\x makes Windows
+    # open an SMB connection to that server, which sends the account's NetNTLMv2
+    # response before any refusal below could run. Read as text, whichever slashes it
+    # is written with (//h/x, \/h/x and /\h\x are all UNC to Windows).
+    if candidate.strip().replace("/", "\\").startswith("\\\\"):
+        raise PathRefused(Code.path_invalid, "I can't open network or device paths.")
+    # A name with a character that renders as nothing reads as something else: a bidi
+    # override shows Notes_<U+202E>txt.bat as Notes_tab.txt on the permission prompt.
+    if has_hidden(candidate):
+        raise PathRefused(Code.path_invalid, "That name has hidden characters in it.")
 
     raw = Path(candidate)
     if not raw.is_absolute():

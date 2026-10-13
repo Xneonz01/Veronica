@@ -67,8 +67,14 @@ full reply. On the call probe, the time from your last word to her voice is abou
 ## Your data
 
 Everything lives under `data/`, which is git-ignored: memory, voice clips, attachments,
-personality and local diagnostics. Nothing leaves the machine. Diagnostics strip
-secrets and shorten paths before writing; turn them off with `telemetry.enabled: false`.
+personality and local diagnostics. Diagnostics strip secrets and shorten paths before
+writing; turn them off with `telemetry.enabled: false`.
+
+Nothing leaves the machine unless you switch on web search in Settings > Web. Then,
+only when she looks something up, the search goes to the service you chose (your own
+SearXNG, or Brave with your key) and a page she reads is fetched from its site. She
+asks first before sending an address nobody gave her, anything that looks like a
+password or a key, or words from your notes and memory.
 
 ## Development
 

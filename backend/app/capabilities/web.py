@@ -12,8 +12,9 @@ from urllib.parse import urlsplit
 
 from pydantic import BaseModel, Field
 
-from app.adapters.web.fetch import FetchRefused
+from app.adapters.web.fetch import FetchRefused, Page
 from app.adapters.web.search import Reason, SearchFailed, SearchHit
+from app.core.text_safety import display_host
 from app.kernel.capability import CapabilityResult, RiskTier
 from app.kernel.errors import Code
 from app.kernel.registry import Capability, CapabilityRegistry
@@ -22,6 +23,10 @@ from app.services.connected.runtime import ConnectedRuntime
 # Above the fetcher's own timeout: it may follow three redirects.
 _READ_TIMEOUT_S = 40.0
 _SEARCH_TIMEOUT_S = 20.0
+# How much of a query a prompt's one line shows, and the host named for an address that
+# has none: the prompt names the host a read resolves, never a cut-off URL.
+_SHOWN_QUERY = 120
+_NO_HOST = "an address that isn't a web page"
 _OFF = CapabilityResult(
     ok=False, code=Code.network_disabled, detail="Web search is switched off in Settings."
 )
@@ -59,9 +64,9 @@ def register_web(registry: CapabilityRegistry, web: ConnectedRuntime, results: i
             detail = _WHY[failed.reason]
             return CapabilityResult(ok=False, code=Code.search_unavailable, detail=detail)
         shown = f"Searched the web: {len(hits)} result{'' if len(hits) == 1 else 's'}."
-        return CapabilityResult(
-            ok=True, detail=shown, data={"content": _listing(hits) or "No results."}
-        )
+        # The addresses it returned may be read next without asking (`kernel/egress.py`).
+        data = {"content": listing(hits) or "No results.", "urls": [hit.url for hit in hits]}
+        return CapabilityResult(ok=True, detail=shown, data=data)
 
     async def read(args: ReadArgs) -> CapabilityResult:
         if not web.store.web_on():
@@ -70,11 +75,9 @@ def register_web(registry: CapabilityRegistry, web: ConnectedRuntime, results: i
             page = await web.fetcher.fetch(args.url.strip())
         except FetchRefused as refused:
             return CapabilityResult(ok=False, code=Code(refused.code), detail=refused.detail)
-        heading = "\n".join(part for part in (page.title, page.url) if part)
-        body = page.text or "(The page has no text I can read.)"
         site = urlsplit(page.url).hostname or "the page"
         return CapabilityResult(
-            ok=True, detail=f"Read a page on {site}.", data={"content": f"{heading}\n\n{body}"}
+            ok=True, detail=f"Read a page on {site}.", data={"content": page_content(page)}
         )
 
     registry.register(
@@ -86,8 +89,9 @@ def register_web(registry: CapabilityRegistry, web: ConnectedRuntime, results: i
             handler=search,
             timeout_s=_SEARCH_TIMEOUT_S,
             voice_exposed=True,
-            summarize=lambda a: f"search the web for {a.query[:80]}",
+            summarize=lambda a: f"search the web for {_clipped(a.query)}",
             available=web.store.web_on,
+            reach="network",
         )
     )
     registry.register(
@@ -98,13 +102,29 @@ def register_web(registry: CapabilityRegistry, web: ConnectedRuntime, results: i
             risk=RiskTier.safe,
             handler=read,
             timeout_s=_READ_TIMEOUT_S,
-            summarize=lambda a: f"read {a.url[:100]}",
+            summarize=lambda a: f"read a page on {display_host(a.url)[0] or _NO_HOST}",
             available=web.store.web_on,
+            reach="network",
+            url_fields=frozenset({"url"}),
         )
     )
 
 
-def _listing(hits: list[SearchHit]) -> str:
+def _clipped(query: str) -> str:
+    """A query as a prompt's one line names it: cut where it says so, the whole of it in
+    the prompt's details (`kernel/display.py`)."""
+    return query if len(query) <= _SHOWN_QUERY else query[:_SHOWN_QUERY].rstrip() + "…"
+
+
+def page_content(page: Page) -> str:
+    """A page as the model reads it: its title and address, then its text."""
+    heading = "\n".join(part for part in (page.title, page.url) if part)
+    return f"{heading}\n\n{page.text or '(The page has no text I can read.)'}"
+
+
+def listing(hits: list[SearchHit]) -> str:
+    """Search results as the model reads them: numbered, each its title, address and
+    snippet."""
     return "\n\n".join(
         "\n".join(part for part in (f"[{n}] {hit.title}", hit.url, hit.snippet) if part)
         for n, hit in enumerate(hits, 1)

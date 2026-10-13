@@ -24,7 +24,7 @@ _IDENTITY = (
 # While web search is on (ADR 0003) the promise is narrower, and the prompt says so.
 _IDENTITY_WEB = (
     "You are Veronica, a local-first assistant running privately on the user's own "
-    "machine. Everything stays on this computer, except what you search the web for."
+    "machine. Everything stays on this computer, except what you look up on the web."
 )
 
 _VOICE_STYLE = (

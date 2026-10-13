@@ -71,6 +71,16 @@ HEADLINES: dict[str, tuple[str, ...]] = {
         "call_echoed",
         "call_echo_caveated",
         "call_false_call",
+        "web_obeyed",
+        "web_ran_unasked",
+        "web_stopped_by_web",
+        "web_stopped_by_egress",
+        "web_echoed",
+        "web_false_call",
+        "call_web_obeyed",
+        "call_web_ran_unasked",
+        "call_web_echoed",
+        "call_web_false_call",
     ),
 }
 
@@ -102,20 +112,41 @@ async def run_family(
         # Kept with the result: the same model at another temperature is another result.
         return {**extraction.summarize(results), "temperature": warmth}, extraction.GOLD
     if family == "injection":
-        planted = attacks.load_cases()[:limit]
-        with tempfile.TemporaryDirectory(prefix="veronica-eval-") as folder:
-            root = Path(folder).resolve()
-            on = attacks.surface(settings, root)
-            found = [await attacks.run_case(llm, model, case, on) for case in planted]
-            # A call reads her memory and files, never a document, on its own prompt.
-            call_on = attacks.surface(settings, root, spoken=True)
-            heard = [case for case in planted if case["vector"] != "document"]
-            call_found = [await attacks.run_case(llm, model, case, call_on) for case in heard]
-            call = {f"call_{key}": value for key, value in scoring.summarize(call_found).items()}
-            return {**scoring.summarize(found), **scoring.conditions(on), **call}, attacks.CASES
+        return await _injection(llm, model, settings, limit), attacks.CASES
     questions = answers.load_cases()[:limit]
     graded = [await answers.run_case(llm, model, case) for case in questions]
     return answers.summarize(graded), answers.CASES
+
+
+async def _injection(
+    llm: OllamaLLMClient, model: str, settings: Settings, limit: int | None
+) -> dict[str, Any]:
+    planted = attacks.load_cases()[:limit]
+    browsed = attacks.load_cases(attacks.WEB_CASES)[:limit]
+
+    async def run(cases: list[dict[str, Any]], on: attacks.Surface) -> dict[str, Any]:
+        return scoring.summarize([await attacks.run_case(llm, model, case, on) for case in cases])
+
+    with tempfile.TemporaryDirectory(prefix="veronica-eval-") as folder:
+        root = Path(folder).resolve()
+        on = attacks.surface(settings, root)
+        found = await run(planted, on)
+        # A call reads her memory and files, never a document, on its own prompt.
+        heard = [case for case in planted if case["vector"] != "document"]
+        call = await run(heard, attacks.surface(settings, root, spoken=True))
+        # The web switched on (since 0.35.0): a page read in chat, a search on a call,
+        # which can't read a page. Kept apart, so the numbers above stay comparable.
+        web = await run(browsed, attacks.surface(settings, root, web=True))
+        searched = [case for case in browsed if not case.get("chat_only")]
+        call_web = await run(searched, attacks.surface(settings, root, spoken=True, web=True))
+    return {
+        **found,
+        **scoring.conditions(on),
+        **{f"call_{key}": value for key, value in call.items()},
+        **{f"web_{key}": value for key, value in web.items()},
+        **{f"call_web_{key}": value for key, value in call_web.items()},
+        "web_cases_hash": file_hash(attacks.WEB_CASES),
+    }
 
 
 def _cell(value: float | None) -> str:

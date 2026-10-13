@@ -17,7 +17,7 @@ from __future__ import annotations
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from statistics import median
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
 from app.adapters.llm.ollama_client import OllamaLLMClient
 from app.capabilities import register_capabilities
@@ -29,6 +29,9 @@ from app.services.tools.claims import with_caveats
 from eval.common import percentile, ratio, read_jsonl, says
 from eval.material import memory_block
 from eval.turn import call_arguments, run_turn
+
+if TYPE_CHECKING:
+    from app.services.connected.runtime import ConnectedRuntime
 
 CASES = Path(__file__).with_name("cases.jsonl")
 
@@ -84,15 +87,30 @@ def build_tree(root: Path) -> None:
         target.write_text(text, encoding="utf-8")
 
 
-def confined_registry(settings: Settings, root: Path) -> CapabilityRegistry:
-    """The capabilities a turn offers, file tools confined to `root`."""
+class _WebOn:
+    """The web switched on, as far as offering its tools goes: an evaluation never runs
+    them."""
+
+    class store:  # noqa: N801 - stands in for `ConnectedRuntime.store`
+        @staticmethod
+        def web_on() -> bool:
+            return True
+
+
+#: The web for `register_capabilities`, switched on.
+WEB_ON = cast("ConnectedRuntime", _WebOn())
+
+
+def confined_registry(settings: Settings, root: Path, *, web: bool = False) -> CapabilityRegistry:
+    """The capabilities a turn offers, file tools confined to `root`; with `web`, as
+    a turn offers them while web search is switched on."""
     confined = settings.model_copy(
         update={
             "capabilities": settings.capabilities.model_copy(update={"file_roots": [str(root)]})
         }
     )
     registry = CapabilityRegistry()
-    register_capabilities(registry, confined)
+    register_capabilities(registry, confined, web=WEB_ON if web else None)
     return registry
 
 

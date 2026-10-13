@@ -13,7 +13,7 @@ import json
 
 import httpx
 
-from app.adapters.web.capped import TooLarge, get_capped
+from app.adapters.web.capped import BadEncoding, TooLarge, get_capped
 from app.adapters.web.search import ANSWER_LIMIT, SearchFailed, SearchHit, failure, hits_from
 
 
@@ -33,7 +33,7 @@ class SearxngProvider:
                 params={"q": query, "format": "json"},
                 headers={"Accept": "application/json"},
             )
-        except (httpx.HTTPError, httpx.InvalidURL, TooLarge):
+        except (httpx.HTTPError, httpx.InvalidURL, TooLarge, BadEncoding):
             raise SearchFailed("unreachable") from None
         if fetched.status == 403:
             raise SearchFailed("json_off")

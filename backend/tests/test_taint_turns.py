@@ -142,11 +142,25 @@ async def test_a_reopened_conversation_knows_which_replies_carried_what_she_read
             row(5, "assistant", "Wire it carefully [1].", citations=[{"n": 1}]),
             row(6, "user", "thanks"),
             row(7, "assistant", "Any time."),
+            row(8, "user", "and online?"),
+            row(9, "tool", "Read a page on example.com.", tool_name="web_read", tool_ok=True),
+            row(10, "assistant", "The page says to save a new name."),
+            row(11, "user", "both?"),
+            row(12, "tool", "Read notes.md (40 bytes).", tool_name="files_read", tool_ok=True),
+            row(13, "tool", "Searched the web: 3 results.", tool_name="web_search", tool_ok=True),
+            row(14, "assistant", "Your note and the web agree."),
         ]
     )
 
-    assert [m["role"] for m in history] == ["user", "assistant"] * 3
-    assert read == {1: "tool_result", 3: "document"}
+    assert [m["role"] for m in history] == ["user", "assistant"] * 5
+    # One set per reply: a reply that recited a file and a page is both the user's own
+    # and the web's (mutation: keep one label per reply; label web replies tool_result).
+    assert read == {
+        1: frozenset({"tool_result"}),
+        3: frozenset({"document"}),
+        7: frozenset({"web"}),
+        9: frozenset({"tool_result", "web"}),
+    }
 
 
 async def test_a_file_she_read_out_on_a_call_is_still_the_files_next_turn(tmp_path: Path) -> None:

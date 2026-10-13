@@ -17,6 +17,7 @@ import pytest
 import soundfile as sf
 
 from app.core import dpapi
+from app.core import sealed as sealed_module
 from app.core.data_key import Locked
 from app.core.file_lock import held, lock_path
 from app.core.sealed import MAGIC, SealBroken, seal, unseal
@@ -164,7 +165,7 @@ def test_a_sealing_that_fails_leaves_the_clip_as_it_was_and_nothing_beside_it(
     def refused(*_args: object) -> None:
         raise PermissionError(13, "Access is denied")
 
-    monkeypatch.setattr(clips_module.os, "replace", refused)
+    monkeypatch.setattr(sealed_module.os, "replace", refused)  # shared since 0.35.0
 
     clips = Clips.open(tmp_path)
 

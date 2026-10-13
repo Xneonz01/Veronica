@@ -54,8 +54,20 @@
   letter-spacing: var(--tracking-ui);
 }
 
+.body {
+  display: grid;
+  gap: 2px;
+}
+
 .summary {
   font-size: var(--text-base);
+  overflow-wrap: anywhere;
+}
+
+/* Why it asks, in a sentence: the badge below names it, this explains it. */
+.warning {
+  font-size: var(--text-sm);
+  color: var(--muted-foreground);
   overflow-wrap: anywhere;
 }
 

@@ -19,6 +19,7 @@ from app.kernel.confirm import PendingView
 from app.kernel.kernel import CapabilityKernel
 from app.kernel.registry import Capability, CapabilityRegistry
 from app.kernel.taint import Taint, declared
+from app.kernel.urls import normalized
 from app.services.tools.render import render_result
 
 logger = logging.getLogger(__name__)
@@ -40,6 +41,9 @@ class ToolOutcome:
     # The call's checked arguments, when it ran: the model's own words from here on,
     # so an unchanged retry isn't taken for a copy of the result that quoted them.
     cleared: tuple[str, ...] = ()
+    # Addresses a search returned, normalised: pages that may be read without asking,
+    # from the next round and for the rest of the conversation (`kernel/egress.py`).
+    urls: tuple[str, ...] = ()
 
     @property
     def shown(self) -> str:
@@ -62,7 +66,6 @@ class ToolBroker:
         self._registry = registry
         self._actor = actor
         self._voice_only = voice_only
-        self._schemas: list[dict[str, Any]] | None = None
 
     @property
     def actor(self) -> str:
@@ -71,11 +74,10 @@ class ToolBroker:
         return self._actor
 
     def schemas(self) -> list[dict[str, Any]]:
-        """The tool list, built once per session."""
-        if self._schemas is None:
-            offered = self._registry.offered(call=self._voice_only)
-            self._schemas = self._registry.schemas(offered)
-        return self._schemas
+        """The tool list as it is now, built for every round: a capability switched on
+        in Settings reaches an open chat at its next message, and one switched off
+        stops being offered (the kernel refuses it if called anyway)."""
+        return self._registry.schemas(self._registry.offered(call=self._voice_only))
 
     def will_confirm(
         self, tool_name: str, arguments: dict[str, Any], taint: Taint | None = None
@@ -162,6 +164,7 @@ class ToolBroker:
                 if result.ok and taint is not None and capability.risk is not RiskTier.safe
                 else ()
             ),
+            urls=_found_urls(result.data) if result.ok else (),
         )
 
     def _request(
@@ -191,15 +194,25 @@ def after_round(taint: Taint | None, outcomes: Iterable[ToolOutcome]) -> Taint |
     if taint is None:
         return None
     done = list(outcomes)
-    web = [outcome.text for outcome in done if _from_web(outcome)]
-    rest = [outcome.text for outcome in done if not _from_web(outcome)]
+    web = [outcome.text for outcome in done if from_web(outcome.capability)]
+    rest = [outcome.text for outcome in done if not from_web(outcome.capability)]
     taint = taint.adding("web", web).adding("tool_result", rest)
+    taint = taint.knowing(url for outcome in done for url in outcome.urls)
     for outcome in done:
         if outcome.capability is not None and outcome.cleared:
             taint = taint.keeping(outcome.capability, outcome.cleared)
     return taint
 
 
-def _from_web(outcome: ToolOutcome) -> bool:
-    """A result fetched from the internet (`web.*`), which the kernel holds apart."""
-    return (outcome.capability or "").startswith("web.")
+def from_web(capability: str | None) -> bool:
+    """A capability whose result was fetched from the internet (`web.*`), which the
+    kernel holds apart from what this computer holds."""
+    return (capability or "").startswith("web.")
+
+
+def _found_urls(data: dict[str, Any]) -> tuple[str, ...]:
+    """The normalised addresses a result offers as safe to read next (a search's)."""
+    urls = data.get("urls")
+    if not isinstance(urls, list):
+        return ()
+    return tuple(sorted(normalized(url for url in urls if isinstance(url, str))))

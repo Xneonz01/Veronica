@@ -28,6 +28,7 @@ from app.adapters.llm.ollama_errors import (
     OllamaModelNoToolsError,
     OllamaUnreachableError,
 )
+from app.core.logging import log_failure
 from app.kernel.taint import Source, Taint
 from app.services.chat import context, lifecycle, window
 from app.services.chat.projects import ProjectStore
@@ -74,7 +75,8 @@ class ChatSession:
         # Replies in _history that carried what she read, by where it came from: a cited
         # answer quotes a document, one after a tool call may repeat its result. Later
         # turns read them as untrusted (`kernel/taint.py`).
-        self._read: dict[int, Source] = {}
+        self._read: dict[int, frozenset[Source]] = {}
+        self._urls: frozenset[str] = frozenset()  # what searches returned, readable unasked
         self._ran: list[ToolOutcome] = []  # what this turn's tool calls produced
         self._turn_task: asyncio.Task[None] | None = None
         self._broker = ToolBroker(kernel.kernel, kernel.registry, actor="veronica:chat")
@@ -192,7 +194,7 @@ class ChatSession:
                 model=self._model,
                 send=timer.send,
                 on_tool=self._record_tool,
-                taint=Taint.of(untrusted=read, trusted=said),
+                taint=Taint.of(untrusted=read, trusted=said, urls=self._urls),
                 window=window.TurnWindow(messages, room, tools),
             )
         except asyncio.CancelledError:
@@ -212,13 +214,12 @@ class ChatSession:
         except OllamaUnreachableError:
             await self._fail("llm_unreachable", "Veronica's mind isn't responding right now.")
             return
-        except Exception:
-            logger.exception("chat turn failed")
+        except Exception as exc:
+            log_failure(logger, "chat turn failed", exc)  # its message can quote the turn
             await self._fail("turn_failed", "Something interrupted that reply. Try again.")
             return
         reply = context.strip_unmatched_citations(reply, len(citations))
-        if citations or self._ran:
-            self._read[len(self._history)] = "document" if citations else "tool_result"
+        lifecycle.label(self, bool(citations))
         # What it went without first: it qualifies the whole answer.
         caveats = [*missed, *lifecycle.settle(self, reply, read)]
         await self._persist("assistant", reply, citations=citations, caveats=caveats)

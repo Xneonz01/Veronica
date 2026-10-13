@@ -22,6 +22,22 @@ from app.kernel.capability import CapabilityResult, RiskTier
 from app.kernel.errors import Code
 from app.kernel.registry import Capability, CapabilityRegistry
 
+# Types nobody writes as text that Windows acts on by itself: run, install, or open with
+# a handler, some without a click (a .scf or .library-ms in a folder Explorer shows can
+# send the account's hash to a server it names). "Write a text file" never needs them.
+_SHELL_ACTIVE = frozenset(
+    {
+        ".exe", ".com", ".scr", ".pif", ".lnk", ".url", ".scf", ".library-ms",
+        ".searchconnector-ms", ".settingcontent-ms", ".msi", ".msp", ".msix", ".appx",
+        ".appinstaller", ".application", ".appref-ms", ".theme", ".themepack", ".chm",
+        ".msc", ".inf", ".reg", ".cpl", ".dll", ".sys", ".ocx", ".hta", ".jar",
+    }
+)  # fmt: skip
+# Scripts are text people write, so they stay allowed; the prompt says they can run.
+_SCRIPTS = frozenset(
+    {".js", ".jse", ".ps1", ".psm1", ".bat", ".cmd", ".vbs", ".vbe", ".wsf", ".wsh", ".py", ".pyw"}
+)
+
 
 class WriteArgs(BaseModel):
     model_config = {"extra": "forbid"}
@@ -53,6 +69,10 @@ def register_write(
         except PathRefused as exc:
             return _refusal(exc.code, exc.detail)
         args.path = str(path)
+        if path.suffix.lower() in _SHELL_ACTIVE or path.name.lower() == "desktop.ini":
+            return _refusal(
+                Code.path_invalid, "I don't write files Windows runs or opens by itself."
+            )
         if path.is_dir():
             return _refusal(Code.path_invalid, "That's a folder, not a file.")
         if not path.parent.is_dir():
@@ -67,6 +87,8 @@ def register_write(
             return found
         size = f"{len(args.content):,} characters"
         what = f"replace {found} with {size}" if found.exists() else f"write {size} to {found}"
+        if found.suffix.lower() in _SCRIPTS:
+            what += " (this file can run as a program)"
         return CapabilityResult(ok=True, detail=what)
 
     def written(args: WriteArgs) -> CapabilityResult:

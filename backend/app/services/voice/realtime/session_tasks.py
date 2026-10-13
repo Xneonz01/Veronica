@@ -84,11 +84,20 @@ async def _greeting_text(s: RealtimeSession) -> str:
     )
 
 
+def own_words(s: RealtimeSession, history: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """`history` without her replies that carried what she read on the web: the recap
+    and learning are filed as her memory of the user, and a page's sentence she passed
+    on would become one, read back later as the user's own."""
+    from_web = {id(entry) for source, entry in s.carried if source == "web"}
+    return [message for message in history if id(message) not in from_web]
+
+
 async def summarize_session(s: RealtimeSession, history: list[dict[str, Any]]) -> None:
     """Summarize the finished session into one sentence; store it (kind=summary)."""
     memory = s.memory
     if memory is None:
         return
+    history = own_words(s, history)
     started = time.perf_counter()
     try:
         messages = [
@@ -130,6 +139,6 @@ async def keep_for_learning(s: RealtimeSession, history: list[dict[str, Any]]) -
     if memory is None:
         return
     try:
-        await memory.calls.add(history)
+        await memory.calls.add(own_words(s, history))
     except Exception as exc:  # never disrupt teardown
         logger.warning("the call couldn't be kept for learning (%s)", type(exc).__name__)
