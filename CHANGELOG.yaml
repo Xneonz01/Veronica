@@ -15,6 +15,8 @@
   date: 2026-10-14
   channel: dev
   sections:
+    improved:
+      - "The project page now shows what the app looks like, the hardware she needs (measured: a call peaks at 13.8 GB of graphics memory with the default model), and how to switch her language model for a smaller or a more capable one."
     fixed:
       - "After you started the app, a chat could seem stuck on Thinking, and only got going once you had started a call. Her language model was only loaded by a call or by your first message, so the first message waited for the whole load: 21 seconds when sent straight after launch. She now loads it in the background as soon as she starts. Sent the moment the chat opens, a first message now waits 7 seconds; sent 10 seconds after launch, half a second, where it took almost 5."
     known:

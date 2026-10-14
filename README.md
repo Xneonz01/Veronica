@@ -10,6 +10,17 @@ database under `data/`.
 
 Status: pre-1.0, developed and used on Windows.
 
+## Screenshots
+
+| | |
+|---|---|
+| ![A chat answer with its sources](docs/screenshots/chat.png) | ![She asks before writing a file](docs/screenshots/permission.png) |
+| Answers from your own documents, with the passage they came from. | Anything that changes something waits for your OK, and shows exactly what it will do. |
+| ![The Memory page](docs/screenshots/memory.png) | ![Her personality, in Settings](docs/screenshots/personality.png) |
+| What she remembers about you, to read, edit, pin or delete. | Her personality is yours to write. |
+
+The people and plans in these are made up.
+
 ## Features
 
 - Voice calls with a cloned voice. You can interrupt her mid-sentence.
@@ -21,14 +32,61 @@ Status: pre-1.0, developed and used on Windows.
 - Voice cloning from 10–15 seconds of speech.
 - A tray icon and a global hotkey that opens a small companion window.
 
-## Requirements
+## System requirements
 
-- Windows 10 or 11 (Linux and macOS are untested, and encryption at rest is Windows-only)
-- An NVIDIA GPU, 16 GB VRAM recommended
-- Python 3.12 with [uv](https://docs.astral.sh/uv/)
-- Node.js 20+
-- Ollama with a model that supports tool calling (`qwen3.5:9b` is the tested default)
-- Rust, only for the desktop shell
+| | Chat only | Chat and voice calls |
+|---|---|---|
+| Graphics card | NVIDIA, about 8 GB free | NVIDIA with 16 GB |
+| Memory (RAM) | 16 GB | 16 GB |
+| Disk | about 20 GB | about 20 GB |
+
+- **The card.** With the default model a call peaked at 13.8 GB of graphics memory,
+  the desktop's own share included (measured on a 16 GB card). Chat alone needs the
+  language model (6.7 GB) and the memory model (1.4 GB). Speech recognition and her
+  voice add about 5 GB, and only while a call is on.
+- **Memory.** Veronica and Ollama held 6.2 GB between them during a call, on top of
+  what Windows and your other programs use.
+- **Disk.** About 13 GB of models (6.6 GB of speech and memory models, 6.6 GB for the
+  default language model) and about 7 GB for the Python and Node.js packages.
+- **Software.** Windows 10 or 11 (Linux and macOS are untested, and encryption at rest is
+  Windows-only), Python 3.12 with [uv](https://docs.astral.sh/uv/), Node.js 20+,
+  [Ollama](https://ollama.com), and Rust only for the desktop shell.
+
+These figures are for the default settings; other cards and models haven't been
+measured. Settings > About has a "This computer" check that compares your machine with
+them.
+
+## Choosing a language model
+
+She uses one language model for chat, calls and learning: `qwen3.5:9b` by default,
+the one she has been measured and tuned with. You can use another one:
+
+- **Less graphics memory:** a smaller model, such as `qwen3:4b`.
+- **More capable:** a larger one, such as `qwen3:14b`, if your card has room for it
+  beside the speech models during a call.
+
+The model has to support tool calling, since that's how she reads files and remembers
+things; "This computer" in Settings > About says so if it doesn't. To switch:
+
+```bash
+ollama pull qwen3:14b
+```
+
+then set it in `.env` (copied from `.env.example`) and restart her backend:
+
+```bash
+VERONICA_LLM__MODEL=qwen3:14b
+```
+
+A model other than the default hasn't been measured, so how well it calls tools and
+follows her rules can differ. Her evaluations run against any model you name, from
+`backend/`:
+
+```bash
+uv run python -m scripts.model_eval --models qwen3:14b
+```
+
+Choosing the model in Settings is planned.
 
 ## Getting started
 
