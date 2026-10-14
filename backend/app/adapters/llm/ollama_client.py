@@ -11,8 +11,8 @@ from __future__ import annotations
 
 import json
 import logging
-from collections.abc import AsyncIterator
-from contextlib import nullcontext
+from collections.abc import AsyncGenerator, AsyncIterator
+from contextlib import aclosing, nullcontext
 from typing import Any
 
 import httpx
@@ -80,7 +80,7 @@ class OllamaLLMClient:
         keep_alive: str | None = None,
         counted: bool = True,
         temperature: float | None = None,
-    ) -> AsyncIterator[LlmChunk]:
+    ) -> AsyncGenerator[LlmChunk, None]:
         """Yield content deltas, then a terminal chunk carrying any tool calls.
 
         `counted` marks the model in use while it streams (`activity`); only work
@@ -179,6 +179,15 @@ class OllamaLLMClient:
         async for chunk in self.stream_chat(messages, tools):
             if chunk.content:
                 yield chunk.content
+
+    async def warm(self, model: str | None = None) -> None:
+        """Load the model and have it answer once, so the next request doesn't wait for
+        the load. Raises as `stream_chat` does. The stream is closed, not left for the
+        collector: open, it held the model's activity mark and Ollama kept writing."""
+        ask = self.stream_chat([{"role": "user", "content": "Ready"}], model=model)
+        async with aclosing(ask) as stream:
+            async for _ in stream:
+                break
 
     async def release_model(self, model: str | None = None) -> bool:
         """Ask Ollama to free the model's VRAM now. Best-effort, and quick.

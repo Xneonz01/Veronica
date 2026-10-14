@@ -115,7 +115,15 @@ class FakeSTT:
         return gen()
 
 
-class FakeLLM:
+class Warms:
+    """`warm` as the real client has it: one short request through `stream_chat`."""
+
+    async def warm(self, model: Any = None) -> None:
+        async for _ in self.stream_chat([{"role": "user", "content": "Ready"}], model=model):  # type: ignore[attr-defined]
+            break
+
+
+class FakeLLM(Warms):
     def __init__(
         self,
         tokens: list[str],
@@ -172,7 +180,7 @@ class FakeLLM:
         return None
 
 
-class ScriptedLLM:
+class ScriptedLLM(Warms):
     """An LLM whose successive stream_chat calls follow a script (tokens or a tool call).
 
     Each script step is ``{"tokens": [...]}`` (a streamed reply) or

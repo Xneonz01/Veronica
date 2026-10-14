@@ -256,9 +256,22 @@ settings to run with (a test hands it its own, since 0.29.0) and keeps them on
 `app.state.settings`, which the lifespan and the routes read; the module's `app` is
 built with `get_settings()`, the cached ones. Construction is cheap: models load
 through the GPU manager the first time a call starts or a memory needs embedding, from
-disk only ([§5.2](#52-gpu-model-manager)). The one exception is the memory model, which
-the start loads in the background and runs once (`memory.warm_on_start`), so the first
-message doesn't wait for it; start-up itself checks that the models are there.
+disk only ([§5.2](#52-gpu-model-manager)). Two exceptions load in the background as
+the start ends, side by side, so the first message doesn't wait for them: the memory
+model, run once (`memory.warm_on_start`), and the chat model, asked one word through
+Ollama as a call's warm-up asks it (`llm.warm_on_start`, `startup.warm_chat_model`,
+since 0.35.1). Before, nothing but a call or the first message loaded the chat model:
+sent straight after launch, a first message waited 21 s for its first word, 16 of them
+for the model, and chat seemed to work only after a call. Now 7 s; sent 10 s after
+launch, 0.6 s where it took 4.6 (measured with a 26B model, the model unloaded first).
+It loads only if the card has room for her model's files beside the memory model and
+the room a call keeps (`card_room.fits_her_model`, the figures a call's check reads):
+another program may be using the card. A memory model already loaded is counted
+twice, which can only make it wait on a nearly full card. It isn't among the work a quit waits for: it is
+cancelled at once, and the release sent at quit still frees the model (measured: a load
+cancelled a second in was never held afterwards). A failure to load is left to the
+first message to report; the log says what kind, and an unexpected one is logged as a
+failure rather than left unseen in its task. Start-up itself checks that the models are there.
 
 The order matters because several components share one SQLite connection:
 
@@ -306,6 +319,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         absent = await startup.check_models(app, settings)
         if stores is not None and settings.memory.warm_on_start and MEMORY_MODEL not in absent:
             startup.track(background, startup.warm_memory_model(stores.memory.embedder))
+        if settings.llm.warm_on_start:  # beside the memory model; a quit cancels it
+            warming = asyncio.create_task(startup.warm_chat_model(voice_runtime.llm, settings))
         current_perf().log("app.startup", ms_since(started))
         yield
     finally:
@@ -407,7 +422,7 @@ change live).
 | `app` | `name` Veronica, `env` dev |
 | `gpu` | `vram_budget_gb` 16, in decimal GB (the manager works in GiB: 14.9) |
 | `asr` | `model_size` large-v3-turbo, `device` cuda, `compute_type` float16, `language` auto, beam 1 for partials / 5 for the final, `decode_interval_ms` 400 |
-| `llm` (`config_llm.py`) | `base_url` http://127.0.0.1:11434, `model` qwen3.5:9b (the one model: chat, the live call, learning), `temperature` 0.7, `think` false, `keep_alive` 30m, `num_ctx` 8192 (refused at start below 5,888 tokens beside the longest reply: `MIN_PROMPT_TOKENS`, her longest persona, every tool with web search on, memory and documents at their budgets and a message; 5,632 before 0.35.0, which left no room for a message once web search was on), `num_predict` 2048 (the longest reply, held back from every chat prompt; 2,048 held back when 0 sets no limit), timeouts: connect 5 s / read 120 s / other 60 s |
+| `llm` (`config_llm.py`) | `base_url` http://127.0.0.1:11434, `model` qwen3.5:9b (the one model: chat, the live call, learning), `temperature` 0.7, `think` false, `keep_alive` 30m, `warm_on_start` true (loaded in the background at start; off in the tests), `num_ctx` 8192 (refused at start below 5,888 tokens beside the longest reply: `MIN_PROMPT_TOKENS`, her longest persona, every tool with web search on, memory and documents at their budgets and a message; 5,632 before 0.35.0, which left no room for a message once web search was on), `num_predict` 2048 (the longest reply, held back from every chat prompt; 2,048 held back when 0 sets no limit), timeouts: connect 5 s / read 120 s / other 60 s |
 | `tts` | `device` cuda; generation `temperature` 0.8, `repetition_penalty` 1.2, `top_p` 0.95, `top_k` 1000 |
 | `vad` | 16 kHz, `threshold` 0.5, `min_speech_ms` 250, `end_silence_min_ms` 200, `end_silence_max_ms` 800, `recheck_ms` 100, `turn_complete_threshold` 0.6 |
 | `voice` | `voices_dir` (the data folder's `voices`), `active_voice_id` veronica-default (the voice a first start speaks in; the one last chosen is kept beside the voices since 0.34.2) |

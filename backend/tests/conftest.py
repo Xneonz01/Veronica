@@ -43,6 +43,7 @@ for _section, _field, _place in STORES:
 # A start that loaded the real memory model would put it on the GPU for every test that
 # boots the app; the ones about the warm-up turn it back on.
 os.environ["VERONICA_MEMORY__WARM_ON_START"] = "false"
+os.environ["VERONICA_LLM__WARM_ON_START"] = "false"
 
 
 def pytest_sessionfinish(session: pytest.Session, exitstatus: int) -> None:

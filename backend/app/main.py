@@ -79,8 +79,9 @@ def websocket_stack_available() -> bool:
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     """Build the runtimes and stores on startup; drain and close them on shutdown.
 
-    Only the memory model's load starts here, in the background
-    (`startup.warm_memory_model`); the GPU manager loads the others on first use.
+    The memory model's load starts here, in the background (`startup.warm_memory_model`),
+    and the chat model's through Ollama (`startup.warm_chat_model`); the GPU manager
+    loads the others on first use.
     """
     started = time.perf_counter()
     settings: Settings = app.state.settings
@@ -108,6 +109,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     voice_runtime: VoiceRuntime | None = None
     stores: Stores | None = None
     learning_task: asyncio.Task[None] | None = None
+    warming: asyncio.Task[None] | None = None
     serving = False
     startup_error: BaseException | None = None
     app.state.problems = []
@@ -149,6 +151,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
         # Not for a memory she started without, or a model that isn't there to load.
         if stores is not None and settings.memory.warm_on_start and MEMORY_MODEL not in absent:
             startup.track(background, startup.warm_memory_model(stores.memory.embedder))
+        if settings.llm.warm_on_start:  # beside the memory model, not after it
+            # Not among the work shutdown waits for: a load isn't worth finishing for a
+            # quit, which waited up to 10 s for it.
+            warming = asyncio.create_task(startup.warm_chat_model(voice_runtime.llm, settings))
         current_perf().log("app.startup", (time.perf_counter() - started) * 1000.0)
         serving = True
         yield
@@ -159,6 +165,10 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             startup_error = exc
         raise
     finally:
+        if warming is not None:
+            warming.cancel()
+            with suppress(asyncio.CancelledError, Exception):
+                await warming
         if learning_task is not None:
             # Not drained: an extraction cut off here never reached `done`, so its
             # conversation is still due at the next start.

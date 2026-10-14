@@ -139,6 +139,31 @@ async def measure(settings: Settings) -> Room | None:
     return room
 
 
+async def fits_her_model(settings: Settings) -> bool:
+    """Whether the card has room to load her language model now, beside the memory model
+    the start is loading too, as the same figures judge a call's room. Loaded already, or a
+    room that can't be judged, it goes ahead: the first message would load it anyway."""
+    if not _all_on_the_card(settings):
+        return True
+    try:
+        card, model = await asyncio.wait_for(
+            asyncio.gather(
+                asyncio.to_thread(machine.card_use), asyncio.to_thread(her_model, settings.llm)
+            ),
+            _READ_TIMEOUT_S,
+        )
+    except (machine.ReadingError, TimeoutError):  # unknown, as a call's check takes it
+        logger.warning("the card's room for her model couldn't be read")
+        return True
+    except Exception:  # a check that breaks must not stop the start
+        logger.warning("the card's room for her model couldn't be judged", exc_info=True)
+        return True
+    if card is None or model.loaded:
+        return True
+    memory_mib = int(settings.memory.embedding_vram_gb * 1024)
+    return card.total_mib - card.used_mib >= model.files_mib + memory_mib + KEEP_FREE_MIB
+
+
 def her_model(llm: LlmSettings) -> HerModel:
     """Her language model's files and whether Ollama has it loaded. Nothing of it is on this
     card when Ollama runs elsewhere, and nothing will load when it isn't answering or

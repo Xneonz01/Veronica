@@ -15,8 +15,15 @@ from fastapi import FastAPI
 
 from app.adapters import model_files
 from app.adapters.base import EmbeddingProvider
+from app.adapters.llm.ollama_client import OllamaLLMClient
+from app.adapters.llm.ollama_errors import (
+    OllamaModelFailedError,
+    OllamaModelMissingError,
+    OllamaUnreachableError,
+)
 from app.core.config import Settings
 from app.core.config_llm import LlmSettings
+from app.core.logging import log_failure
 from app.core.problems import Problem, announce
 from app.kernel.audit_integrity import AuditIntegrity, check_chain
 from app.kernel.runtime import KernelRuntime
@@ -26,6 +33,7 @@ from app.services.chat.learning_worker import LearningWorker, transcript_budget
 from app.services.persona import PersonaService
 from app.services.tools import ToolBroker
 from app.services.voice.clips import UNUSABLE
+from app.services.voice.realtime import card_room
 from app.services.voice.runtime import VoiceRuntime
 from app.stores import Stores, memory_problem
 from app.telemetry import current_blackbox
@@ -165,3 +173,19 @@ async def warm_memory_model(embedder: EmbeddingProvider) -> None:
         await embedder.embed(["warm up"])
     except Exception:
         logger.exception("could not load the memory model at start")
+
+
+async def warm_chat_model(llm: OllamaLLMClient, settings: Settings) -> None:
+    """Load the chat model now, so the first message doesn't wait for it (`warm_on_start`
+    in `core/config_llm.py`), if the card has room: another program may be using it, and
+    the first message would only meet the same card later. A failure is left for that
+    first message to report, in words the app has: a log line here says only what kind."""
+    if not await card_room.fits_her_model(settings):
+        logger.info("not loading the chat model at start: the card hasn't room for it now")
+        return
+    try:
+        await llm.warm(settings.llm.model)
+    except (OllamaUnreachableError, OllamaModelMissingError, OllamaModelFailedError) as exc:
+        logger.warning("could not load the chat model at start (%s)", type(exc).__name__)
+    except Exception as exc:  # anything else sat unseen in the task until a quit dropped it
+        log_failure(logger, "could not load the chat model at start", exc)

@@ -33,6 +33,11 @@ class LlmSettings(BaseModel):
     load_timeout_s: float = 120.0
     think: bool = False  # qwen3 reasons by default; off for low-latency voice
     keep_alive: str = "30m"  # pin the model in VRAM between turns
+    # Loaded in the background at start, beside the memory model. Nothing else loaded it
+    # before the first message or a call: a first message sent at launch waited 21 s,
+    # 16 of them for the model, and chat seemed to need a call first (a call's warm-up
+    # loaded it). Off in the tests.
+    warm_on_start: bool = True
     # Sent, not left at Ollama's 4,096, which drops the front of a long prompt (the
     # persona, the tool rules) without an error. The largest prompt, chat's with web
     # search on, measures 5,691 tokens (`scripts/prompt_probe.py`, 0.35.0); with the

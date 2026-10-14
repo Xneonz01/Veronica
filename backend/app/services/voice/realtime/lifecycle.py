@@ -201,12 +201,7 @@ async def prewarm_tts(s: RealtimeSession) -> None:
 
 async def prewarm_llm(s: RealtimeSession) -> None:
     try:
-        async for _ in s.runtime.llm.stream_chat(
-            [{"role": "user", "content": "Ready"}],
-            tools=None,
-            model=s.settings.llm.model,
-        ):
-            break
+        await s.runtime.llm.warm(s.settings.llm.model)
     except OllamaUnreachableError:
         logger.warning("Ollama unreachable during prewarm")
     except (OllamaModelMissingError, OllamaModelFailedError) as exc:

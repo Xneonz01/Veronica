@@ -27,7 +27,15 @@ from app.telemetry import install, uninstall
 from app.telemetry.blackbox import BlackBox
 from app.telemetry.perf import PerfLogger
 from app.telemetry.runctx import RunContext
-from tests.fakes import FakeDetector, FakeSTT, FakeTTS, FakeWS, ListMetricsSink, build_fake_runtime
+from tests.fakes import (
+    FakeDetector,
+    FakeSTT,
+    FakeTTS,
+    FakeWS,
+    ListMetricsSink,
+    Warms,
+    build_fake_runtime,
+)
 from tests.test_realtime_session import feed, start_call, wait_until
 from tests.test_vad import _FakeVad
 from tests.test_voice_confirm import _session as confirm_session
@@ -169,7 +177,7 @@ class _TimedSTT(FakeSTT):
         return gen()
 
 
-class _TimedLLM:
+class _TimedLLM(Warms):
     """First token after 300 ms; the first sentence is complete 250 ms later.
 
     Each token waits on the loop before it arrives, as a real stream waits on the

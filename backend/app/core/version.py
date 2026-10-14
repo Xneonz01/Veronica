@@ -10,6 +10,6 @@ minor number and a release that only fixes things bumps the patch number.
 """
 
 APP_NAME = "Veronica"
-APP_VERSION = "0.35.0"
-APP_VERSION_LABEL = "On the web"
+APP_VERSION = "0.35.1"
+APP_VERSION_LABEL = "Ready when you are"
 APP_CHANNEL = "dev"  # dev | beta | stable
