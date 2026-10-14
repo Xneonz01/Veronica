@@ -29,7 +29,8 @@ from datetime import datetime
 from typing import TYPE_CHECKING, Any
 
 from app.kernel.taint import Taint
-from app.services.tools import ToolBroker, ToolOutcome, after_round
+from app.services.tools import ToolBroker, ToolOutcome, after_round, went_down
+from app.services.tools.markup import LAST_ROUND, MarkupGate
 from app.services.tools.sources import read_sources
 from app.services.voice.realtime import spoken_confirm
 from app.services.voice.realtime.metrics import TurnMetrics
@@ -95,21 +96,30 @@ async def run_tool_rounds(
     the turn instead of finishing after the call has moved on.
     """
     ran: list[ToolOutcome] = []
+    down: set[str] = set()
     for round_index in range(MAX_TOOL_ROUNDS):
         last = round_index == MAX_TOOL_ROUNDS - 1
-        tools = None if last else broker.schemas()
+        tools = None if last else broker.schemas(without=down)
+        # Asked without tools, a model may still write a call out as text: never read
+        # aloud (`tools/markup.py`).
+        gate = MarkupGate() if last else None
         spoke_this_round = False
         tool_calls: list[dict[str, Any]] | None = None
 
-        calling = s.runtime.llm.stream_chat(messages, tools=tools, model=model)
+        asked = [*messages, LAST_ROUND] if last else messages
+        calling = s.runtime.llm.stream_chat(asked, tools=tools, model=model)
         async with read_reply(calling, budget) as stream:
             async for chunk in stream:
-                if chunk.content:
+                said = gate.feed(chunk.content) if gate is not None else chunk.content
+                if said:
                     metrics.mark_ttft()
-                    await speak(chunk.content)
+                    await speak(said)
                     spoke_this_round = True
                 if chunk.done:
                     tool_calls = chunk.tool_calls
+        if gate is not None and (rest := gate.end()):
+            metrics.mark_ttft()
+            await speak(rest)
         await speak_held()
 
         if last or not tool_calls:
@@ -136,6 +146,7 @@ async def run_tool_rounds(
             # Once a round: two slow tools in a row said "One moment." twice.
             spoke_this_round = spoke_this_round or filled
         ran += outcomes
+        down |= went_down(outcomes)
         note_sources(s, outcomes)
         taint = after_round(taint, outcomes)
         if taint is not None:

@@ -1306,7 +1306,11 @@ With a kernel wired in, `respond` runs `tool_loop.run_tool_rounds` instead of a 
 pass. Its rules:
 
 - At most three rounds. The last round is sent **without** tools, so a turn always ends
-  in speech rather than silence.
+  in speech rather than silence, with the note and the guard chat's last round has
+  (§9.2): a reply that opens as a tool call written out as text, or holds one of the
+  markers no prose has, isn't read aloud past it.
+- A capability whose service a call found down (`search_unavailable`) isn't offered
+  again for the rest of the reply (`tools.went_down`), as in chat.
 - The voice broker only exposes capabilities flagged `voice_exposed` (currently all
   nine: the four memory ones, `files.read`, `files.list`, `files.search`, `files.write`
   and `apps.open`). Every tool schema costs prompt tokens on every spoken turn.
@@ -1712,6 +1716,29 @@ final round without tools puts what the last round fetched into words. Since 0.3
 (bug 25): a last round that wrote a sentence beside its calls was taken as the answer,
 and what those calls fetched went unsaid. A final round that writes nothing leaves
 that sentence as the answer, rather than an empty one.
+
+Since 0.35.0 the final round is told, as a system note sent with it and never kept in
+the conversation, that tools are over and to answer in words, saying what didn't work
+(`tools/markup.LAST_ROUND`). Sent as a system message mid-conversation, it was
+followed by qwen3.5:9b and two other local models alike, though not every template
+shows such a message in its own loop. The reply's start is held back until it reads
+as words (`MarkupGate`, 16 characters): one that opens as a tool call written out as
+text (`<tool_call>`, `<|tool_call>`, `<|python_tag|>`, `[TOOL_CALLS]`,
+`<function=`) is replaced by "I couldn't finish looking that up." Later in the reply,
+only the markers no prose holds (`<|tool_call>`, `<|python_tag|>`, `[TOOL_CALLS]`) cut
+it there, 13 characters being held back as it streams in case one starts: an answer
+can mention `<tool_call>`, and can be JSON. Not caught: DeepSeek's markers and calls
+written as Python. And a capability whose service a
+call found down (`search_unavailable`: no search service running, a bad key, a rate
+limit) isn't offered again for the rest of the reply (`tools.went_down`). With no search
+service running, another local model searched three times in each of 9 turns, spent
+every round, and in use wrote its next call as text, which was shown as her answer.
+Measured on the same three requests, three runs each: searches per turn fell from 2.9
+to 1.2 on that model, and none of its answers came out as a call, where told nothing
+4 of 9 did once search was taken away; qwen3.5:9b searched once and answered in words
+before and after. Changing the tool list between rounds costs little: both models read
+the whole prompt again each round anyway, and the round after a search was taken away
+took 20 to 30 ms longer on the other model, 60 to 85 ms on qwen3.5:9b.
 
 ### 9.3 What goes into the prompt
 

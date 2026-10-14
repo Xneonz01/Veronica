@@ -10,12 +10,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections.abc import Iterable
+from collections.abc import Collection, Iterable
 from dataclasses import dataclass
 from typing import Any
 
 from app.kernel.capability import CapabilityRequest, RiskTier
 from app.kernel.confirm import PendingView
+from app.kernel.errors import Code
 from app.kernel.kernel import CapabilityKernel
 from app.kernel.registry import Capability, CapabilityRegistry
 from app.kernel.taint import Taint, declared
@@ -73,11 +74,13 @@ class ToolBroker:
         and so on every prompt it raises."""
         return self._actor
 
-    def schemas(self) -> list[dict[str, Any]]:
+    def schemas(self, without: Collection[str] = ()) -> list[dict[str, Any]]:
         """The tool list as it is now, built for every round: a capability switched on
         in Settings reaches an open chat at its next message, and one switched off
-        stops being offered (the kernel refuses it if called anyway)."""
-        return self._registry.schemas(self._registry.offered(call=self._voice_only))
+        stops being offered (the kernel refuses it if called anyway). `without`: the
+        capabilities this turn found down (`went_down`)."""
+        offered = self._registry.offered(call=self._voice_only)
+        return self._registry.schemas([c for c in offered if c.name not in without])
 
     def will_confirm(
         self, tool_name: str, arguments: dict[str, Any], taint: Taint | None = None
@@ -202,6 +205,18 @@ def after_round(taint: Taint | None, outcomes: Iterable[ToolOutcome]) -> Taint |
         if outcome.capability is not None and outcome.cleared:
             taint = taint.keeping(outcome.capability, outcome.cleared)
     return taint
+
+
+# Codes that say the service behind a capability is down, not that one call went wrong.
+_SERVICE_DOWN = frozenset({Code.search_unavailable})
+
+
+def went_down(outcomes: Iterable[ToolOutcome]) -> set[str]:
+    """Capabilities whose service a call found down, not offered for the rest of the
+    turn: asked again, the same service answers the same. With no search service
+    running, another local model searched three times in each of 9 turns and spent
+    every round on it; qwen3.5:9b stopped after one."""
+    return {o.capability for o in outcomes if o.capability and o.code in _SERVICE_DOWN}
 
 
 def from_web(capability: str | None) -> bool:

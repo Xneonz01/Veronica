@@ -159,7 +159,7 @@ def test_a_budget_too_small_for_the_fence_gets_the_note_alone() -> None:
 
 
 class _NoTools:
-    def schemas(self) -> list[dict[str, Any]]:
+    def schemas(self, without: Any = ()) -> list[dict[str, Any]]:
         return []
 
 

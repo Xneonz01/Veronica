@@ -426,7 +426,7 @@ async def test_teardown_leaves_no_tasks() -> None:
 class _OneTool:
     """A call's tools, as much of them as a model that refuses them sees: their list."""
 
-    def schemas(self) -> list[dict[str, Any]]:
+    def schemas(self, without: Any = ()) -> list[dict[str, Any]]:
         parameters = {"type": "object", "properties": {}}
         return [
             {"type": "function", "function": {"name": "memory_recall", "parameters": parameters}}

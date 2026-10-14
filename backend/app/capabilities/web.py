@@ -31,7 +31,8 @@ _OFF = CapabilityResult(
     ok=False, code=Code.network_disabled, detail="Web search is switched off in Settings."
 )
 _WHY: dict[Reason, str] = {
-    "unreachable": "I couldn't reach the search service.",
+    "unreachable": "I couldn't reach the search service: check it is running, or choose "
+    "another in Settings > Web.",
     "refused": "The search service turned that down.",
     "json_off": "The SearXNG server doesn't answer in JSON: add json to its search formats.",
     "bad_key": "The search service didn't accept the key in Settings.",

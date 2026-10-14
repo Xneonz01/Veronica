@@ -16,7 +16,8 @@ from collections.abc import Awaitable, Callable
 from typing import TYPE_CHECKING, Any
 
 from app.kernel.taint import Taint
-from app.services.tools import ToolBroker, ToolOutcome, after_round
+from app.services.tools import ToolBroker, ToolOutcome, after_round, went_down
+from app.services.tools.markup import LAST_ROUND, MarkupGate
 
 if TYPE_CHECKING:
     from app.adapters.llm.ollama_client import OllamaLLMClient
@@ -60,10 +61,12 @@ async def stream_reply(
     own rounds can't be made to fit, she answers from what she has, without tools.
     """
     reply = ""
+    down: set[str] = set()
     for _ in range(MAX_TOOL_ROUNDS):
         parts: list[str] = []
         tool_calls: list[dict[str, Any]] | None = None
-        async for chunk in llm.stream_chat(messages, tools=broker.schemas(), model=model):
+        tools = broker.schemas(without=down)
+        async for chunk in llm.stream_chat(messages, tools=tools, model=model):
             if chunk.content:
                 parts.append(chunk.content)
                 await send({"type": "token", "text": chunk.content})
@@ -94,6 +97,7 @@ async def stream_reply(
             await on_tool(name, outcome)
             messages.append({"role": "tool", "content": outcome.text})
         taint = after_round(taint, outcomes)
+        down |= went_down(outcomes)
         if window is not None and not window.make_room():
             break  # the tool list is room it can't spare
 
@@ -101,13 +105,19 @@ async def stream_reply(
     # round: the last round's results are in `messages`, and nothing has read them yet.
     # One round without tools puts them into words. A sentence the last round carried
     # before its calls was returned here once, and what it fetched went unsaid (bug 25).
+    # Asked without tools, a model may still write a call out as text (`tools/markup.py`):
+    # told so first, and held back if it does.
     parts = []
-    async for chunk in llm.stream_chat(messages, tools=None, model=model):
-        if chunk.content:
-            parts.append(chunk.content)
-            await send({"type": "token", "text": chunk.content})
+    gate = MarkupGate()
+    async for chunk in llm.stream_chat([*messages, LAST_ROUND], tools=None, model=model):
+        if passed := gate.feed(chunk.content):
+            parts.append(passed)
+            await send({"type": "token", "text": passed})
         if chunk.done and window is not None and chunk.usage is not None:
             window.observe(chunk.usage.prompt_tokens, with_tools=False)
+    if rest := gate.end():
+        parts.append(rest)
+        await send({"type": "token", "text": rest})
     # A round that wrote nothing leaves the last round's sentence, not an empty answer.
     return "".join(parts) or reply
 
