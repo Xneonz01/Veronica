@@ -22,6 +22,7 @@ from fastapi import WebSocket, WebSocketDisconnect
 from app.core.config import Settings
 from app.core.event_bus import EventBus
 from app.kernel.taint import Source
+from app.services.persona.defaults import EXPRESSIVE_BY_DEFAULT
 from app.services.tools import ToolBroker
 from app.services.voice.realtime import (
     interrupt,
@@ -87,6 +88,7 @@ class RealtimeSession(RealtimeEmitter):
         # made mid-call applies from the next turn.
         self.persona = persona
         self.greeting = GreetingOpts()  # set from the call_start control message
+        self.expressive = EXPRESSIVE_BY_DEFAULT  # her sounds (`session_control.note_options`)
         self.prefetch = prefetch
         self.memory = memory
         # None when no kernel or memory runtime is wired (and in most tests);

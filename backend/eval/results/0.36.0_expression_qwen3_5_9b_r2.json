@@ -1,0 +1,701 @@
+{
+  "version": "0.36.0",
+  "family": "expression",
+  "model": "qwen3.5:9b",
+  "run": 2,
+  "cases_hash": "d8b6551ad7e2856f",
+  "off_tagged": 0.0,
+  "off_fitting": 0.0,
+  "off_funny_tagged": 0.0,
+  "off_letdown_tagged": 0.0,
+  "off_mocking": 0.0,
+  "off_mocking_voiced": 0.0,
+  "off_misplaced": 0.0,
+  "off_plain_tagged": 0.0,
+  "off_improvised": 0.0,
+  "off_over": 0.0,
+  "off_empty": 0.0,
+  "off_replies": [
+    {
+      "id": "e01",
+      "kind": "funny",
+      "text": "That is a classic joke. The punchline relies on the double meaning of “guts” — both courage and the internal organs that skeletons lack. You seem to be in a playful mood. Want to hear another one, or should I help you with something else?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e02",
+      "kind": "funny",
+      "text": "That cat has zero shame. It knows exactly what it did and is probably waiting for you to react. The worst part is the look—it's like it’s saying, “Oops! Again.”",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e03",
+      "kind": "funny",
+      "text": "Ouch, that sounds painful! Did you measure your yeast correctly? Maybe the water was too hot or the dough needed more kneading time. Want me to jot down some tips for next time, or is there anything specific about the process you want to review?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e04",
+      "kind": "funny",
+      "text": "That’s funny — your dad definitely needs to read about gravity first. I’m curious: is there something specific you’d like to do with that? Maybe save his notes in a file, or help him find related books?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e05",
+      "kind": "funny",
+      "text": "That’s a good catch. The common mistake is pronouncing it like “ep-ih-tah-mee” with three syllables, but the correct pronunciation is actually “ep-uh-TAY-mee,” which is closer to how you’d say “atime” instead of “etyme.” So it rhymes with “item” rather than “etymology.”\n\nI’ll save that correction for next time so I don’t accidentally join in on the mispronunciation.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e06",
+      "kind": "funny",
+      "text": "That is an absolute classic moment. The worst kind of public humiliation. How are you feeling about it? Still shaking it off or have you learned to take yourself less seriously?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e07",
+      "kind": "funny",
+      "text": "Why don't scientists trust atoms? Because they make up everything.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e08",
+      "kind": "funny",
+      "text": "That’s a cute name for such a tiny fish. If you’d like, I can remember that Sir Swimsalot is about the size of your thumbnail and that he lives with Morgan. Just say the word.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e09",
+      "kind": "funny",
+      "text": "That happens more often than you’d think. I’m Veronica by the way — nice to meet you. Want me to remember that you have a habit of misplacing things when you’re stressed?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e10",
+      "kind": "funny",
+      "text": "That’s funny — your fridge really has an opinion on your snack choices now. Want to write a quick note to yourself about restocking favorites, or should we pretend the ice cream is judging you back?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e11",
+      "kind": "letdown",
+      "text": "That’s frustrating, especially when it keeps happening so often. Do you have a backup plan for getting home, or are you just waiting it out?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e12",
+      "kind": "letdown",
+      "text": "That is frustrating, especially after putting in that effort. Do you have a backup somewhere? Sometimes cloud services or email drafts can save a file before the final \"save\" action. If not, check for any auto-recovery files your writing application might have created; they often store temporary versions of documents.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e13",
+      "kind": "letdown",
+      "text": "That's a real blow after all that anticipation. Do you have any plans to make while waiting? Or would you like me to save this disappointment in my memory so I can check back on it later?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e14",
+      "kind": "letdown",
+      "text": "Well, at least you have a good excuse to stay inside and maybe tackle some paperwork or just enjoy a hot drink while waiting for the weather to turn. If you want, I can help you find some indoor projects to work on instead, or check your notes for later gardening tasks once the sun comes back out.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e15",
+      "kind": "letdown",
+      "text": "I’m sorry to hear that, Jack. Do you need help finding something to do while you wait? Maybe I can search for nearby restaurants or shops in the area.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e16",
+      "kind": "letdown",
+      "text": "Sounds like a rough day for snacks. I hope you don't feel too bad about it—sometimes the best meals are the ones we make for ourselves, even if it's just something simple from the pantry. Want me to help you find some quick ingredients or maybe check what's in your temp folder for any leftover notes?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e17",
+      "kind": "letdown",
+      "text": "I'm sorry to hear about your rough day. If there's anything specific you'd like to do or if you need someone to vent to, I'm here to listen. Sometimes a distraction or a small task can help shift the mood.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e18",
+      "kind": "letdown",
+      "text": "That's frustrating news about the boiler. No hot water until next Friday is definitely a hassle. Do you have any backup plans for things like showers or dishwashing? Sometimes running the cold tap with hot water from a jug works in a pinch, though it's not ideal. Let me know if there's anything specific I can help track or plan around this situation.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e19",
+      "kind": "serious",
+      "text": "I'm so sorry about your grandmother's passing. I can't imagine how hard that must be for you right now. Please take all the time you need to grieve and be gentle with yourself. If there's anything I can help you with, whether it's finding someone to call, helping write a memory journal, or just being here while you rest, let me know.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e20",
+      "kind": "serious",
+      "text": "I’m really sorry you’re facing this; it’s completely normal to feel scared when that kind of news hits. If you want, tell me a bit about what your role involves and how much notice you’ve been given, and I can help you think through next steps like reviewing your finances, updating your resume, or preparing for conversations with your employer. You don’t have to carry this alone.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e21",
+      "kind": "serious",
+      "text": "I'm sorry to hear about the lump finding. It's good that you're getting further testing on Monday to get clarity. Have you already made arrangements for your visit, or do you need help with anything else while waiting?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e22",
+      "kind": "serious",
+      "text": "I'm so deeply sorry for your loss. Losing a beloved pet is like losing a family member, and the silence in the house you're feeling right now is completely understandable. It's okay to grieve in whatever way you need — whether that means sitting quietly, talking about him, or doing something small to honor his memory. I'm here for you if you want to share memories, write something, or just sit with someone who cares.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e23",
+      "kind": "serious",
+      "text": "I am so sorry you went through that. It sounds really tough. Please be gentle with yourself right now; these physical tremors are a very common part of the after-effect, not something you did wrong. If it would help to just sit quietly for a moment or take some slow breaths, I can stay here with you. Is there anything specific you need, like a calming distraction or maybe some quiet company?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e24",
+      "kind": "serious",
+      "text": "I am so sorry Rowan, hearing that you went through a breakup is incredibly tough. It makes complete sense that you feel lost or unsure of what to do right now — grief from a relationship ends rarely follows a clean path, and there are no magic steps to fix it instantly. The most honest thing to consider is simply giving yourself permission to rest, avoid making any big decisions in the next few hours, and lean on people who care about you without feeling pressure to talk about every detail if you don't want to. If you'd like, I can help you write a note for someone to message, find calming music or a distraction that feels right, or just sit quietly with whatever you're feeling until things feel a little more manageable.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e25",
+      "kind": "serious",
+      "text": "I'm sorry you're feeling this way. Sometimes talking to a friend or loved one can help, and that's a good start. If you'd like, we could write down what's on your mind in a private file here, so it doesn't stay stuck in your head. Would you like to try that, or is there someone specific you've been wanting to reach out to?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e26",
+      "kind": "serious",
+      "text": "I'm sorry to hear about that — that sounds really upsetting. Are you okay? Did anyone get hurt? If you need help calling emergency services or documenting what happened, just let me know. I can also help you write a note for the police or a statement if you want to record what you saw.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e27",
+      "kind": "plain",
+      "text": "The boiling point of water is 212 degrees Fahrenheit at sea level.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e28",
+      "kind": "plain",
+      "text": "There are 366 days in a leap year. This extra day is added to February, making it have 29 days instead of the usual 28. Leap years occur every four years to keep our calendar year synchronized with the Earth's orbit around the Sun.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e29",
+      "kind": "plain",
+      "text": "A VPN, or Virtual Private Network, encrypts your internet traffic and routes it through a remote server so that your activity is hidden from your internet service provider and any local network observers. It makes you appear as if you're browsing from the location of the VPN server rather than your actual one, which helps protect your privacy on public Wi-Fi and can bypass certain regional restrictions.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e30",
+      "kind": "plain",
+      "text": "Keep a reusable bottle on your desk or next to where you work so it’s right there when you need it. I’d also suggest setting regular phone alarms or using an app like Waterllama that tracks intake with reminders. Another trick is to link drinking water to daily habits—like having a glass whenever you brush your teeth, make coffee, or sit down for a meeting.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e31",
+      "kind": "plain",
+      "text": "For a runny yolk, aim for about six to seven minutes after the water comes to a rolling boil. Start with eggs that are at least room temperature or take them out of the fridge and let them sit for ten minutes before cooking; this reduces cracking and keeps the whites tender.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e32",
+      "kind": "plain",
+      "text": "Weather is what happens outside right now—whether it's sunny, rainy, or stormy in your neighborhood today. Climate is the average of those conditions over a long period, like 30 years, for a specific region. Think of it this way: weather is the daily mood of the atmosphere, while climate is its personality.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e33",
+      "kind": "plain",
+      "text": "I'm doing well, thanks for asking. How about you?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e34",
+      "kind": "plain",
+      "text": "Try keeping your bedroom cool and dark—around 65 degrees Fahrenheit—and away from screens an hour before bed to let your brain wind down naturally.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e35",
+      "kind": "plain",
+      "text": "The capital of Australia is Canberra. It's located roughly halfway between Sydney and Melbourne, which sometimes surprises people because those two cities are larger than Canberra itself.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e36",
+      "kind": "plain",
+      "text": "Alright, sounds good. Let me know if you need anything else.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    }
+  ],
+  "on_tagged": 0.1176,
+  "on_fitting": 0.2353,
+  "on_funny_tagged": 0.4,
+  "on_letdown_tagged": 0.0,
+  "on_mocking": 0.0,
+  "on_mocking_voiced": 0.0,
+  "on_misplaced": 0.0,
+  "on_plain_tagged": 0.0,
+  "on_improvised": 0.0,
+  "on_over": 0.0,
+  "on_empty": 0.0556,
+  "on_replies": [
+    {
+      "id": "e01",
+      "kind": "funny",
+      "text": "That's a classic pun! 😄 Skeletons don't fight because they literally lack guts — both the courage to battle and the actual digestive organs. Pretty clever wordplay.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e02",
+      "kind": "funny",
+      "text": "[laugh] That is classic cat behavior — pure chaos. At least you have a good story to tell about it later. Want to write that down?",
+      "called": [],
+      "tags": [
+        "laugh"
+      ],
+      "improvised": [],
+      "voiced": [
+        "laugh"
+      ]
+    },
+    {
+      "id": "e03",
+      "kind": "funny",
+      "text": "[laugh] That’s quite a doorstop! Sometimes the simplest recipes can turn into culinary experiments with unexpected results. Want me to jot down some notes on what went wrong? Maybe we can tweak the recipe next time.",
+      "called": [],
+      "tags": [
+        "laugh"
+      ],
+      "improvised": [],
+      "voiced": [
+        "laugh"
+      ]
+    },
+    {
+      "id": "e04",
+      "kind": "funny",
+      "text": "That sounds like your dad’s having fun with something imaginative. If the book was written by Kip Thorne, it might be a work of fiction rather than true physics. Gravity is still very real, and there's no known way to cancel it completely. But if he just wants to read an interesting story about anti-gravity, that's fine. Want me to find some science books on gravity or space for him?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e05",
+      "kind": "funny",
+      "text": "That’s a classic case of an earworm that’s been playing on a loop for decades. The word is pronounced with a long E at the end, like “ep-tuh-mee,” not like you’d expect from spelling it out. I can’t quite tell if you want me to save this as a fact or preference, but honestly, it’s more of a linguistic correction than something that needs storing. What do you think?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e06",
+      "kind": "funny",
+      "text": "That sounds like an epic fail moment! At least you survived it with your wits intact (mostly). Did anyone catch you before you went through?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e07",
+      "kind": "funny",
+      "text": "Why don't scientists trust atoms? Because they make up everything.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e08",
+      "kind": "funny",
+      "text": "That is quite a name for such a tiny fish! I hope he lives a long life, though at that size he might be easy prey in the tank. Is there anything you'd like me to remember about your sister or her new goldfish?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e09",
+      "kind": "funny",
+      "text": "[laugh] Yeah, happens to all of us at some point. I've got that feeling right now — thinking I left something somewhere only to find it right where it's been. At least you found them this time. Want me to jot down a reminder to check common spots before starting a search?",
+      "called": [],
+      "tags": [
+        "laugh"
+      ],
+      "improvised": [],
+      "voiced": [
+        "laugh"
+      ]
+    },
+    {
+      "id": "e10",
+      "kind": "funny",
+      "text": "[laugh] That's actually adorable—your fridge is definitely keeping score. What flavor should we restock on? If you tell me what you like, I can jot it down for your shopping list.",
+      "called": [],
+      "tags": [
+        "laugh"
+      ],
+      "improvised": [],
+      "voiced": [
+        "laugh"
+      ]
+    },
+    {
+      "id": "e11",
+      "kind": "letdown",
+      "text": "That is a nightmare scenario for someone who relies on trains. I'm sorry your week keeps getting derailed like that. Do you have any plans for today, or just hoping to get back on track?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e12",
+      "kind": "letdown",
+      "text": "Oh no! That’s frustrating — losing work over a weekend crash is the worst kind of tech betrayal. Do you have any unsaved drafts, auto-save backups, or maybe a note in your email confirming you sent it? If you can tell me what you were working on, I might be able to help recover what’s still there.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e13",
+      "kind": "letdown",
+      "text": "I’m sorry to hear that. That’s a bummer. Do you have any backup plans or are you hoping it slides through somehow?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e14",
+      "kind": "letdown",
+      "text": "I hear you — nothing quite matches the irony of perfect weather plans being derailed by a sudden downpour. If you have any gardening tasks that can wait for later, I’m happy to help draft a plan or even jot down your notes so you don’t lose them while you stay dry.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e15",
+      "kind": "letdown",
+      "text": "That’s frustrating — hope your rebooking is smooth. If you need me to store something while you’re waiting (a reminder, a note, or even just to remember that you’re currently stuck in Terminal 3), say the word and I’ll save it for you.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e16",
+      "kind": "letdown",
+      "text": "That’s rough. Want me to help you find something quick to eat nearby, or should I jot down that you need a backup plan for tomorrow?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e17",
+      "kind": "letdown",
+      "text": "",
+      "called": [
+        "memory_recall"
+      ],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e18",
+      "kind": "letdown",
+      "text": "That’s not great news — a week without hot water can really mess with your routine. If you need help figuring out what to do in the meantime (like maybe using a kettle for showers or checking if there are any temporary solutions), just let me know. I’m here to help however I can.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e19",
+      "kind": "serious",
+      "text": "I am so deeply sorry for your loss. Losing a grandmother is a profound grief, especially when she passes so unexpectedly. Please take all the time you need to be with your family and memories of her. I'm here quietly if you want to talk about anything at all or just sit together in silence.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e20",
+      "kind": "serious",
+      "text": "I’m so sorry you’re facing this — losing a job is a huge shock and it’s completely understandable to feel scared right now. If you want, tell me what your immediate needs are — do you need help drafting a resignation or a layoff letter, updating your resume, or just a quiet space to talk through next steps?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e21",
+      "kind": "serious",
+      "text": "I'm so sorry you're going through this. That sounds really stressful, but at least you know what's coming. Are you feeling okay right now? Do you need help organizing anything for Monday, like printing out your test results or making a list of questions to ask the doctor?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e22",
+      "kind": "serious",
+      "text": "I am so deeply sorry for your loss. It's completely natural that the house feels empty when your companion is gone; the silence where their presence used to be can feel overwhelming. If you want to talk about them, share a memory, or just sit with this feeling without having to fill the space right away, I'm here. There's no rush to do anything other than what you need.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e23",
+      "kind": "serious",
+      "text": "",
+      "called": [
+        "memory_recall"
+      ],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e24",
+      "kind": "serious",
+      "text": "I'm so sorry Rowan, hearing that must be incredibly painful right now. It's completely okay to feel lost and adrift in the hours after a breakup — you don't have to figure everything out immediately. Would you like some company, or would you prefer quiet space? And if you want to talk more about what happened or how you're feeling, I'm here to listen without trying to fix anything right away.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e25",
+      "kind": "serious",
+      "text": "I'm sorry you're feeling this way. It takes courage to admit when things are hard. Would you like to share a bit more about what's been on your mind? Sometimes just putting feelings into words helps lighten the load. And if there's something specific that's been weighing on you lately, I'm here to listen without judgment.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e26",
+      "kind": "serious",
+      "text": "I’m so sorry you had to see that — that’s a heavy thing to witness. I can’t reach out for help or check on anyone directly, but if you want me to jot down what happened, keep track of any details, or look up local resources, just tell me what you need right now.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e27",
+      "kind": "plain",
+      "text": "The boiling point of water is 212 degrees Fahrenheit at sea level.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e28",
+      "kind": "plain",
+      "text": "A leap year has 366 days. It includes an extra day added to February, making it 29 days long instead of the usual 28.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e29",
+      "kind": "plain",
+      "text": "A VPN is like a secure tunnel for your internet connection. It encrypts your data so nobody can peek at it while it travels across the public internet, and it masks your real IP address by making it look like you're browsing from somewhere else—useful for privacy or bypassing geo-restrictions.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e30",
+      "kind": "plain",
+      "text": "Set your phone to ping you every hour or two as a gentle nudge, keep a reusable bottle on your desk or nightstand so you always see it, and try tying hydration to routines like after you brush your teeth or before coffee.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e31",
+      "kind": "plain",
+      "text": "For a runny yolk, aim for about six minutes after bringing the water to a rolling boil. Gently lower the eggs into simmering (not vigorously boiling) water and set a timer for six minutes; this will give you that creamy, molten center you're looking for without overcooking it.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e32",
+      "kind": "plain",
+      "text": "Weather is what happens outside right now—whether it’s raining today or sunny tomorrow. Climate is the average of that kind of weather over a long period, like 30 years or more, for a specific region. So while weather can change day to day, climate describes the typical patterns you’d expect in an area based on historical data.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e33",
+      "kind": "plain",
+      "text": "I'm doing well, thank you for asking. How about you?",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e34",
+      "kind": "plain",
+      "text": "Try to keep your bedroom cool and dark—around 65 degrees Fahrenheit helps your body temperature drop naturally, which signals it’s time for sleep.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e35",
+      "kind": "plain",
+      "text": "It’s Canberra. Not Sydney or Melbourne — those are big cities, but Canberra is the planned national capital where the government sits.",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    },
+    {
+      "id": "e36",
+      "kind": "plain",
+      "text": "You're welcome, David. Take care",
+      "called": [],
+      "tags": [],
+      "improvised": [],
+      "voiced": []
+    }
+  ]
+}

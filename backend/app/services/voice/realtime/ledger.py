@@ -18,6 +18,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from app.adapters.tts.expression import without_tags
+
 
 @dataclass(slots=True)
 class Span:
@@ -51,7 +53,7 @@ class SpokenLedger:
         isn't the reply, so hearing up to here is hearing the reply whole. With no words
         in this ledger (all of them heard before a spoken confirmation), that is its
         start: a caveat said after the round isn't her words."""
-        return max((span.end for span in self._spans if span.text), default=0)
+        return max((span.end for span in self._spans if without_tags(span.text)), default=0)
 
     def begin(self, text: str) -> None:
         """Open a span for a chunk about to be synthesised.
@@ -90,19 +92,20 @@ class SpokenLedger:
 
         Spans that finished before the cut come back whole. The span the cut falls in is
         trimmed to its last whole word and marked "…": half a word teaches the model a
-        word she never said. Everything after the cut is left out.
+        word she never said. Everything after the cut is left out. A sound tag counts
+        towards a span's time, as its laugh or sigh takes some, but is never heard text.
         """
         heard: list[str] = [self._heard_before] if self._heard_before else []
         for span in self._spans:
             if span.samples <= 0:
                 continue  # no audio, never heard, wherever its empty range falls
             if span.end <= played:
-                if span.text:
-                    heard.append(span.text)
+                if words := without_tags(span.text):
+                    heard.append(words)
                 continue
             if span.start >= played:
                 break
-            partial = _whole_words(span.text, (played - span.start) / span.samples)
+            partial = without_tags(_whole_words(span.text, (played - span.start) / span.samples))
             if partial:
                 heard.append(f"{partial}…")
             break

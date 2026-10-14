@@ -66,3 +66,26 @@ export function writeGreeting(value: GreetingSettings): void {
   write(GREETING_LENGTH_KEY, value.length)
   write(GREETING_CALLBACK_KEY, value.callback ? 'on' : 'off')
 }
+
+// Expressive voice: whether her voice makes the sounds her replies ask for (a laugh, a
+// sigh). Owned here like the greeting and sent with call_start, and sent again when it
+// changes during a call (`useRealtimeCall`), so it applies from her next reply.
+const EXPRESSIVE_KEY = 'veronica.call.expressive'
+const expressiveListeners = new Set<(on: boolean) => void>()
+
+export function readExpressive(): boolean {
+  return read(EXPRESSIVE_KEY) !== 'off' // default: on
+}
+
+export function writeExpressive(on: boolean): void {
+  write(EXPRESSIVE_KEY, on ? 'on' : 'off')
+  for (const listener of expressiveListeners) listener(on)
+}
+
+/** Call `listener` whenever the setting changes; returns the unsubscribe. */
+export function onExpressiveChange(listener: (on: boolean) => void): () => void {
+  expressiveListeners.add(listener)
+  return () => {
+    expressiveListeners.delete(listener)
+  }
+}

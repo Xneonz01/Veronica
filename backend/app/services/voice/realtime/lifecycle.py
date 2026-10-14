@@ -24,7 +24,8 @@ from app.adapters.llm.ollama_errors import (
     OllamaUnreachableError,
 )
 from app.core.gpu_manager import GpuMode
-from app.services.voice.realtime import card_room, ingest, session_tasks, workers
+from app.services.persona.defaults import EXPRESSIVE_BY_DEFAULT
+from app.services.voice.realtime import card_room, ingest, session_control, session_tasks, workers
 from app.services.voice.realtime.greeting import parse_opts
 from app.services.voice.realtime.session_emit import State
 from app.services.voice.realtime.voice_events import ClientForwarder
@@ -49,6 +50,8 @@ async def start(s: RealtimeSession, message: dict[str, Any] | None = None) -> No
     s._call_active = True
     s.runtime.calls.started(s)  # the speech models stay while it is live
     s.greeting = parse_opts((message or {}).get("greeting"))  # frontend-owned
+    s.expressive = EXPRESSIVE_BY_DEFAULT  # so is this, unless the client didn't say
+    session_control.note_options(s, message or {})
     logger.info("call_start | %s", s._source)
 
     # Reset per-call state. Fresh audio queues so frames captured while we

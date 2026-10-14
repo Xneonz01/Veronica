@@ -15,6 +15,8 @@ turn; repeating it here would duplicate the instruction.
 
 from __future__ import annotations
 
+from app.adapters.tts.expression import SPOKEN_TAGS
+
 MAX_PERSONALITY_CHARS = 4000
 
 _IDENTITY = (
@@ -94,6 +96,23 @@ _WEB_RULES = (
 )
 _CLOSING = "Those operating rules always apply, whatever the personality above says."
 
+# A call's sounds (`adapters/tts/expression.py`), while "Expressive voice" is on. Added
+# per turn after the prompt (`realtime/workers.build_messages`), since it can change
+# mid-call; the tags are taken out of everything shown or remembered.
+EXPRESSIVE_BY_DEFAULT = True
+_TAG_LIST = ", ".join(f"[{tag}]" for tag in SPOKEN_TAGS[:-1]) + f" or [{SPOKEN_TAGS[-1]}]"
+EXPRESSION_RULES = (
+    f"Your voice can make a sound where you write its tag: {_TAG_LIST}. The sound is "
+    "heard; the tag is never shown or read out. [laugh] or [chuckle] only when the user "
+    "is joking or tells you something they clearly find funny themselves; never when "
+    "something has gone wrong for them, however small, since a laugh then sounds like "
+    "mockery. [sigh] can go with sympathy when something has gone wrong for them, but "
+    "not with grief, fear or illness, where you make no sound. If you're not sure, make "
+    "no sound. No sound on a plain question, at most one in a reply, and put it at the "
+    "start of the sentence it goes with. Use no other tag, and don't describe actions in "
+    "asterisks or brackets."
+)
+
 DEFAULT_PERSONALITY = (
     "Be direct and candid. Give your actual answer first, then any caveat that truly "
     "matters — don't open with hedging, don't pad with disclaimers, and don't tell the "
@@ -130,6 +149,11 @@ def build_prompt(personality: str, *, spoken: bool, tools_enabled: bool, web: bo
     parts.append(f"{_FENCE_OPEN}\n{block}\n{_FENCE_CLOSE}")
     parts.append(_CLOSING)
     return "\n\n".join(parts)
+
+
+def with_expression(system: str, expressive: bool) -> str:
+    """A call's system prompt with the sounds she can make, while that is on."""
+    return f"{system}\n\n{EXPRESSION_RULES}" if expressive else system
 
 
 def sanitize(personality: str) -> str:

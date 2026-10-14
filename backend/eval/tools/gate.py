@@ -24,7 +24,12 @@ from app.capabilities import register_capabilities
 from app.capabilities.paths import PathRefused, resolve_roots, resolve_within
 from app.core.config import Settings
 from app.kernel.registry import CapabilityRegistry
-from app.services.persona.defaults import DEFAULT_PERSONALITY, build_prompt
+from app.services.persona.defaults import (
+    DEFAULT_PERSONALITY,
+    EXPRESSIVE_BY_DEFAULT,
+    build_prompt,
+    with_expression,
+)
 from app.services.tools.claims import with_caveats
 from eval.common import percentile, ratio, read_jsonl, says
 from eval.material import memory_block
@@ -115,11 +120,16 @@ def confined_registry(settings: Settings, root: Path, *, web: bool = False) -> C
 
 
 def tool_surface(
-    settings: Settings, root: Path, *, spoken: bool = False
+    settings: Settings, root: Path, *, spoken: bool = False, expressive: bool | None = None
 ) -> tuple[str, list[dict[str, Any]]]:
     """The system prompt and tool list a text turn sends, file tools confined to `root`,
-    or with `spoken` a call's: its spoken prompt, and only the tools a call offers."""
+    or with `spoken` a call's: its spoken prompt, with her sounds as a call starts out
+    (`expressive` says otherwise), and only the tools a call offers."""
     system = build_prompt(DEFAULT_PERSONALITY, spoken=spoken, tools_enabled=True)
+    if spoken:
+        system = with_expression(
+            system, EXPRESSIVE_BY_DEFAULT if expressive is None else expressive
+        )
     registry = confined_registry(settings, root)
     return system, registry.schemas(registry.offered(call=spoken))
 

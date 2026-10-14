@@ -9,6 +9,7 @@ import { useLaneStatus } from '../audio/useAppEvents'
 import { AudioDevices } from '../call/AudioDevices'
 import { STATE_LABEL } from '../call/callCopy'
 import { useCall, useCallStatus } from '../call/context'
+import { ExpressiveChoice } from '../call/ExpressiveChoice'
 import { GreetingChoice } from '../call/GreetingChoice'
 import { LiveLines } from '../call/LiveLines'
 import { Orb } from '../call/Orb'
@@ -139,6 +140,12 @@ export function Call() {
               Greeting
             </h3>
             <GreetingChoice />
+          </section>
+          <section className={styles.group} aria-labelledby="call-voice">
+            <h3 id="call-voice" className={styles.groupTitle}>
+              Her voice
+            </h3>
+            <ExpressiveChoice />
           </section>
         </div>
       </Sheet>

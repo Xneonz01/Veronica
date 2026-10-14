@@ -38,6 +38,17 @@ async def dispatch(s: RealtimeSession, message: dict[str, Any]) -> None:
         await s._stop_call()
     elif action == "playback_position":
         note_playback(s, message)
+    elif action == "call_options":
+        note_options(s, message)
+
+
+def note_options(s: RealtimeSession, message: dict[str, Any]) -> None:
+    """What the client's call settings say: `expressive`, whether her voice makes the
+    sounds its tags ask for. Sent with `call_start` and again whenever it changes, and
+    read from the next reply on."""
+    expressive = message.get("expressive")
+    if isinstance(expressive, bool):
+        s.expressive = expressive
 
 
 def note_playback(s: RealtimeSession, message: dict[str, Any]) -> None:

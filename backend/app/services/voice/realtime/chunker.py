@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import re
 
+from app.adapters.tts.expression import holds_laugh
 from app.adapters.tts.text import ends_on_abbreviation
 
 # A terminator, with any closing quote or bracket, that whitespace has followed.
@@ -80,7 +81,13 @@ class SentenceChunker:
         if self._clause_chunking:
             clause = _CLAUSE_END.search(self._buffer)
             opening = self._buffer[: clause.end()].strip() if clause is not None else ""
-            if clause is not None and len(opening) >= self._min_clause_chars:
+            # Not a clause with a laugh in it: whether it is said depends on the rest of
+            # its sentence ("[laugh] You poor thing, that's the worst.", `considerate`).
+            if (
+                clause is not None
+                and len(opening) >= self._min_clause_chars
+                and not holds_laugh(opening)
+            ):
                 return self._take(clause.end())
         # Not while a sentence end waits for its next word: cut at the last space, it
         # sent a long sentence's last word ("here.") as a chunk of its own.

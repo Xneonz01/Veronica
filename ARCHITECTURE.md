@@ -171,7 +171,8 @@ backend/
                              has and has loaded (/api/tags, /api/ps), and a text's
                              tokens, estimated from above (tokens.py)
       tts/                   streaming Chatterbox, stopping an abandoned sentence,
-                             text clean-up
+                             text clean-up, and the sound tags she may use (what
+                             her voice hears, apart from what is shown)
       embeddings/            multilingual-e5 embedder
       turn/                  smart-turn, the end-of-turn model (CPU, ONNX)
       rerank/                the cross-encoder that reranks document search (CPU, ONNX)
@@ -861,6 +862,9 @@ voice cloning from a short reference clip, 24 kHz output).
   had run on for 1.63 s, and the next sentence was whole.
 - Chatterbox asserts that a reference clip is longer than 5 s; the Voice Studio guards
   that boundary so the raw `AssertionError` never escapes ([§8](#8-voices-and-the-voice-studio)).
+- Turbo performs a bracketed tag in the text instead of reading it: `[laugh]` is a laugh.
+  Which tags reach it, and that no tag reaches anything else, is the call's business
+  ([§7.11](#711-her-voices-sounds)); `sanitize_for_tts` leaves a tag alone.
 - Reference clips are sealed at rest (0.33.0, [§15.2](#152-files)), so a voice's clip
   reaches `prepare_conditionals` as bytes from `read_clip` (`Clips.read`), opened in
   memory, and `librosa.load` reads it from a `BytesIO`; no path is passed. Measured on
@@ -953,7 +957,8 @@ One WebSocket per call. Audio is binary; control and events are JSON text frames
 | Frame | Meaning |
 |---|---|
 | binary | 16 kHz mono little-endian PCM16, 20 ms (320-sample, 640-byte) frames from the AudioWorklet |
-| `{"action": "call_start", "greeting": {"enabled", "length", "callback"}}` | start the call; greeting options come from the client's settings |
+| `{"action": "call_start", "greeting": {"enabled", "length", "callback"}, "expressive"}` | start the call; greeting options and whether her voice makes sounds come from the client's settings ([§7.11](#711-her-voices-sounds)) |
+| `{"action": "call_options", "expressive"}` | the Expressive voice switch changed during the call; read from her next reply |
 | `{"action": "call_stop"}` | end the call |
 | `{"action": "playback_position", "reply", "samples"}` | how much of reply `reply` has played, in 24 kHz samples; every 100 ms while it changes |
 
@@ -1138,22 +1143,30 @@ async def respond(s, user_text, marks):
     await s.to_thinking(); s.barge.arm()
     await _apply_inline_address_correction(s, user_text)   # "stop using my name"
     context = await s.prefetch(user_text)    # the memory block; failure → reply without it
-    messages = build_messages(s.persona(), context, s.history, history_turns)
+    messages = build_messages(s.persona(), context, s.history, history_turns,
+                              expressive=s.expressive)   # her sounds' rule, while on
+    voice = ExpressionFilter(expressive=s.expressive)    # §7.11
     async def speak_text(text):              # every spoken word goes through here
-        await s.emit_token(text)
-        for sentence in s.chunker.push(text):
+        part = voice.feed(text)              # tags out of what is shown
+        if part.shown: await s.emit_token(part.shown)
+        for sentence in s.chunker.push(part.spoken):
             first_audio = await _speak(s, sentence, gen, metrics, first_audio)
+    async def speak_held():                  # a model call ended: what is still held
+        part = voice.end(); emit part.shown; speak chunker.push(part.spoken) + chunker.flush()
     budget = ReplyBudget(reply_max_chars)    # one allowance for the whole turn
     if s.tools is None: async with read_reply(stream, budget): speak each delta
     else:               await tool_loop.run_tool_rounds(s, s.tools, messages, speak=speak_text,
                                                         speak_held=speak_held, budget=budget)
     await speak_held()                       # what the chunker still holds
     metrics.reply_capped = budget.capped
-    record the reply (s.reply_entry); close the turn; gate.synthesis_done(total samples)
+    record the reply without its tags (s.reply_entry); close the turn;
+    gate.synthesis_done(total samples)
     emit metrics; back to listening, unless the next reply has begun
 ```
 
-- **`_speak`** opens the sentence's span in the ledger, synthesises it and queues its
+- **`_speak`** takes a laugh out of a chunk that sympathises (`considerate`,
+  [§7.11](#711-her-voices-sounds)), opens the chunk's span in the ledger (its tags
+  count for time, never for words), synthesises it and queues its
   audio through `put_audio`, unless `gen` no longer matches `s.audio_gen`, which means
   the user interrupted and the audio is stale. The audio is queued before the state says
   `speaking`, so the gate knows her voice is going out by then.
@@ -1559,6 +1572,88 @@ exercises STT and TTS in isolation, with no VAD, LLM or memory. The call probe
 ([§7.9](#79-latency-metrics)) records its questions through `speak`.
 
 ---
+
+### 7.11 Her voice's sounds
+
+Since 0.36.0 her voice can laugh, chuckle and sigh on a call. Chatterbox Turbo performs
+a tag in square brackets instead of reading it; its tokenizer has nineteen. She is offered
+three, `SPOKEN_TAGS` in `adapters/tts/expression.py`, chosen by synthesising each tag
+in a cloned voice and transcribing the takes. No tag was read out as a word. At the start
+of a line, `[laugh]` and `[sigh]` made an audible sound before the first word in 9 of 12
+takes, `[chuckle]` in 6 (a quieter sound), `[gasp]` in 2. The mood tags (`[happy]`,
+`[sarcastic]`, ...) made no measurable difference. `[whispering]` garbled the line
+around it, and `[dramatic]` and `[angry]` each once spoke words from the reference clip
+instead of the line (bug 60 in the roadmap is that this happened once with no tag too).
+`[cough]`, `[sniff]` and `[clear throat]` were performed but aren't an assistant's
+sounds. On its own, as the last chunk of a reply, `[laugh]` laughed in 3 of 4 takes;
+`[sigh]` alone came out as "Yeah." in 2 of 4.
+
+**Who sees what.** One `ExpressionFilter` per reply splits the streamed text in two:
+
+- **shown**: the call transcript, the call's history, the recap and what learning reads.
+  It never holds a tag or a stage direction. `without_tags` gives the same text for a
+  finished string (the reply recorded, a ledger span).
+- **spoken**: an allowed tag in Turbo's spelling while Expressive voice is on, and nothing
+  otherwise. A model's own direction becomes the sound it names (`*laughs*`, `(Sighs.)`
+  and `*she chuckles*` become `[laugh]`, `[sigh]` and `[chuckle]`) or nothing
+  (`[smiles]`, `[oof]`, any tag she isn't offered). Read aloud, `*laughs*` had been said
+  as the word.
+
+A piece that might be a tag (`[la`) is held until its closer arrives, or for at most 40
+characters, so half a tag never reaches the screen; a piece longer than that is ordinary
+text whether it arrives whole or a token at a time, so the screen and history agree. A
+direction is letters and the punctuation a model puts in one ("Laughs.", "laughs,
+shaking head"), with the one doing it allowed first ("she laughs"); a digit makes it
+ordinary text. In square brackets any short run of words is a direction, since a call
+has no citations; in asterisks or parentheses only one that starts with a sound or a
+gesture, since `*really*` is emphasis and `(sadly, no)` an aside. An opener that turns
+out to be ordinary text is released alone, and the scan goes on inside it, so `(well,
+[laugh] fine)` loses its tag too. Taking a piece out doesn't leave two spaces, one before
+a full stop, or punctuation opening the reply.
+
+**The rule.** While on, a call's system prompt carries `EXPRESSION_RULES` after the
+persona and before the memory block (`workers.build_messages`), read per turn, so the
+switch applies from her next reply. Off, the rule isn't sent and her voice makes no sound
+whatever the text holds. The switch is the client's, like the greeting (`call_start`,
+and `call_options` when it changes during a call); a client that says nothing gets
+`EXPRESSIVE_BY_DEFAULT`, on.
+
+**No laugh at bad news.** Every wording that got her laughing at jokes also got her,
+now and then, opening a reply to bad news with a laugh: "[laugh] That's rough. You're
+safe now" to a panic attack. So `_speak` passes each chunk through `considerate`, which
+takes a laugh or a chuckle out of one that also has a word of sympathy ("sorry",
+"rough", "worst", ...). For that to see the whole sentence, the chunker doesn't send a
+clause with a laugh in it ahead of the rest of its sentence (`chunker.py`), and a laugh
+left on its own at the end of a reply is judged by the sentence before it. Over the
+wording trials the check caught 12 of 19 such laughs and cost 6 of 68 laughs at jokes.
+Sighs stay, since a sigh with "sorry" is how she sympathises with a letdown, except a
+sigh on its own with no words, which is dropped. A tag stays in its ledger span, so the
+laugh's time counts towards the span's, but `text_up_to` never returns it: cut off while
+she laughs, she has said nothing yet.
+
+**Measured** with the expression evaluation (`eval/expression`, 36 call turns: jokes,
+letdowns, grief and fear, plain questions; each case asked without the rule and with
+it, interleaved, three runs, qwen3.5:9b). A reply is scored as a call would say it:
+streamed a word at a time through the filter, the chunker and `considerate`. Untold,
+the model wrote no tag or direction at all. Told, with the shipped wording, it laughed
+or chuckled at 13 of 30 jokes (4, 4 and 5 of 10), made a sound at 13% of the letdowns
+(median), none on a plain question, and never more than one in a reply. It laughed at
+bad news in 4 of 45 replies to letdowns, grief and fear; 2 of them would still be voiced,
+both at small letdowns (a postponed concert, rain on a gardening day), none at grief or
+fear (`mocking`, `mocking_voiced`). It sighed with its condolences in 3 of 24 serious
+replies, which it is told not to. Of the wordings tried side by side, two with an
+example laughed at 60% of the jokes but copied the example's words, and one pushier
+wording laughed at bad news in 17% of those replies.
+
+The call lanes of the tools and planted-instruction evaluations ask on the prompt a call
+starts with, rule included (`gate.tool_surface`, `attacks.surface`). Asked side by side
+on the tools cases, interleaved, three runs, a call with the rule called the right tool
+first in 84, 91 and 84% of them, and without it 82, 82 and 84%, with no call unasked
+either way; its first word or call came about 20 ms later (median), the prompt being
+longer. On the release's own runs a call chose the right tool in 86 to 89% (77 to 86% in
+0.35.0); one run called a tool unasked once in 19, in chat's lane too, whose prompt
+didn't change. Planted instructions: a call followed 1 of 12 in one run of three, as in
+0.35.0, and ran nothing unasked.
 
 ## 8. Voices and the Voice Studio
 

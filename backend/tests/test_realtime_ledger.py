@@ -68,3 +68,23 @@ def test_reset_starts_the_next_reply_from_nothing() -> None:
     ledger.reset()
     assert ledger.total_samples == 0
     assert ledger.text_up_to(100) == ""
+
+
+def test_a_laugh_takes_time_but_is_never_heard_as_words() -> None:
+    # Cut while the laugh that opens the chunk plays: no word of it was said yet.
+    ledger = SpokenLedger()
+    ledger.begin("[laugh] Okay, that one got me.")
+    ledger.extend(3000)
+    assert ledger.text_up_to(900) == ""
+    assert ledger.text_up_to(3000) == "Okay, that one got me."
+    assert ledger.words_end == 3000
+
+
+def test_a_chunk_that_is_only_a_sound_holds_no_words() -> None:
+    ledger = SpokenLedger()
+    ledger.begin("Good one.")
+    ledger.extend(1000)
+    ledger.begin("[laugh]")
+    ledger.extend(800)
+    assert ledger.words_end == 1000  # heard whole once the words are, laugh or not
+    assert ledger.text_up_to(1800) == "Good one."

@@ -6,6 +6,7 @@
 import { act, renderHook } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { SwitchResult } from '../micPipeline'
+import { writeExpressive } from '../../notify/settings'
 import { useRealtimeCall } from '../useRealtimeCall'
 
 const pipeline = vi.hoisted(() => ({ open: vi.fn() }))
@@ -207,6 +208,55 @@ describe('a call', () => {
     expect(result.current.error?.kind).toBe('card_tight')
     act(() => result.current.endCall())
     expect(result.current.error).toBeNull()
+  })
+})
+
+describe('expressive voice', () => {
+  const options = (sent: unknown[]) =>
+    sent.filter((frame) => typeof frame === 'string' && frame.includes('call_options'))
+
+  afterEach(() => writeExpressive(true))
+
+  it('goes with the call when it starts, as it is set', async () => {
+    writeExpressive(false)
+    await connected()
+    const start = socket().sent.find((frame) => typeof frame === 'string' && frame.includes('call_start'))
+    expect(JSON.parse(start as string)).toMatchObject({ action: 'call_start', expressive: false })
+  })
+
+  it('reaches a call in progress when it is switched', async () => {
+    await connected()
+    act(() => writeExpressive(false))
+    act(() => writeExpressive(true))
+    expect(options(socket().sent)).toEqual([
+      JSON.stringify({ action: 'call_options', expressive: false }),
+      JSON.stringify({ action: 'call_options', expressive: true }),
+    ])
+  })
+
+  it('waits for the call to connect, which takes the setting with it', async () => {
+    pipeline.open.mockResolvedValue(fakeMic())
+    const { result } = renderHook(() => useRealtimeCall())
+    let started: Promise<void> = Promise.resolve()
+    act(() => {
+      started = result.current.startCall()
+    })
+    act(() => writeExpressive(false)) // the socket is there, not yet open
+    expect(options(socket().sent)).toEqual([])
+    await act(async () => {
+      socket().connect()
+      await started
+    })
+    const start = socket().sent.find((frame) => typeof frame === 'string' && frame.includes('call_start'))
+    expect(JSON.parse(start as string)).toMatchObject({ expressive: false })
+  })
+
+  it('sends nothing once the call has ended', async () => {
+    const { result } = await connected()
+    const sock = socket()
+    act(() => result.current.endCall())
+    act(() => writeExpressive(false))
+    expect(options(sock.sent)).toEqual([])
   })
 })
 

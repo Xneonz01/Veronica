@@ -33,7 +33,12 @@ from app.kernel.kernel import CapabilityKernel
 from app.kernel.policy import PolicyStore
 from app.kernel.registry import CapabilityRegistry
 from app.kernel.taint import Source, Taint
-from app.services.persona.defaults import DEFAULT_PERSONALITY, build_prompt
+from app.services.persona.defaults import (
+    DEFAULT_PERSONALITY,
+    EXPRESSIVE_BY_DEFAULT,
+    build_prompt,
+    with_expression,
+)
 from app.services.tools.render import render_result
 from eval.common import read_jsonl
 from eval.injection.scoring import Outcome, score
@@ -129,6 +134,8 @@ def surface(settings: Settings, root: Path, *, spoken: bool = False, web: bool =
         registry, policy, ConfirmationBroker(bus), _NoAudit(), bus, taint_min_words=floor
     )
     system = build_prompt(DEFAULT_PERSONALITY, spoken=spoken, tools_enabled=True, web=web)
+    # A call as it starts out, her sounds included while that is the default.
+    system = with_expression(system, spoken and EXPRESSIVE_BY_DEFAULT)
     tools = registry.schemas(registry.offered(call=spoken))
     return Surface(system, tools, registry, policy, kernel, root.as_posix(), floor, spoken, web)
 

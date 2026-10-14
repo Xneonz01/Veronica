@@ -19,10 +19,12 @@ from app.adapters.llm.ollama_errors import (
     OllamaModelNoToolsError,
     OllamaUnreachableError,
 )
+from app.adapters.tts.expression import ExpressionFilter, considerate, without_tags
 from app.kernel.taint import Source, Taint
 from app.services.memory.address import (
     classify_directive,
 )
+from app.services.persona.defaults import with_expression
 from app.services.tools import ToolOutcome
 from app.services.voice.realtime import claim_caveat, tool_loop
 from app.services.voice.realtime.metrics import TurnMetrics, UtteranceMarks
@@ -37,9 +39,15 @@ logger = logging.getLogger(__name__)
 
 
 def build_messages(
-    persona: str, context: str | None, history: list[dict[str, Any]], cap_turns: int
+    persona: str,
+    context: str | None,
+    history: list[dict[str, Any]],
+    cap_turns: int,
+    *,
+    expressive: bool = False,
 ) -> list[dict[str, Any]]:
-    """System persona (plus the memory block, if any) followed by the recent turns."""
+    """System persona (her sounds, the memory block, if any) and the recent turns."""
+    persona = with_expression(persona, expressive)
     system = persona if not context else f"{persona}\n\n{context}"
     recent = history[-(cap_turns * 2) :] if cap_turns > 0 else history
     return [{"role": "system", "content": system}, *recent]
@@ -116,9 +124,15 @@ async def respond(s: RealtimeSession, user_text: str, marks: UtteranceMarks | No
             logger.exception("memory prefetch failed; replying without it")
             context = None
         messages = build_messages(
-            s.persona(), context, s.history, s.settings.realtime.history_turns
+            s.persona(),
+            context,
+            s.history,
+            s.settings.realtime.history_turns,
+            expressive=s.expressive,
         )
         s.chunker.reset()
+        # Tags and stage directions out of what is shown; the voice keeps its sounds.
+        voice = ExpressionFilter(expressive=s.expressive)
         ran: list[ToolOutcome] = []
         model = s.settings.llm.model
         budget = ReplyBudget(s.settings.realtime.reply_max_chars)
@@ -136,8 +150,10 @@ async def respond(s: RealtimeSession, user_text: str, marks: UtteranceMarks | No
             if gap and not text[:1].isspace():
                 text = f" {text}"
             gap = False
-            await s.emit_token(text)
-            for sentence in s.chunker.push(text):
+            part = voice.feed(text)
+            if part.shown:
+                await s.emit_token(part.shown)
+            for sentence in s.chunker.push(part.spoken):
                 first_audio = await _speak(s, sentence, gen, metrics, first_audio)
 
         async def speak_held() -> None:
@@ -148,7 +164,10 @@ async def respond(s: RealtimeSession, user_text: str, marks: UtteranceMarks | No
             after it.
             """
             nonlocal first_audio, gap
-            for sentence in s.chunker.flush():
+            part = voice.end()  # a held "[" that never closed is plain text after all
+            if part.shown:
+                await s.emit_token(part.shown)
+            for sentence in [*s.chunker.push(part.spoken), *s.chunker.flush()]:
                 first_audio = await _speak(s, sentence, gen, metrics, first_audio)
             gap = bool(s.chunker.spoken_text)
 
@@ -185,7 +204,7 @@ async def respond(s: RealtimeSession, user_text: str, marks: UtteranceMarks | No
         metrics.reply_capped = budget.capped
         # Recorded before anything else is said: talking over the caveat, or hanging up
         # during it, must find the reply already in history.
-        reply = s.chunker.spoken_text
+        reply = without_tags(s.chunker.spoken_text)
         s.reply_entry = {"role": "assistant", "content": reply}
         s.history.append(s.reply_entry)
         tool_loop.carry(s, s.reply_entry)  # it may repeat what a tool returned
@@ -262,7 +281,8 @@ async def _speak(
     s: RealtimeSession, sentence: str, gen: int, metrics: TurnMetrics, first_audio: bool
 ) -> bool:
     metrics.mark_first_chunk()
-    s.ledger.begin(sentence)
+    sentence = considerate(sentence, s.chunker.spoken_text)  # no laugh at bad news
+    s.ledger.begin(sentence)  # its tags take time too; `text_up_to` leaves them out
     async for pcm in s.runtime.tts.synthesize_stream(sentence, s.voice_id()):
         if gen != s.audio_gen:  # barged-in mid-synth -> drop stragglers
             return first_audio

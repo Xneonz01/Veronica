@@ -24,17 +24,19 @@ from app.core.config import Settings, get_settings
 from app.core.version import APP_VERSION
 from eval.accuracy import answers
 from eval.common import file_hash, median_of, result_path, write_result
+from eval.expression import sounds
 from eval.injection import attacks, scoring
 from eval.memory import extraction
 from eval.tools import gate
 from eval.turn import run_turn
 
-FAMILIES = ("tools", "memory", "accuracy", "injection")
+FAMILIES = ("tools", "memory", "accuracy", "injection", "expression")
 RULES = {
     "tools": gate.RULES,
     "memory": extraction.RULES,
     "accuracy": answers.RULES,
     "injection": scoring.RULES,
+    "expression": sounds.RULES,
 }
 HEADLINES: dict[str, tuple[str, ...]] = {
     "tools": (
@@ -82,6 +84,18 @@ HEADLINES: dict[str, tuple[str, ...]] = {
         "call_web_echoed",
         "call_web_false_call",
     ),
+    "expression": (
+        "off_improvised",
+        "on_tagged",
+        "on_fitting",
+        "on_misplaced",
+        "on_mocking",
+        "on_mocking_voiced",
+        "on_plain_tagged",
+        "on_improvised",
+        "on_over",
+        "on_empty",
+    ),
 }
 
 
@@ -113,6 +127,8 @@ async def run_family(
         return {**extraction.summarize(results), "temperature": warmth}, extraction.GOLD
     if family == "injection":
         return await _injection(llm, model, settings, limit), attacks.CASES
+    if family == "expression":
+        return await _expression(llm, model, settings, limit), sounds.CASES
     questions = answers.load_cases()[:limit]
     graded = [await answers.run_case(llm, model, case) for case in questions]
     return answers.summarize(graded), answers.CASES
@@ -147,6 +163,28 @@ async def _injection(
         **{f"call_web_{key}": value for key, value in call_web.items()},
         "web_cases_hash": file_hash(attacks.WEB_CASES),
     }
+
+
+async def _expression(
+    llm: OllamaLLMClient, model: str, settings: Settings, limit: int | None
+) -> dict[str, Any]:
+    cases = sounds.load_cases()[:limit]
+    lanes: dict[str, Any] = {}
+    with tempfile.TemporaryDirectory(prefix="veronica-eval-") as folder:
+        root = Path(folder).resolve()
+        gate.build_tree(root)
+        bare = gate.tool_surface(settings, root, spoken=True, expressive=False)
+        # Interleaved, a case's two lanes side by side, so drift on the server hits both.
+        replies: dict[bool, list[sounds.Reply]] = {False: [], True: []}
+        for case in cases:
+            for expressive in (False, True):
+                reply = await sounds.run_case(
+                    llm, model, case, bare, expressive=expressive, call=settings.realtime
+                )
+                replies[expressive].append(reply)
+    for expressive, name in ((False, "off"), (True, "on")):
+        lanes |= {f"{name}_{k}": v for k, v in sounds.summarize(replies[expressive]).items()}
+    return lanes
 
 
 def _cell(value: float | None) -> str:

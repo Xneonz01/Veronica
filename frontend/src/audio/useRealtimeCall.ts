@@ -4,7 +4,7 @@
 
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react'
 import { WS } from '../lib/api'
-import { readGreeting } from '../notify/settings'
+import { onExpressiveChange, readExpressive, readGreeting } from '../notify/settings'
 import {
   CALL_DROPPED,
   CONNECT_ERROR,
@@ -291,7 +291,9 @@ export function useRealtimeCall(): RealtimeCall {
           socket.send(JSON.stringify({ action: 'playback_position', ...position }))
         }
       })
-      socket.send(JSON.stringify({ action: 'call_start', greeting: readGreeting() }))
+      socket.send(
+        JSON.stringify({ action: 'call_start', greeting: readGreeting(), expressive: readExpressive() }),
+      )
       setInCall(true)
       // Stay on 'connecting': the backend drives 'warming_up' -> 'listening'.
     } catch {
@@ -323,6 +325,17 @@ export function useRealtimeCall(): RealtimeCall {
   }, [])
 
   useEffect(() => teardown, [teardown])
+
+  // Expressive voice switched during a call: from her next reply on.
+  useEffect(
+    () =>
+      onExpressiveChange((expressive) => {
+        if (ws.current?.readyState === WebSocket.OPEN) {
+          ws.current.send(JSON.stringify({ action: 'call_options', expressive }))
+        }
+      }),
+    [],
+  )
 
   return {
     // The backend says "listening" once the last of her words is synthesised, and

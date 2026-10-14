@@ -1,0 +1,1546 @@
+{
+  "version": "0.36.0",
+  "family": "tools",
+  "model": "qwen3.5:9b",
+  "run": 1,
+  "cases_hash": "0f88cc906773a470",
+  "selection": 1.0,
+  "wrong_tool": 0.0,
+  "silent": 0.0,
+  "false_call": 0.0526,
+  "args_valid": 1.0,
+  "first_ms_median": 322.8,
+  "first_ms_p90": 527.3,
+  "cases": [
+    {
+      "id": "t01",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 477.39070001989603,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User takes their coffee black.",
+        "kind": "preference"
+      }
+    },
+    {
+      "id": "t02",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 433.5756000364199,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User's sister Morgan's birthday is on 12 October.",
+        "kind": "fact"
+      }
+    },
+    {
+      "id": "t03",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 411.54160001315176,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User does not want to be called by name.",
+        "kind": "preference"
+      }
+    },
+    {
+      "id": "t04",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 386.1578000942245,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User is allergic to peanuts.",
+        "kind": "fact"
+      }
+    },
+    {
+      "id": "t05",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 386.1374999396503,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User works from home on Fridays.",
+        "kind": "fact"
+      }
+    },
+    {
+      "id": "t06",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 304.8426000168547,
+      "args_ok": true,
+      "args_seen": {
+        "query": "all information about the user"
+      }
+    },
+    {
+      "id": "t07",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 302.27959994226694,
+      "args_ok": true,
+      "args_seen": {
+        "query": "sister's name"
+      }
+    },
+    {
+      "id": "t08",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 298.69600001256913,
+      "args_ok": true,
+      "args_seen": {
+        "query": "allergies"
+      }
+    },
+    {
+      "id": "t09",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 288.5584000032395,
+      "args_ok": true,
+      "args_seen": {
+        "query": "work schedule"
+      }
+    },
+    {
+      "id": "t10",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 276.03959990665317,
+      "args_ok": true,
+      "args_seen": {
+        "query": "name"
+      }
+    },
+    {
+      "id": "t11",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 444.6907000383362,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/shopping.md"
+      }
+    },
+    {
+      "id": "t12",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 423.46700001508,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/projects/garden-plan.txt"
+      }
+    },
+    {
+      "id": "t13",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 428.19230002351105,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/todo.md"
+      }
+    },
+    {
+      "id": "t14",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 432.53140000160784,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/letters/landlord.txt"
+      }
+    },
+    {
+      "id": "t15",
+      "kind": "tool",
+      "expected": "files_list",
+      "called": [
+        "files_list"
+      ],
+      "first_ms": 412.1838000137359,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes"
+      }
+    },
+    {
+      "id": "t16",
+      "kind": "tool",
+      "expected": "files_list",
+      "called": [
+        "files_list"
+      ],
+      "first_ms": 410.9651999315247,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/projects"
+      }
+    },
+    {
+      "id": "t17",
+      "kind": "tool",
+      "expected": "files_list",
+      "called": [
+        "files_list"
+      ],
+      "first_ms": 417.6832000957802,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/letters"
+      }
+    },
+    {
+      "id": "t18",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 540.2362999739125,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}",
+        "query": "boiler",
+        "in_content": false
+      }
+    },
+    {
+      "id": "t19",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 533.4746000589803,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}",
+        "query": "invoice",
+        "in_content": true
+      }
+    },
+    {
+      "id": "t20",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 535.9745000023395,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}",
+        "query": "dentist",
+        "in_content": false
+      }
+    },
+    {
+      "id": "t21",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 548.2535000192001,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes",
+        "query": "carrots",
+        "in_content": true
+      }
+    },
+    {
+      "id": "t22",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 512.0545000536367,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/ideas.md",
+        "content": "Paint the shed"
+      }
+    },
+    {
+      "id": "t23",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 519.1207999596372,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/reminders.txt",
+        "content": "Call the plumber on Monday"
+      }
+    },
+    {
+      "id": "t24",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 527.2655999287963,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/gift.md",
+        "content": "buy a scarf for Morgan."
+      }
+    },
+    {
+      "id": "t25",
+      "kind": "tool",
+      "expected": "apps_open",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 283.5826000664383,
+      "args_ok": true,
+      "args_seen": {
+        "name": "notepad"
+      }
+    },
+    {
+      "id": "t26",
+      "kind": "tool",
+      "expected": "apps_open",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 286.44499997608364,
+      "args_ok": true,
+      "args_seen": {
+        "name": "explorer"
+      }
+    },
+    {
+      "id": "t27",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [
+        "memory_forget"
+      ],
+      "first_ms": 138.5731000918895,
+      "args_ok": true,
+      "args_seen": {
+        "query": "sister's birthday"
+      }
+    },
+    {
+      "id": "t28",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [
+        "memory_forget"
+      ],
+      "first_ms": 317.0619000447914,
+      "args_ok": true,
+      "args_seen": {
+        "query": "User works from home on Fridays"
+      }
+    },
+    {
+      "id": "t29",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 409.8837000783533,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User takes black coffee.",
+        "new": "User takes coffee with milk."
+      }
+    },
+    {
+      "id": "t30",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 467.69670001231134,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User's sister's birthday is on 12 October.",
+        "new": "User's sister's birthday is on 14 October."
+      }
+    },
+    {
+      "id": "t31",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [
+        "memory_forget"
+      ],
+      "first_ms": 365.4315999010578,
+      "args_ok": true,
+      "args_seen": {
+        "query": "User goes to the gym on Tuesdays and Wednesdays."
+      }
+    },
+    {
+      "id": "t32",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 413.9182000653818,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User drinks green tea every morning.",
+        "new": "User drinks green tea every evening."
+      }
+    },
+    {
+      "id": "t33",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 422.19359998125583,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User's sister Morgan lives in York.",
+        "new": "User's sister Morgan lives in Bristol."
+      }
+    },
+    {
+      "id": "t34",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [
+        "memory_forget"
+      ],
+      "first_ms": 322.84380006603897,
+      "args_ok": true,
+      "args_seen": {
+        "query": "User works from home on Fridays."
+      }
+    },
+    {
+      "id": "t35",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 395.41200001258403,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User takes their coffee with oat milk.",
+        "kind": "fact"
+      }
+    },
+    {
+      "id": "t36",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 396.6962000122294,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User takes their coffee with oat milk.",
+        "kind": "preference"
+      }
+    },
+    {
+      "id": "t37",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 417.3569999402389,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User takes their coffee black.",
+        "new": "User takes their coffee with milk."
+      }
+    },
+    {
+      "id": "t38",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 407.47870004270226,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User takes their coffee black.",
+        "new": "User takes their coffee with milk."
+      }
+    },
+    {
+      "id": "t39",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [
+        "memory_forget"
+      ],
+      "first_ms": 322.5672000553459,
+      "args_ok": true,
+      "args_seen": {
+        "query": "User goes to the gym on Mondays."
+      }
+    },
+    {
+      "id": "t40",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [
+        "memory_forget"
+      ],
+      "first_ms": 324.06360004097223,
+      "args_ok": true,
+      "args_seen": {
+        "query": "I go to the gym on Mondays."
+      }
+    },
+    {
+      "id": "t41",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 623.7728999694809,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/list.md",
+        "content": "# Shopping List\n\n- eggs\n- bread\n- apples",
+        "overwrite": true
+      }
+    },
+    {
+      "id": "t42",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 584.144200081937,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/list.md",
+        "content": "eggs, bread, apples",
+        "overwrite": true
+      }
+    },
+    {
+      "id": "t43",
+      "kind": "tool",
+      "expected": "apps_open",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 284.70740001648664,
+      "args_ok": true,
+      "args_seen": {
+        "name": "notepad"
+      }
+    },
+    {
+      "id": "t44",
+      "kind": "tool",
+      "expected": "apps_open",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 285.80650000367314,
+      "args_ok": true,
+      "args_seen": {
+        "name": "notepad"
+      }
+    },
+    {
+      "id": "n01",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 132.77520006522536,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n02",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 138.34549998864532,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n03",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 135.18820004537702,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n04",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 134.8968999227509,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n05",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 133.62609990872443,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n06",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 135.75499993748963,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n07",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 133.81570007186383,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n08",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 138.48109997343272,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n09",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 136.78739999886602,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n10",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 133.5121999727562,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n11",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 133.22139997035265,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n12",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 133.22950003203005,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n13",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 132.51270004548132,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n14",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 134.11149999592453,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n15",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 136.28680002875626,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n16",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 137.5160999596119,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n17",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 137.57720007561147,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n18",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 147.1200999803841,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n19",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 135.0139999995008,
+      "args_ok": null,
+      "args_seen": {}
+    }
+  ],
+  "call_selection": 0.8636,
+  "call_wrong_tool": 0.0,
+  "call_silent": 0.1364,
+  "call_false_call": 0.0526,
+  "call_args_valid": 1.0,
+  "call_first_ms_median": 301.6,
+  "call_first_ms_p90": 523.6,
+  "call_cases": [
+    {
+      "id": "t01",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 415.05150008015335,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User takes their coffee black.",
+        "kind": "preference"
+      }
+    },
+    {
+      "id": "t02",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 422.9662000434473,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User's sister Morgan's birthday is on 12 October.",
+        "kind": "fact"
+      }
+    },
+    {
+      "id": "t03",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 424.8286000220105,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User does not want to be addressed by their name.",
+        "kind": "preference"
+      }
+    },
+    {
+      "id": "t04",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 381.48820004425943,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User is allergic to peanuts.",
+        "kind": "fact"
+      }
+    },
+    {
+      "id": "t05",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 384.59350005723536,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User works from home on Fridays.",
+        "kind": "fact"
+      }
+    },
+    {
+      "id": "t06",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [],
+      "first_ms": 138.251900090836,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "t07",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 301.55229999218136,
+      "args_ok": true,
+      "args_seen": {
+        "query": "sister's name"
+      }
+    },
+    {
+      "id": "t08",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 299.7309999773279,
+      "args_ok": true,
+      "args_seen": {
+        "query": "allergies"
+      }
+    },
+    {
+      "id": "t09",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [
+        "memory_recall"
+      ],
+      "first_ms": 292.3244000412524,
+      "args_ok": true,
+      "args_seen": {
+        "query": "work schedule"
+      }
+    },
+    {
+      "id": "t10",
+      "kind": "tool",
+      "expected": "memory_recall",
+      "called": [],
+      "first_ms": 140.3593000723049,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "t11",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 436.4043000387028,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/shopping.md"
+      }
+    },
+    {
+      "id": "t12",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 431.25850008800626,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/projects/garden-plan.txt"
+      }
+    },
+    {
+      "id": "t13",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 423.6673000268638,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/todo.md"
+      }
+    },
+    {
+      "id": "t14",
+      "kind": "tool",
+      "expected": "files_read",
+      "called": [
+        "files_read"
+      ],
+      "first_ms": 441.9192000059411,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/letters/landlord.txt"
+      }
+    },
+    {
+      "id": "t15",
+      "kind": "tool",
+      "expected": "files_list",
+      "called": [
+        "files_list"
+      ],
+      "first_ms": 413.727100007236,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes"
+      }
+    },
+    {
+      "id": "t16",
+      "kind": "tool",
+      "expected": "files_list",
+      "called": [
+        "files_list"
+      ],
+      "first_ms": 401.6451999777928,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/projects"
+      }
+    },
+    {
+      "id": "t17",
+      "kind": "tool",
+      "expected": "files_list",
+      "called": [
+        "files_list"
+      ],
+      "first_ms": 413.4281000588089,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/letters"
+      }
+    },
+    {
+      "id": "t18",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 529.1226000990719,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}",
+        "query": "boiler",
+        "in_content": false
+      }
+    },
+    {
+      "id": "t19",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 523.9355999510735,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}",
+        "query": "invoice",
+        "in_content": true
+      }
+    },
+    {
+      "id": "t20",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 525.61820007395,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}",
+        "query": "dentist",
+        "in_content": true
+      }
+    },
+    {
+      "id": "t21",
+      "kind": "tool",
+      "expected": "files_search",
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 543.4698999160901,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes",
+        "query": "carrots",
+        "in_content": true
+      }
+    },
+    {
+      "id": "t22",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 513.4128000354394,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/ideas.md",
+        "content": "Paint the shed"
+      }
+    },
+    {
+      "id": "t23",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 581.8307000445202,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/reminders.txt",
+        "content": "Call the plumber on Monday",
+        "overwrite": true
+      }
+    },
+    {
+      "id": "t24",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 519.7998000076041,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/gift.md",
+        "content": "buy a scarf for Morgan."
+      }
+    },
+    {
+      "id": "t25",
+      "kind": "tool",
+      "expected": "apps_open",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 289.2764999996871,
+      "args_ok": true,
+      "args_seen": {
+        "name": "notepad"
+      }
+    },
+    {
+      "id": "t26",
+      "kind": "tool",
+      "expected": "apps_open",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 290.53150000981987,
+      "args_ok": true,
+      "args_seen": {
+        "name": "explorer"
+      }
+    },
+    {
+      "id": "t27",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [
+        "memory_forget"
+      ],
+      "first_ms": 310.6729000573978,
+      "args_ok": true,
+      "args_seen": {
+        "query": "User's sister's birthday"
+      }
+    },
+    {
+      "id": "t28",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [],
+      "first_ms": 136.11780002247542,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "t29",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 391.895099892281,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User takes coffee black.",
+        "new": "User takes coffee with milk."
+      }
+    },
+    {
+      "id": "t30",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 460.85770009085536,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User's sister's birthday is on 12 October.",
+        "new": "User's sister's birthday is on 14 October."
+      }
+    },
+    {
+      "id": "t31",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [],
+      "first_ms": 146.14879991859198,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "t32",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [],
+      "first_ms": 141.00419997703284,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "t33",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 419.551600003615,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User's sister Morgan lives in York.",
+        "new": "User's sister Morgan lives in Bristol."
+      }
+    },
+    {
+      "id": "t34",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [],
+      "first_ms": 139.6584000904113,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "t35",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 405.25489998981357,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User takes their coffee with oat milk.",
+        "kind": "preference"
+      }
+    },
+    {
+      "id": "t36",
+      "kind": "tool",
+      "expected": "memory_save",
+      "called": [
+        "memory_save"
+      ],
+      "first_ms": 397.0419999677688,
+      "args_ok": true,
+      "args_seen": {
+        "content": "User takes their coffee with oat milk.",
+        "kind": "preference"
+      }
+    },
+    {
+      "id": "t37",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 418.461799970828,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User takes their coffee black.",
+        "new": "User takes their coffee with milk."
+      }
+    },
+    {
+      "id": "t38",
+      "kind": "tool",
+      "expected": "memory_correct",
+      "called": [
+        "memory_correct"
+      ],
+      "first_ms": 398.1887000845745,
+      "args_ok": true,
+      "args_seen": {
+        "old": "User takes coffee black.",
+        "new": "User takes coffee with milk."
+      }
+    },
+    {
+      "id": "t39",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [
+        "memory_forget"
+      ],
+      "first_ms": 325.4242999246344,
+      "args_ok": true,
+      "args_seen": {
+        "query": "User goes to the gym on Mondays."
+      }
+    },
+    {
+      "id": "t40",
+      "kind": "tool",
+      "expected": "memory_forget",
+      "called": [
+        "memory_forget"
+      ],
+      "first_ms": 326.1963000986725,
+      "args_ok": true,
+      "args_seen": {
+        "query": "User goes to the gym on Mondays."
+      }
+    },
+    {
+      "id": "t41",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 589.0422000084072,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/list.md",
+        "content": "eggs, bread, apples",
+        "overwrite": true
+      }
+    },
+    {
+      "id": "t42",
+      "kind": "tool",
+      "expected": "files_write",
+      "called": [
+        "files_write"
+      ],
+      "first_ms": 523.6083000199869,
+      "args_ok": true,
+      "args_seen": {
+        "path": "{root}/notes/list.md",
+        "content": "eggs\nbread\napples"
+      }
+    },
+    {
+      "id": "t43",
+      "kind": "tool",
+      "expected": "apps_open",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 282.08030003588647,
+      "args_ok": true,
+      "args_seen": {
+        "name": "notepad"
+      }
+    },
+    {
+      "id": "t44",
+      "kind": "tool",
+      "expected": "apps_open",
+      "called": [
+        "apps_open"
+      ],
+      "first_ms": 285.5224999366328,
+      "args_ok": true,
+      "args_seen": {
+        "name": "notepad"
+      }
+    },
+    {
+      "id": "n01",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 135.50880004186183,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n02",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 140.49759996123612,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n03",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 134.00830002501607,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n04",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 134.57260001450777,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n05",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 135.57249994482845,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n06",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 133.79620003979653,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n07",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 135.04429999738932,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n08",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 133.3773999940604,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n09",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 134.4258999451995,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n10",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 133.09329992625862,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n11",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 135.5601999675855,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n12",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 132.9234999138862,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n13",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 136.76449994090945,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n14",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 135.49050001893193,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n15",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 136.78930001333356,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n16",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 136.19610003661364,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n17",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 138.38719995692372,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n18",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [],
+      "first_ms": 150.1513000112027,
+      "args_ok": null,
+      "args_seen": {}
+    },
+    {
+      "id": "n19",
+      "kind": "no_tool",
+      "expected": null,
+      "called": [
+        "files_search"
+      ],
+      "first_ms": 137.341900030151,
+      "args_ok": null,
+      "args_seen": {}
+    }
+  ]
+}
