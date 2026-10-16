@@ -47,3 +47,13 @@ class CapabilitySettings(BaseModel):
     minute_budget: dict[str, int] = Field(
         default_factory=lambda: {"web.search": 15, "web.read": 30}
     )
+    # Tool servers (MCP, `services/mcp`): which run is set live in Settings; these bound
+    # them. Every offered tool is read by the model on every chat turn.
+    mcp_tools_per_turn: int = Field(default=12, ge=1, le=64)
+    # And what they may take of the chat window together, in tokens. Every chat turn
+    # sends the persona and every tool before anything else, so these come out of the
+    # room for the message, what she recalls for it and the conversation: 3,637 tokens
+    # at the default window with web search on, 2,137 with this much taken. One tool
+    # with long descriptions measured 1,752. Raise it with `llm.num_ctx`.
+    mcp_tool_tokens: int = Field(default=1_500, ge=0)
+    mcp_call_timeout_s: float = Field(default=60.0, gt=0)

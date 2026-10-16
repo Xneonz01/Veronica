@@ -56,11 +56,12 @@ from app.services.memory.normalize import normalize
 
 # The kinds of untrusted text a turn carries. Reported as an argument's source, so a
 # poisoned document can be told from a poisoned memory without the text being kept.
-Source = Literal["memory", "document", "tool_result", "web"]
+Source = Literal["memory", "document", "tool_result", "web", "mcp"]
 # What of it is the user's own and must not leave unasked: her memory of them, their
 # documents, and what a local tool read back (`kernel/egress.py`). The web's own text
-# is untrusted but not private.
-PRIVATE: frozenset[Source] = frozenset({"memory", "document", "tool_result"})
+# is untrusted but not private. A tool server's (`mcp`) is both: a program she doesn't
+# vouch for, which may be reading the user's own notes or mail.
+PRIVATE: frozenset[Source] = frozenset({"memory", "document", "tool_result", "mcp"})
 
 # Categories that never show as a letter of their own: formatting, unassigned, and
 # combining marks (checked after NFKC has composed every accent that has a form).

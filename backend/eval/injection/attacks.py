@@ -2,7 +2,8 @@
 and tools exactly as a turn sends them, with the instruction in one of the places a turn
 reads text the user didn't write: a document it cites, her memory block, a file she was
 asked to read, as the result of that read, or (since 0.35.0, `web_cases.jsonl`) the web:
-a page she was asked to read in chat, a search she was asked to make on a call. And a
+a page she was asked to read in chat, a search she was asked to make on a call; or (since
+0.37.0, `mcp_cases.jsonl`) what a tool server's tool returned, in chat. And a
 call's prompt and tools (`spoken`), on what a call reads: her memory, a file's contents
 and a search, never a document. The model's first round is recorded, never run, and
 judged by `scoring.py`, which puts each call that carries the instruction out to the
@@ -31,8 +32,9 @@ from app.kernel.capability import CapabilityResult
 from app.kernel.confirm import ConfirmationBroker
 from app.kernel.kernel import CapabilityKernel
 from app.kernel.policy import PolicyStore
-from app.kernel.registry import CapabilityRegistry
+from app.kernel.registry import Capability, CapabilityRegistry
 from app.kernel.taint import Source, Taint
+from app.services.mcp.tools import capability, read_tools
 from app.services.persona.defaults import (
     DEFAULT_PERSONALITY,
     EXPRESSIVE_BY_DEFAULT,
@@ -48,7 +50,20 @@ from eval.turn import run_turn
 
 CASES = Path(__file__).with_name("cases.jsonl")
 WEB_CASES = Path(__file__).with_name("web_cases.jsonl")
-VECTORS: tuple[Source, ...] = ("document", "memory", "tool_result", "web")
+MCP_CASES = Path(__file__).with_name("mcp_cases.jsonl")
+VECTORS: tuple[Source, ...] = ("document", "memory", "tool_result", "web", "mcp")
+# The tool server a `mcp` case's text comes from: a notes server, its search approved,
+# offered as the product offers one (`services/mcp/tools.py`).
+_NOTES = {
+    "name": "search",
+    "title": "Search notes",
+    "description": "Finds the user's notes that mention a word.",
+    "inputSchema": {
+        "type": "object",
+        "properties": {"query": {"type": "string", "description": "What to look for."}},
+        "required": ["query"],
+    },
+}
 # The read or the search the user asked for, shaped as Ollama returns a call.
 _READ_CALL_ID = "call_r3ad0001"
 
@@ -123,10 +138,16 @@ def _check(case: dict[str, Any]) -> None:
     missing = {"title", "url", "query", "call_utterance"} - case.keys()
     if case["vector"] == "web" and missing:
         raise ValueError(f"{name}: a web case names its {', '.join(sorted(missing))}")
+    if case["vector"] == "mcp" and not case.get("query"):
+        raise ValueError(f"{name}: a tool server case names what was searched for")
 
 
-def surface(settings: Settings, root: Path, *, spoken: bool = False, web: bool = False) -> Surface:
+def surface(
+    settings: Settings, root: Path, *, spoken: bool = False, web: bool = False, mcp: bool = False
+) -> Surface:
     registry = confined_registry(settings, root, web=web)
+    if mcp:  # a notes server's search, approved: never run here
+        registry.register(_notes_search())
     bus = InProcessEventBus()
     policy = PolicyStore(bus, settings.capabilities.policy)
     floor = settings.capabilities.taint_min_words
@@ -167,6 +188,11 @@ def reading(case: dict[str, Any], on: Surface) -> Reading:
         path = f"{on.root}/{case['path']}"
         messages += _round("files_read", {"path": path}, result)
         read.append(("tool_result", result))
+    elif case["vector"] == "mcp":
+        found_notes = CapabilityResult(ok=True, data={"content": material})
+        result = render_result("mcp.notes.search", found_notes)
+        messages += _round("mcp_notes_search", {"query": case["query"]}, result)
+        read.append(("mcp", result))
     elif web:
         name, arguments, content, found = _web_result(case, material, on.spoken)
         result = render_result(
@@ -176,6 +202,14 @@ def reading(case: dict[str, Any], on: Surface) -> Reading:
         read.append(("web", result))
     taint = Taint.of(untrusted=read, trusted=[utterance], urls=found)
     return Reading(messages, taint, tuple(text for _source, text in read))
+
+
+def _notes_search() -> Capability:
+    async def never(_tool: str, _args: dict[str, Any]) -> CapabilityResult:
+        raise AssertionError("an evaluation runs nothing")
+
+    tool = read_tools("notes", [_NOTES])[0]
+    return capability(tool, "Notes", never, running=lambda: True, timeout_s=65.0)
 
 
 def _round(tool: str, arguments: dict[str, Any], result: str) -> list[dict[str, Any]]:

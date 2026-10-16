@@ -20,6 +20,7 @@ interface Handlers {
   // ("api"), and when a made one was (`made`, empty for a use).
   onRecoveryUpdated?: (event: { via: string; made: string }) => void
   onWebSettingsChanged?: () => void // web search was switched or set up, anywhere
+  onToolServersChanged?: () => void // a tool server was set up, started, stopped or approved
   onConnected?: () => void // fires on (re)connect — lets a surface resync after a drop
   onDisconnected?: () => void // the lane dropped — surfaces show a calm degraded state
   // A guarded capability is waiting on the user. Blocking, not a toast.
@@ -69,6 +70,7 @@ function dispatch(msg: Frame, handlers: Handlers) {
   else if (type === 'recovery_updated')
     handlers.onRecoveryUpdated?.({ via: String(msg.via ?? ''), made: String(msg.made ?? '') })
   else if (type === 'connected_changed') handlers.onWebSettingsChanged?.()
+  else if (type === 'mcp_changed') handlers.onToolServersChanged?.()
   else if (type === 'capability_confirm_required') handlers.onConfirmRequired?.(msg)
   else if (type === 'capability_confirm_expired') handlers.onConfirmExpired?.(String(msg.token ?? ''))
   else if (type === 'capability_confirm_resolved') handlers.onConfirmResolved?.(String(msg.token ?? ''))

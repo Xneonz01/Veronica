@@ -203,6 +203,9 @@ backend/
                              (cipher.py) and the encryption at rest (at_rest.py)
       persona/               the editable personality and the fixed prompt scaffold
       connected/             the web's settings, live, and the clients that reach it
+      mcp/                   tool servers: their setups and approvals, the process
+                             and its job object, JSON-RPC and the protocol's two
+                             eras, their tools as capabilities
       recovery.py            her recovery key, made and used across her key files
       tools/                 a surface's tools: the capabilities it offers the model,
                              and what a turn read, by source
@@ -3339,6 +3342,7 @@ Registered once at startup by `app/capabilities/__init__.py`:
 | `apps.open` | guarded | yes | launch an allow-listed application by name |
 | `web.search` | safe, reaches the network | yes | search the web through the provider in Settings: numbered titles, addresses and snippets ([§12.12](#1212-the-web)) |
 | `web.read` | safe, reaches the network | no | read one page as text ([§12.12](#1212-the-web)) |
+| `mcp.<server>.<tool>` | guarded, always asks, reaches another program | no | a tool server's tool, once approved, while its server runs ([§12.13](#1213-tool-servers-mcp)) |
 
 **Memory** (`capabilities/memory.py`) goes through `MemoryService`, like the Memory page,
 so every write raises the same notification. Until 0.17 the model's memory tools had a
@@ -3827,6 +3831,138 @@ Extension I) is marked by the backend and shown by the app. No published file ho
 (`tests/test_repository.py`), since a reviewer can't see it.
 
 ---
+
+### 12.13 Tool servers (MCP)
+
+Since 0.37.0 she can use the tools of a program the user runs that speaks the Model
+Context Protocol (ADR 0003): a notes server, a calendar's. Set up in Settings > Tools,
+each runs as her child process over stdio, its approved tools become capabilities that
+ask every time, and none is offered on a call.
+
+**A setup** (`services/mcp/setup.py`): an id (`[a-z0-9-]{1,32}`, its tools' prefix), a
+name, the program as an absolute path to an `.exe`, `.cmd` or `.bat` (no shell, nothing
+looked up on PATH; read once, quotes taken off, so the checks and the launch see the same
+path; never a network path, whose lookup would send the user's Windows sign-in), its
+arguments, its variables, on or off, and the user's word on whether it reaches the
+internet; 16 servers at most. A `.cmd` or `.bat` runs through cmd.exe, which reads
+`&`, `|`, `%` and quotes in an argument as its own (BatBadBut), so its arguments are
+held to letters, digits and `@._/:=,+\-`. Its environment is a short list of what a
+Windows program needs (`INHERITED`: `PATH`, `SystemRoot`, `APPDATA`, ...), never a
+`PYTHON*`, `NODE_OPTIONS`, `NODE_PATH`, Java, Perl or Ruby options variable, which change
+what a program runs before its own code, nor `NPM_CONFIG_*` or `UV_*`, which change what
+npx or uvx fetch, nor `VERONICA_*`; plus its own, a name it sets replacing hers whatever
+its case (`Path` for `PATH`). The setups and the approvals are kept
+in `mcp.json` (`store.py`), each server's arguments and variables sealed with the data
+key and bound to its id; where there is no data key, a server that has any isn't kept.
+A screen is sent the variables' names, never their values, and a change that leaves a
+value out keeps the saved one. A changed program or arguments is another program: its
+approvals go.
+
+**The process** (`process.py`, `job.py`): started with `subprocess` and threads, not
+asyncio's subprocesses (bug 14), suspended, assigned to a job object with
+`KILL_ON_JOB_CLOSE` and only then resumed, through a Toolhelp snapshot of its threads, so
+nothing it starts escapes the job. Closing the job, which Windows also does when her
+backend exits, a crash included, ends it and everything it started. One thread reads its
+lines and decodes them, off the event loop; a line over 4 MiB stops it. Another keeps the
+last 64 KiB of its stderr, for the user (`GET /mcp/servers/{id}/log`, hidden characters
+shown), never logged. A third writes what is queued for it: a server that stops reading
+its input once held a thread of the shared pool per write, and enough of them stalled
+the rest of her backend, so a write never waits, and past 64 lines waiting it is refused.
+Stopping queues the close of its input, waits two seconds, then closes the job; a stop
+that comes before the process exists ends it as it starts. Starts are taken one at a
+time, and a stop or a newer start makes an older one give up and end its process. A
+server the user changes or removes is retired: a restart still due on it never starts it
+again, and it offers nothing, its tools being the new one's to offer. Its
+working folder is `data/mcp/<id>/`.
+
+**The protocol** (`rpc.py`, `protocol.py`). Both eras, since most servers people run
+still speak the older one:
+
+- **Current (2026-07-28), stateless.** No handshake: every request's `params._meta`
+  carries `io.modelcontextprotocol/protocolVersion`, `.../clientInfo` and
+  `.../clientCapabilities` (empty). A server is probed with `server/discover`: a result
+  that lists 2026-07-28 is current; the error for a version it doesn't speak (-32022)
+  means it is current but can't speak ours, said in Settings, with no fallback; anything
+  else, or no answer in 10 s, is older. One that dies while probed is asked the older
+  way first next time. A current server never writes requests on stdio and a client
+  never writes responses, so a request from one is dropped.
+- **Older (2025-11-25, 2025-06-18, 2025-03-26, 2024-11-05).** `initialize` offering
+  2025-11-25, a reply naming one of those, then `notifications/initialized`. `ping` is
+  answered; any other request it sends is told -32601: she declares no client
+  capabilities, so there is no sampling or roots to offer. Batches are read only from a
+  2025-03-26 server, the one revision that had them, 64 at most.
+- One message per line; a line that isn't JSON, or nests deep enough that `json.loads`
+  raises `RecursionError`, is dropped. At most 8 requests wait at once. One given up on
+  (its timeout, or the turn cancelled) is cancelled with `notifications/cancelled`,
+  never `initialize`, and a late answer is dropped.
+- The tool list is read page by page (`nextCursor`, 200 tools at most), again when its
+  `ttlMs` runs out (between a minute and an hour; five minutes when unsaid), when an
+  older server says `tools/list_changed` (a second's debounce), and on a restart.
+- A call's result of `resultType` `input_required` that carries only `requestState` is
+  sent again with it, the call tried three times in all; one asking for input she can't give
+  (`inputRequests`) is refused in words (`tool_needs_input`); a kind she doesn't know is
+  invalid.
+
+**The tools** (`schema.py`, `tools.py`). A tool is offered only once the user approves it
+in Settings, and only as it was then: its pin is the SHA-256 of its name, title,
+description, input schema and annotations in canonical JSON, so a description a server
+changes later, to steer her, withholds the tool until it is looked at anew. An approval
+carries the pin the screen showed (one without it is refused, 422 `pin_missing`), and a
+tool that changed in between is refused (409 `tool_changed`), so the words approved are the words read. The name a server gives
+itself is cleaned and cut like a description. Its name is
+`mcp.<id>.<tool>` (a dot in the tool's own name becomes `_`; a second name that comes out
+the same is left out). Its `inputSchema` becomes the flat model the kernel validates
+with: strings (an `enum` as a `Literal`, `maxLength` kept, at most 20,000), integers,
+numbers (never NaN or infinity, which aren't JSON), true-or-false, lists of those (100
+items, each held as a value is), nullable where it says, `required` kept and nothing else
+accepted. A nested object, a `$ref` (never fetched), `anyOf` and the rest,
+a name a model or a field can't carry, or more than 32 arguments, and the tool is listed
+as unsupported, with the reason. Descriptions are told to the model with what renders as
+nothing removed, and shown to the user with it made visible (`⟪U+200B⟫`), cut at 300.
+
+Each approved tool is a capability: `guarded`, `always_ask` (the policy refuses to set it
+to run unasked, even from a config file), `reach="external"`, withdrawn when its server
+stops (a call to it is then refused as a tool she doesn't have), and at the moment it
+runs refused if it was withdrawn or changed since its prompt was raised. Never on a call:
+a call's broker refuses any tool it doesn't offer, a tool server's included, should the
+model name one. Its prompt names it "<title> from <server>", saying when the server
+reaches the internet. A result's text items are joined and every other kind named in words (an
+image, a file, a link), cleaned and cut at 8,000 characters; an error the tool reports is
+a failure in her words, the server's own not passed on, since a failure reaches the
+model unfenced. Its text is `mcp` (`kernel/taint.py`): private, like a local tool's, so
+it doesn't leave unasked, and like the web's, every action that isn't `safe` asks after
+it (`AFTER_MCP`), and learning doesn't file a reply after it as the user's own.
+
+**Offered together**: 12 tools at most, taking at most 1,500 tokens of the chat window
+(`capabilities.mcp_tools_per_turn`, `mcp_tool_tokens`), filled server by server in the
+order each lists its tools, a tool already offered keeping its place; past those, an
+approved tool waits, and Settings says so. One tool that alone takes more than the share
+is never offered at the default settings. The window sends the persona and
+every tool before anything else: at the default 8,192 tokens with web search on, 3,637
+are left for the message, what she recalls and the conversation, and one tool with long
+descriptions measured 1,752.
+
+**When it goes wrong**: a server that won't start says why in Settings (no program at
+that path, a version she doesn't speak, no answer) and never stops her starting, and
+isn't tried again: its setup is the user's to fix. One that stops while running is
+started again after 2, 10 and 30 s; one that keeps stopping, three times without staying
+up a minute, is left off until the user restarts it, which forgives what went before.
+
+**Measured** with the planted-instruction evaluation's tool-server lane
+(`eval/injection/mcp_cases.jsonl`: six instructions and two controls as a notes server's
+search result, chat, three runs, qwen3.5:9b): the model called the planted file write in
+two runs, and it asked first, by its own policy, so nothing was written; nothing ran
+unasked, and no control was answered with a call. In one run it also said it had saved a
+planted preference it never called a tool for (1 of 18 attack replies), which the claim
+check puts a note under ([§12.10](#1210-what-she-says-she-did)).
+
+| Route | Purpose |
+|---|---|
+| `GET /mcp` | every server, its state, its tools by state with their pins, and the per-turn caps (`per_turn`, `tokens`) |
+| `POST /mcp/servers` · `PUT /mcp/servers/{id}` · `DELETE /mcp/servers/{id}` | add (409 `server_exists`, `too_many_servers` past 16), change, remove; 422 `setup_invalid` in words, 409 `cannot_keep` without a data key |
+| `POST /mcp/servers/{id}/restart` | start it again, its crashes forgiven |
+| `PUT /mcp/servers/{id}/tools/{tool}` `{approved, pin}` | approve a tool as the screen showed it (409 `tool_changed` if it changed since), or withdraw it |
+| `GET /mcp/servers/{id}/log` | the end of its stderr |
 
 ## 13. Personality
 
@@ -4391,6 +4527,9 @@ direction: no build since has written to it, and it is no longer made.
   folder every program on the account shares, and deleted after
   (`api/uploads.private_copy`); copies a crash left there are swept at the start.
 - `connected.json`: the web's settings, with the Brave key sealed ([§12.12](#1212-the-web)).
+- `mcp.json`: the tool servers and the tools approved, each server's arguments and
+  variables sealed and bound to its id; `mcp/<id>/` is each server's working folder
+  ([§12.13](#1213-tool-servers-mcp)).
 - `persona.json` and `policy.json` are written atomically (temp file + `os.replace`).
 - `voice_turns.jsonl` is append-only and not rotated; at roughly 150 bytes a turn it
   grows slowly.
@@ -4490,6 +4629,7 @@ allowed `Origin` or none (§18). Errors are typed (§5.4).
 | `GET /capabilities` · `PUT /capabilities/{name}/policy` | capabilities and their modes |
 | `GET /capabilities/pending` · `GET /capabilities/pending/{token}` · `POST /capabilities/confirm` | confirmations, one prompt's arguments in full, an answer |
 | `GET /connected` · `PUT /connected` · `PUT /connected/key` · `POST /connected/test` | the web's settings ([§12.12](#1212-the-web)) |
+| `GET /mcp` · `POST /mcp/servers` · `PUT`/`DELETE /mcp/servers/{id}` · `POST /mcp/servers/{id}/restart` · `PUT /mcp/servers/{id}/tools/{tool}` · `GET /mcp/servers/{id}/log` | tool servers ([§12.13](#1213-tool-servers-mcp)) |
 | `GET /audit?limit=&offset=&capability=&decision=` | the audit log |
 | `GET /audit/verify` | whether its hash chain still adds up, and the first row that doesn't |
 | `POST /audit/review` | accept a break the person has looked at ([§12.6](#126-the-audit-log)) |
@@ -4555,6 +4695,7 @@ Everything published on the bus, by producer.
 | `capability.confirm_resolved` / `.confirm_expired` | confirmation broker | `{token, approved, via}` / `{token, reason}` |
 | `policy.changed` | `PolicyStore` | `{capability, mode}` |
 | `persona.changed` | `PersonaService` | `{personality}` |
+| `mcp.changed` | `McpStore`, `McpRuntime` | `{}`: a tool server was set up, started or stopped, or a tool of it approved; screens read `GET /mcp` again |
 
 Call events carry `source = "voice.session.<conn_id>"` and are forwarded only to their own
 call's socket.
@@ -4575,6 +4716,8 @@ the web pages the user visits, and text that tries to steer the model.
 | Text nobody sees: tag characters, bidi overrides, zero-width marks | Dropped from pages, search results and documents before the model reads them, and from the user's files all but what an edit needs; shown as `⟪U+…⟫` in prompts and in the chat's code and links; a file name holding one is refused | `core/text_safety.py`, `capabilities/paths.py`, `lib/reveal.ts` |
 | A page sending her data out | A call that reaches the network asks before an address nobody gave her, a secret or the user's own words leaves; ceilings per turn and per minute ([§12.4](#what-leaves-for-the-web)) | `kernel/egress.py`, `kernel/budget.py` |
 | A page pointing her at the user's network or her own backend (SSRF) | Only public addresses, none of this computer's or in the IPv6 /56 around it, checked on every hop and pinned for the connection; no credentials, cookies, proxies or kept connections; https never downgraded ([§12.12](#1212-the-web)) | `adapters/web/fetch.py`, `connected/runtime.py` |
+| A tool server's text steering her | Its result is `mcp` text, fenced like any tool result and counted as the user's own: after it every action that isn't `safe` asks, and it doesn't leave unasked. Its tools always ask, are never offered on a call, and are offered only once approved, as they were then: a description changed later withholds the tool until it is approved again ([§12.13](#1213-tool-servers-mcp)) | `services/mcp/tools.py`, `kernel/verdict.py`, `kernel/taint.py`, `kernel/policy.py` |
+| A tool server outliving her, or tricked into starting something else | Started suspended in a job object that ends it and all it started when her backend exits; an absolute path to an `.exe`, `.cmd` or `.bat`, no shell, a batch file's arguments plain; an environment of a short list, never `PYTHON*`, `NODE_OPTIONS` or `VERONICA_*` | `services/mcp/job.py`, `process.py`, `setup.py` |
 | A page built to exhaust her | Decompression in bounded steps against a 2 MB cap; a linear parser fed 524,288 characters at most, off the event loop; a 25 s deadline; search fields cut before they are read | `adapters/web/capped.py`, `page_text.py`, `search.py` |
 | A prompt that shows one thing and approves another | Hidden characters shown, the real host and file named, nothing cut without saying so, secrets blanked, Allow deaf for its first 500 ms ([§12.5](#125-confirmation)) | `kernel/display.py`, `shell/PermissionPrompts.tsx` |
 | Markup or code in what she shows | Everything reaches the screen as text React escapes, and a test fails on any way to turn a string into markup or code; the built page carries a Content-Security-Policy: the app's own scripts and styles only, no inline code or eval, connections to her backend only, no frames, objects, forms or base | `scripts/__tests__/sinks.test.ts`, `src/lib/csp.ts`, `vite.config.ts` |

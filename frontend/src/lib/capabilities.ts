@@ -52,14 +52,22 @@ function wire(name: string): string {
   return name.replace(/\./g, '_')
 }
 
+/** A tool a tool server offers ("mcp.notes.add_note"). Its prompt and its card name
+    the server; here it is only one of those. */
+export function fromToolServer(name: string): boolean {
+  return wire(name).startsWith('mcp_')
+}
+
 /** The action a permission request is for, as a short imperative. */
 export function capabilityRequest(name: string): string {
+  if (fromToolServer(name)) return 'Use a tool from a tool server'
   return ASKING[wire(name)] ?? 'Use one of my tools'
 }
 
 /** A finished tool run, as a short past-tense title. */
 export function toolRunTitle(name: string, ok: boolean): string {
   const key = wire(name)
+  if (fromToolServer(name)) return ok ? 'Used a tool from a tool server' : "A tool server's tool didn't work"
   if (!ok) return TRIED[key] ?? "A tool didn't work"
   return DONE[key] ?? 'Used one of my tools'
 }

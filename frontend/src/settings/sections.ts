@@ -1,7 +1,7 @@
 // The parts of the Settings page, in order. Kept apart from the page so the command
 // palette can link to a part without importing the page.
 
-export type SettingsSection = 'general' | 'personality' | 'calls' | 'desktop' | 'web' | 'privacy' | 'about'
+export type SettingsSection = 'general' | 'personality' | 'calls' | 'desktop' | 'web' | 'tools' | 'privacy' | 'about'
 
 export const SETTINGS_SECTIONS: readonly { value: SettingsSection; label: string }[] = [
   { value: 'general', label: 'General' },
@@ -9,6 +9,7 @@ export const SETTINGS_SECTIONS: readonly { value: SettingsSection; label: string
   { value: 'calls', label: 'Calls' },
   { value: 'desktop', label: 'Desktop' },
   { value: 'web', label: 'Web' },
+  { value: 'tools', label: 'Tools' },
   { value: 'privacy', label: 'Privacy' },
   { value: 'about', label: 'About' },
 ]

@@ -57,6 +57,8 @@ class PersonaService:
         self._fits_window: Callable[[str], bool] | None = None
         # Off until the web's settings are open (`web_with`).
         self._web_on: Callable[[], bool] = lambda: False
+        # None running until the tool servers are (`servers_with`).
+        self._servers_online: Callable[[], bool] = lambda: False
 
     @property
     def personality(self) -> str:
@@ -66,6 +68,11 @@ class PersonaService:
         """From now on, read whether web search is on per prompt (ADR 0003): her line
         about what stays on this computer follows the switch."""
         self._web_on = web_on
+
+    def servers_with(self, online: Callable[[], bool]) -> None:
+        """From now on, read per prompt whether a tool server that reaches the internet
+        is running: her line about what stays on this computer says so while one is."""
+        self._servers_online = online
 
     def check_window_with(self, fits: Callable[[str], bool]) -> None:
         """From now on, refuse a personality whose chat prompt `fits` turns down."""
@@ -87,6 +94,7 @@ class PersonaService:
             spoken=surface is Surface.voice,
             tools_enabled=tools_enabled,
             web=self._web_on(),
+            servers_online=self._servers_online(),
         )
 
     def provider(self, surface: Surface, *, tools_enabled: bool = False) -> Callable[[], str]:
@@ -112,7 +120,13 @@ class PersonaService:
             )
         # Within the length, a text of emoji or of a rare script can still fill the
         # window: saved, it would send every chat message back.
-        chat_prompt = build_prompt(cleaned, spoken=False, tools_enabled=True, web=self._web_on())
+        chat_prompt = build_prompt(
+            cleaned,
+            spoken=False,
+            tools_enabled=True,
+            web=self._web_on(),
+            servers_online=self._servers_online(),
+        )
         if self._fits_window is not None and not self._fits_window(chat_prompt):
             raise PersonaRejected(
                 Code.persona_fills_window,

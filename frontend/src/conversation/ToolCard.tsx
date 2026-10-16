@@ -2,9 +2,9 @@
 // more to it (what a recall found), the rest on opening. A failure says what she
 // couldn't do and why, in her words.
 
-import { AppWindow, BookmarkMinus, BookmarkPlus, Brain, ChevronDown, FilePen, FileSearch, FileText, FolderOpen, Globe, PenLine, Search, Wrench } from 'lucide-react'
+import { AppWindow, BookmarkMinus, BookmarkPlus, Brain, ChevronDown, FilePen, FileSearch, FileText, FolderOpen, Globe, PenLine, Plug, Search, Wrench } from 'lucide-react'
 import type { ToolRun } from '../chat/types'
-import { toolRunTitle } from '../lib/capabilities'
+import { fromToolServer, toolRunTitle } from '../lib/capabilities'
 import { cx } from '../ui/cx'
 import styles from './ToolCard.module.css'
 import { presentResult } from './toolResult'
@@ -24,7 +24,7 @@ const ICONS: Record<string, typeof Wrench> = {
 }
 
 export function ToolCard({ run }: { run: ToolRun }) {
-  const Icon = ICONS[run.name.replace(/\./g, '_')] ?? Wrench
+  const Icon = fromToolServer(run.name) ? Plug : (ICONS[run.name.replace(/\./g, '_')] ?? Wrench)
   const result = presentResult(run.name, run.result)
   const [peek, ...rest] = result.split('\n')
   const head = (

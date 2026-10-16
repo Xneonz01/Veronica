@@ -29,7 +29,10 @@ The people and plans in these are made up.
 - A memory page where you can see, edit, pin, approve or delete what she has learned.
 - File and app actions that go through a permission layer: changes need your OK (on
   screen, or out loud during a call) and every decision is logged.
-- Voice cloning from 10–15 seconds of speech.
+- Voice cloning from 10–15 seconds of speech. On a call her voice can laugh, chuckle or
+  sigh where it fits.
+- Web search, off until you switch it on, and tools from MCP servers you run (Settings >
+  Tools): she offers a server's tool only once you approve it, and asks before every use.
 - A tray icon and a global hotkey that opens a small companion window.
 
 ## System requirements
@@ -133,6 +136,9 @@ only when she looks something up, the search goes to the service you chose (your
 SearXNG, or Brave with your key) and a page she reads is fetched from its site. She
 asks first before sending an address nobody gave her, anything that looks like a
 password or a key, or words from your notes and memory.
+
+A tool server you add in Settings > Tools is a program with your account's rights, and
+what it does inside its tools, online or not, is up to it: add only one you trust.
 
 ## Development
 

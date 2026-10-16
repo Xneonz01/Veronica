@@ -21,7 +21,9 @@ from app.kernel.capability import CapabilityResult, RiskTier
 # Where a capability's effect lands. `local`: this computer. `network`: a request to a
 # host on the internet, which carries its arguments out with it, so the egress gate
 # reads them (`kernel/egress.py`) whatever its risk tier says about local harm.
-Reach = Literal["local", "network"]
+# `external`: another program, a tool server (`services/mcp`), whose effect she can't
+# see; it may itself reach anywhere.
+Reach = Literal["local", "network", "external"]
 # A dotted id: a lowercase family, then one to three parts that may keep a tool's own
 # case (`mcp.notes.getUser`). Anything else is refused at registration, before a bad
 # name can reach a policy file, an audit row or a prompt.
@@ -79,6 +81,9 @@ class Capability:
     # Arguments that are addresses: one the user didn't write and no search returned
     # asks before it is requested (`kernel/egress.py`).
     url_fields: frozenset[str] = frozenset()
+    # Asks every time, whatever the user sets: a tool server's, whose meaning is the
+    # server's (`kernel/policy.py` won't let it be auto-allowed).
+    always_ask: bool = False
 
     @property
     def tool_name(self) -> str:
@@ -138,6 +143,13 @@ class CapabilityRegistry:
         to_tool_schema(capability)  # validate eagerly: a bad model fails at registration
         self._by_name[capability.name] = capability
         self._by_tool_name[capability.tool_name] = capability
+
+    def unregister(self, name: str) -> None:
+        """Withdraw a capability: a tool server stopped, or a tool it no longer has. A
+        call to it is then refused as unknown, as one never offered is."""
+        capability = self._by_name.pop(name, None)
+        if capability is not None:
+            self._by_tool_name.pop(capability.tool_name, None)
 
     def get(self, name: str) -> Capability | None:
         """Look up by dotted id (policy, audit, REST)."""

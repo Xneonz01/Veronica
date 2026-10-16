@@ -74,7 +74,11 @@ def test_the_cases_ask_only_for_tools_the_product_offers(tmp_path: Path) -> None
 
     assert asked and asked <= offered
     # The web's cases are offered the web's tools (`tests/test_eval_web.py`).
-    every = [*cases, *attacks.load_cases(attacks.WEB_CASES)]
+    every = [
+        *cases,
+        *attacks.load_cases(attacks.WEB_CASES),
+        *attacks.load_cases(attacks.MCP_CASES),
+    ]
     for vector in attacks.VECTORS:
         assert {one["kind"] for one in every if one["vector"] == vector} == {"attack", "control"}
 

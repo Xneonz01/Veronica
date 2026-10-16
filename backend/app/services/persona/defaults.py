@@ -28,6 +28,17 @@ _IDENTITY_WEB = (
     "You are Veronica, a local-first assistant running privately on the user's own "
     "machine. Everything stays on this computer, except what you look up on the web."
 )
+# And while a tool server the user marked as reaching the internet runs (`services/mcp`).
+_OUT_BY_SERVER = "what a tool server that reaches the internet sends"
+_IDENTITY_SERVER = (
+    "You are Veronica, a local-first assistant running privately on the user's own "
+    f"machine. Everything stays on this computer, except {_OUT_BY_SERVER}."
+)
+_IDENTITY_BOTH = (
+    "You are Veronica, a local-first assistant running privately on the user's own "
+    "machine. Everything stays on this computer, except what you look up on the web "
+    f"and {_OUT_BY_SERVER}."
+)
 
 _VOICE_STYLE = (
     "You are speaking aloud. Reply in a natural, spoken style — a sentence or two, "
@@ -126,7 +137,14 @@ _FENCE_OPEN = "--- Personality ---"
 _FENCE_CLOSE = "--- End personality ---"
 
 
-def build_prompt(personality: str, *, spoken: bool, tools_enabled: bool, web: bool = False) -> str:
+def build_prompt(
+    personality: str,
+    *,
+    spoken: bool,
+    tools_enabled: bool,
+    web: bool = False,
+    servers_online: bool = False,
+) -> str:
     """Compose the system prompt for one surface.
 
     The editable block sits between fixed halves, so emptying it, or filling it with
@@ -136,7 +154,15 @@ def build_prompt(personality: str, *, spoken: bool, tools_enabled: bool, web: bo
     if spoken:
         style = _VOICE_STYLE_WITH_TOOLS if tools_enabled else _VOICE_STYLE
     web = web and tools_enabled  # without tools there is no way to reach it
-    parts = [_IDENTITY_WEB if web else _IDENTITY, style, _MEMORY_RULES]
+    # A call is offered no tool server's tools, so it sends nothing through one.
+    served = servers_online and tools_enabled and not spoken
+    identity = {
+        (False, False): _IDENTITY,
+        (True, False): _IDENTITY_WEB,
+        (False, True): _IDENTITY_SERVER,
+        (True, True): _IDENTITY_BOTH,
+    }[(web, served)]
+    parts = [identity, style, _MEMORY_RULES]
     if not spoken:
         parts.append(_CITATION_RULES)
     if tools_enabled:

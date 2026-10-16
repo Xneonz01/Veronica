@@ -2,8 +2,9 @@
 
 Defaults derive from the risk tier, except for a guarded capability declared
 `auto_approve` (one its own notification can undo), and the user can retune any
-capability live. One rule is not user-overridable: a `dangerous` capability can never
-be set to auto-allow, so a human always sees it.
+capability live. One rule is not user-overridable: a `dangerous` capability, or one
+declared `always_ask` (a tool server's), can never be set to auto-allow, so a human
+always sees it.
 
 Changes are persisted to `policy.json` in her data folder. Held only in memory, a user who switched
 `files.write` to deny would silently get confirm back on the next restart.
@@ -42,6 +43,10 @@ def _default(capability: Capability) -> PolicyMode:
     if capability.auto_approve and capability.risk is RiskTier.guarded:
         return PolicyMode.auto_allow
     return _DEFAULTS[capability.risk]
+
+
+def _always_asks(capability: Capability) -> bool:
+    return capability.risk is RiskTier.dangerous or capability.always_ask
 
 
 class PolicyViolation(ValueError):
@@ -84,13 +89,13 @@ class PolicyStore:
     def mode_for(self, capability: Capability) -> PolicyMode:
         mode = self._overrides.get(capability.name, _default(capability))
         # Defence in depth: even a config file cannot auto-allow a dangerous action.
-        if capability.risk is RiskTier.dangerous and mode is PolicyMode.auto_allow:
+        if _always_asks(capability) and mode is PolicyMode.auto_allow:
             return PolicyMode.confirm
         return mode
 
     async def set_mode(self, capability: Capability, mode: PolicyMode) -> None:
-        if capability.risk is RiskTier.dangerous and mode is PolicyMode.auto_allow:
-            raise PolicyViolation("A dangerous capability always needs confirmation.")
+        if _always_asks(capability) and mode is PolicyMode.auto_allow:
+            raise PolicyViolation("That action always needs confirmation.")
         self._overrides[capability.name] = mode
         self._save()
         await self._bus.publish(

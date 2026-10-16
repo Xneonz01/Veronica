@@ -22,7 +22,7 @@ from typing import NamedTuple, Protocol, TypeVar
 from app.services.chat.learning_queue import Due, LearningQueue
 from app.services.chat.store import ChatStore, StoredMessage
 from app.services.memory.call_queue import CallDue, CallQueue
-from app.services.tools.sources import CONTENT_TOOLS
+from app.services.tools.sources import returns_content
 
 _PAGE = 200  # messages read per extraction, at most
 _LABEL = 12  # what the transcript adds to a turn: "User: " or "Veronica: " and a newline
@@ -146,7 +146,7 @@ def heard(messages: Sequence[StoredMessage], *, after_content: bool = False) -> 
     said: set[int] = set()
     for m in messages:
         if m.role == "tool":
-            after_content = after_content or m.tool_name in CONTENT_TOOLS
+            after_content = after_content or returns_content(m.tool_name)
             continue
         if m.content.strip() and (
             m.role == "user" or (m.role == "assistant" and not m.citations and not after_content)
@@ -164,7 +164,7 @@ def ends_on_content(read: Sequence[StoredMessage]) -> bool:
     after = False
     for m in read:
         if m.role == "tool":
-            after = after or m.tool_name in CONTENT_TOOLS
+            after = after or returns_content(m.tool_name)
         elif m.role in ("user", "assistant"):
             after = False
     return after

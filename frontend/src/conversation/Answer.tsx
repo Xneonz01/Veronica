@@ -2,9 +2,10 @@
 // and once it has settled, where it came from and a way to copy it. While she is
 // working the mark breathes and a line says what she is doing.
 
-import { Brain, Check, CircleAlert, Copy, FolderOpen, Globe } from 'lucide-react'
+import { Brain, Check, CircleAlert, Copy, FolderOpen, Globe, Plug } from 'lucide-react'
 import { useState } from 'react'
 import type { ChatMessage, ChatState, Citation } from '../chat/types'
+import { fromToolServer } from '../lib/capabilities'
 import { IconButton } from '../ui/Button'
 import { cx } from '../ui/cx'
 import { Mark } from '../ui/Mark'
@@ -87,10 +88,14 @@ function Footer({ message }: { message: ChatMessage }) {
   const [copied, setCopied] = useState(false)
   const recalled = message.tools.some((run) => run.name === 'memory_recall' && run.ok)
   const browsed = message.tools.some((run) => WEB_TOOLS.has(run.name) && run.ok)
-  // The web first: of everything an answer can draw on, it is what nobody vouches for.
+  const served = message.tools.some((run) => fromToolServer(run.name) && run.ok)
+  // The web first, then a tool server: of everything an answer can draw on, they are
+  // what nobody vouches for.
   const trust = browsed
     ? { icon: <Globe size={14} aria-hidden="true" />, text: 'From the web' }
-    : message.citations.length > 0
+    : served
+      ? { icon: <Plug size={14} aria-hidden="true" />, text: 'From a tool server' }
+      : message.citations.length > 0
       ? { icon: <FolderOpen size={14} aria-hidden="true" />, text: 'From your files' }
       : recalled
         ? { icon: <Brain size={14} aria-hidden="true" />, text: 'From what I remember' }

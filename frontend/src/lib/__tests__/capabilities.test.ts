@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { capabilityRequest, toolRunTitle } from '../capabilities'
+import { capabilityRequest, fromToolServer, toolRunTitle } from '../capabilities'
 
 const IDENTIFIER = /\b[a-z]+[._][a-z_]+\b/
 
@@ -28,5 +28,14 @@ describe('capability names', () => {
         expect(text).not.toMatch(IDENTIFIER)
       }
     }
+  })
+})
+
+describe('a tool server tool', () => {
+  it('is named as one in either spelling, never by its raw name', () => {
+    expect(capabilityRequest('mcp.notes.add_note')).toBe('Use a tool from a tool server')
+    expect(toolRunTitle('mcp_notes_add_note', true)).toBe('Used a tool from a tool server')
+    expect(toolRunTitle('mcp_notes_add_note', false)).toBe("A tool server's tool didn't work")
+    expect(fromToolServer('mcpish_tool')).toBe(false)
   })
 })

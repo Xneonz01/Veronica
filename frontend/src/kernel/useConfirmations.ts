@@ -10,10 +10,11 @@ import { useAppEvents } from '../audio/useAppEvents'
 import { apiFetch } from '../lib/api'
 
 /** Why she asks for an action its setting would have let run: an argument came word
- *  for word from something she read, the turn read the web, or a call to the web would
- *  send an address nobody gave her, a secret, or words of yours (`kernel/egress.py`). */
-export type AskReason = 'from_reading' | 'after_web' | 'unfamiliar_link' | 'sends_secret' | 'sends_private'
-const REASONS: readonly string[] = ['from_reading', 'after_web', 'unfamiliar_link', 'sends_secret', 'sends_private']
+ *  for word from something she read, the turn read the web or a tool server, or a call
+ *  to the web would send an address nobody gave her, a secret, or words of yours
+ *  (`kernel/egress.py`). */
+export type AskReason = 'from_reading' | 'after_web' | 'after_mcp' | 'unfamiliar_link' | 'sends_secret' | 'sends_private'
+const REASONS: readonly string[] = ['from_reading', 'after_web', 'after_mcp', 'unfamiliar_link', 'sends_secret', 'sends_private']
 
 /** One argument as the prompt shows it: hidden characters revealed, a secret blanked. */
 export interface ConfirmDetail {

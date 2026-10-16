@@ -2,7 +2,7 @@
 
 - **Status:** accepted by the owner, 2026-10-11, including the rule that a turn which
   read web or MCP content makes every action that isn't `safe` ask first. Web search
-  ships in 0.35.0; the MCP client is next (0.36.0). The dated notes at the end record
+  shipped in 0.35.0 and the MCP client in 0.37.0. The dated notes at the end record
   what was decided while building it.
 - **Changes a security promise:** ARCHITECTURE §18 says the only connection the backend
   makes is to Ollama on 127.0.0.1, the README says nothing leaves the machine, and her
@@ -177,3 +177,18 @@ current version (2026-07-28) is stateless where earlier ones are not, so a clien
 speak both. Option 3 is chosen: a small client of our own over `subprocess.Popen`,
 speaking the current version and falling back to the older one, with the server held
 in a Windows job object so it can't outlive her. No SDK dependency.
+
+### 2026-10-14: the MCP client, shipped in 0.37.0
+
+0.36.0 went to her voice's sounds, so the client is 0.37.0. Built as decided: our own,
+over `subprocess.Popen`, each server started suspended and held in a job object. Read
+against the specification before writing it, which corrected the plan in four places:
+the current revision's `_meta` keys are namespaced (`io.modelcontextprotocol/...`); the
+server's name is in the discover result's `_meta`, not beside it; the error for an
+unsupported version is -32022, with `data.supported`; and an `input_required` result
+can't simply be refused, since the message patterns are mandatory, so a result that only
+sends state back is retried with it, and one that asks for input is said in words. A
+current server announces a changed tool list only on a subscription she doesn't open,
+so its list is read again when its `ttlMs` runs out. Measured beside the plan: one tool
+with long descriptions took 1,752 tokens of the chat window, so the tools offered
+together are held to 1,500 tokens as well as to twelve.

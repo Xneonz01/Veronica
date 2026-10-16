@@ -93,6 +93,17 @@ computer as your network, which is what most homes are given; a provider that gi
 /48 leaves the rest of it looking public, as does a network that gives its computers
 public IPv4 addresses.
 
+A tool server (Settings > Tools) is a program you chose, with the rights of your
+account: she asks before every one of its tools, offers a tool only once you have
+approved it, and withholds it again if the server changes how it describes it, but she
+can't see what the server does inside a tool, or what it sends anywhere. What it
+returns is as untrusted as a web page, so after it she asks before she saves, writes or
+opens anything, and as private as your own files, so a run of its words doesn't leave
+unasked; a short piece of it, a code or an address, can still go out in a web search.
+On Windows it is held in a job object, so it ends when she does. Any program that can call her backend can also add a server, switch
+one on and approve its tools, as it can change her other settings: the same open door
+as the rest of the API, which the planned key held by the desktop app closes.
+
 [ARCHITECTURE.md §18](ARCHITECTURE.md#18-security-model) maps each defence to the code
 that implements it.
 

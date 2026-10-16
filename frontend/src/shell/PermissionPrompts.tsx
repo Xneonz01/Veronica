@@ -29,6 +29,7 @@ export const ARM_MS = 500
 const REASONS: Record<AskReason, { badge: string; said: string }> = {
   from_reading: { badge: 'From something I read', said: 'The words for this came from something I read, not from you.' },
   after_web: { badge: 'After reading the web', said: "I read something on the web just before this, so I'm checking with you." },
+  after_mcp: { badge: 'After a tool server answered', said: "A tool server answered me just before this, so I'm checking with you." },
   unfamiliar_link: { badge: 'Address not from you', said: "You didn't give me this address, and no search turned it up." },
   sends_secret: { badge: 'Looks like a secret', said: 'This would send something that looks like a password or a key.' },
   sends_private: { badge: 'Sends something of yours', said: 'This would send words from your files or from what I know about you.' },

@@ -50,6 +50,10 @@ class Code(StrEnum):
     fetch_too_large = "fetch_too_large"
     not_a_page = "not_a_page"
     search_unavailable = "search_unavailable"
+    # Tool servers (`services/mcp`).
+    server_unavailable = "server_unavailable"  # not running, or stopped mid-call
+    tool_error = "tool_error"  # the server's tool said it didn't work
+    tool_needs_input = "tool_needs_input"  # it asked for input she can't give
     # Persona
     persona_too_long = "persona_too_long"
     persona_fills_window = "persona_fills_window"

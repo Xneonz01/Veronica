@@ -16,7 +16,7 @@ from app.kernel.capability import AuditSink, CapabilityResult, Decision
 from app.kernel.errors import Code
 from app.kernel.measure import measure, ms_since
 from app.kernel.registry import Capability, CapabilityRegistry
-from app.kernel.verdict import AFTER_WEB, FROM_READING, Verdict
+from app.kernel.verdict import AFTER_MCP, AFTER_WEB, FROM_READING, Verdict
 from app.schemas.events import Event
 from app.telemetry import current_blackbox
 
@@ -139,7 +139,7 @@ def note(capability: Capability, verdict: Verdict) -> None:
             capability=capability.name,
             **verdict.tainted.as_fields(),
         )
-    elif verdict.why is not None and verdict.why not in (FROM_READING, AFTER_WEB):
+    elif verdict.why is not None and verdict.why not in (FROM_READING, AFTER_WEB, AFTER_MCP):
         current_blackbox().record(
             "info", "capability.egress", capability=capability.name, why=verdict.why
         )

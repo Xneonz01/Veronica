@@ -15,7 +15,8 @@ The gates, in order; the strictest outcome wins (refuse, then ask, then run):
    nothing.
 5. **After the web.** A turn whose prompt holds text from the web, read this turn or
    carried in an earlier reply, makes everything that isn't `safe` ask: a page's
-   instruction reworded by the model gets past the copy check (ADR 0003).
+   instruction reworded by the model gets past the copy check (ADR 0003). A tool
+   server's result counts the same: its author is no more known than a page's.
 6. **Egress.** A call that reaches the network asks when it would send an unfamiliar
    address, a secret, or the user's own words (`kernel/egress.py`). Gate 5 doesn't
    apply to those calls: a search after a search runs, as long as it sends nothing it
@@ -42,6 +43,8 @@ from app.kernel.taint import Tainted, find
 FROM_READING = "from_reading"
 # Or its turn read the web, copied or not:
 AFTER_WEB = "after_web"
+# Or what a tool server returned (`services/mcp`):
+AFTER_MCP = "after_mcp"
 
 
 class Action(StrEnum):
@@ -65,6 +68,7 @@ class Verdict:
 _OFF = {
     "network": (Code.network_disabled, "Web search is switched off in Settings."),
     "local": (Code.unavailable, "That isn't available right now."),
+    "external": (Code.unavailable, "That tool's server isn't running right now."),
 }
 _SPENT = "I've done that as many times as I can for now, so I stopped there."
 
@@ -98,8 +102,11 @@ def decide(
         return Verdict(Action.ask, why=why, tainted=tainted)
     if tainted is not None:
         return Verdict(Action.ask, why=FROM_READING, tainted=tainted)
-    if taint is not None and capability.risk is not RiskTier.safe and taint.read("web"):
-        return Verdict(Action.ask, why=AFTER_WEB)
+    if taint is not None and capability.risk is not RiskTier.safe:
+        if taint.read("web"):
+            return Verdict(Action.ask, why=AFTER_WEB)
+        if taint.read("mcp"):
+            return Verdict(Action.ask, why=AFTER_MCP)
     why = _egress_why(capability, args, req)
     if why is not None:
         return Verdict(Action.ask, why=why)

@@ -83,6 +83,11 @@ HEADLINES: dict[str, tuple[str, ...]] = {
         "call_web_ran_unasked",
         "call_web_echoed",
         "call_web_false_call",
+        "mcp_obeyed",
+        "mcp_ran_unasked",
+        "mcp_stopped_by_mcp",
+        "mcp_echoed",
+        "mcp_false_call",
     ),
     "expression": (
         "off_improvised",
@@ -155,13 +160,18 @@ async def _injection(
         web = await run(browsed, attacks.surface(settings, root, web=True))
         searched = [case for case in browsed if not case.get("chat_only")]
         call_web = await run(searched, attacks.surface(settings, root, spoken=True, web=True))
+        # A tool server's result (since 0.37.0): chat only, as its tools are.
+        served = attacks.load_cases(attacks.MCP_CASES)[:limit]
+        mcp = await run(served, attacks.surface(settings, root, mcp=True))
     return {
         **found,
         **scoring.conditions(on),
         **{f"call_{key}": value for key, value in call.items()},
         **{f"web_{key}": value for key, value in web.items()},
         **{f"call_web_{key}": value for key, value in call_web.items()},
+        **{f"mcp_{key}": value for key, value in mcp.items()},
         "web_cases_hash": file_hash(attacks.WEB_CASES),
+        "mcp_cases_hash": file_hash(attacks.MCP_CASES),
     }
 
 

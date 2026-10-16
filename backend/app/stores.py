@@ -33,6 +33,7 @@ from app.services.chat.attachments import AttachmentStore
 from app.services.chat.projects import ProjectStore
 from app.services.chat.store import ChatStore
 from app.services.connected.runtime import ConnectedRuntime, build_connected
+from app.services.mcp.runtime import McpRuntime, build_mcp
 from app.services.memory import at_rest, cipher, migrations, upgrade_copy
 from app.services.memory.migrations import DatabaseTooNewError
 from app.services.memory.runtime import MemoryRuntime, build_memory_runtime
@@ -52,6 +53,7 @@ class Stores:
     attachments: AttachmentStore
     projects: ProjectStore
     web: ConnectedRuntime
+    mcp: McpRuntime
     problems: list[Problem] = field(default_factory=list)
 
 
@@ -98,6 +100,8 @@ async def open_stores(
     # The web's settings and its one client; its key sealed with the data key.
     web = build_connected(settings.capabilities, bus, data_dir, key)
     register_capabilities(kernel.registry, settings, memory=memory, web=web)
+    # Tool servers, their setups sealed with the data key; started once she serves.
+    mcp = build_mcp(settings.capabilities, bus, kernel.registry, data_dir, key)
     try:
         await memory.init()
         await kernel.init()
@@ -124,7 +128,7 @@ async def open_stores(
     # every copy, since one of them is the way back. What can't go now goes next time.
     with suppress(OSError):
         upgrade_copy.remove_old(anchored(settings.memory.db_path))
-    return Stores(memory, kernel, chat, attachments, projects, web, problems)
+    return Stores(memory, kernel, chat, attachments, projects, web, mcp, problems)
 
 
 def memory_problem(error: Exception) -> Problem | None:

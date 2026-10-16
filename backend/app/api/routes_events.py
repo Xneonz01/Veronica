@@ -45,6 +45,8 @@ _WIRE: dict[str, str] = {
     "recovery.updated": "recovery_updated",
     # The web's settings changed (ADR 0003): every Settings screen follows.
     "connected.changed": "connected_changed",
+    # A tool server was set up, started or stopped, or one of its tools approved.
+    "mcp.changed": "mcp_changed",
 }
 
 

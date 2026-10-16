@@ -19,7 +19,7 @@ from app.kernel.confirm import PendingView
 from app.kernel.errors import Code
 from app.kernel.kernel import CapabilityKernel
 from app.kernel.registry import Capability, CapabilityRegistry
-from app.kernel.taint import Taint, declared
+from app.kernel.taint import Source, Taint, declared
 from app.kernel.urls import normalized
 from app.services.tools.render import render_result
 
@@ -94,8 +94,8 @@ class ToolBroker:
         kernel re-reads policy and makes the actual decision.
         """
         capability = self._registry.by_tool_name(tool_name)
-        if capability is None:
-            return False
+        if capability is None or (self._voice_only and not capability.voice_exposed):
+            return False  # refused before anyone is asked (`execute`)
         return self._kernel.requires_confirmation(self._request(capability, arguments, taint))
 
     def pending_confirmations(self) -> list[PendingView]:
@@ -149,7 +149,10 @@ class ToolBroker:
         of the prompt (`render_result`); `request_id` is how `prompt_for` finds the
         prompt it raises."""
         capability = self._registry.by_tool_name(tool_name)
-        if capability is None:
+        # Not one this surface offers (a call is offered only `voice_exposed` ones): a
+        # model that names another anyway, a tool server's on a call, is refused as if
+        # it didn't exist.
+        if capability is None or (self._voice_only and not capability.voice_exposed):
             logger.info("model asked for an unknown tool: %r", tool_name)
             return ToolOutcome(text="That tool isn't available.", ok=False, code="unknown_tool")
 
@@ -197,9 +200,8 @@ def after_round(taint: Taint | None, outcomes: Iterable[ToolOutcome]) -> Taint |
     if taint is None:
         return None
     done = list(outcomes)
-    web = [outcome.text for outcome in done if from_web(outcome.capability)]
-    rest = [outcome.text for outcome in done if not from_web(outcome.capability)]
-    taint = taint.adding("web", web).adding("tool_result", rest)
+    for source in ("web", "mcp", "tool_result"):
+        taint = taint.adding(source, (o.text for o in done if source_of(o.capability) == source))
     taint = taint.knowing(url for outcome in done for url in outcome.urls)
     for outcome in done:
         if outcome.capability is not None and outcome.cleared:
@@ -219,10 +221,15 @@ def went_down(outcomes: Iterable[ToolOutcome]) -> set[str]:
     return {o.capability for o in outcomes if o.capability and o.code in _SERVICE_DOWN}
 
 
-def from_web(capability: str | None) -> bool:
-    """A capability whose result was fetched from the internet (`web.*`), which the
-    kernel holds apart from what this computer holds."""
-    return (capability or "").startswith("web.")
+def source_of(capability: str | None) -> Source:
+    """What a capability's result counts as, by its name in either spelling (`web.read`,
+    or `web_read` as the model calls it and a chat stores it): the web's, fetched from
+    the internet; a tool server's (`mcp`), a program she doesn't vouch for; or a tool's
+    of her own, which the kernel holds apart from both."""
+    family = (capability or "").replace("_", ".", 1).split(".", 1)[0]
+    if family == "web":
+        return "web"
+    return "mcp" if family == "mcp" else "tool_result"
 
 
 def _found_urls(data: dict[str, Any]) -> tuple[str, ...]:

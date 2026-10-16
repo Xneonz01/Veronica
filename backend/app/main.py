@@ -23,6 +23,7 @@ from app.api.routes_chat import router as chat_router
 from app.api.routes_connected import router as connected_router
 from app.api.routes_events import router as events_router
 from app.api.routes_health import router as health_router
+from app.api.routes_mcp import router as mcp_router
 from app.api.routes_memory import router as memory_router
 from app.api.routes_persona import router as persona_router
 from app.api.routes_projects import router as projects_router
@@ -147,6 +148,7 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
             learning_task = startup.serve(app, stores, voice_runtime, settings, background)
             startup.hold_persona_to_window(persona, stores.kernel, settings.llm)
             persona.web_with(stores.web.store.web_on)
+            persona.servers_with(stores.mcp.reaching_internet)
         absent = await startup.check_models(app, settings)
         # Not for a memory she started without, or a model that isn't there to load.
         if stores is not None and settings.memory.warm_on_start and MEMORY_MODEL not in absent:
@@ -184,6 +186,8 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
                 task.cancel()
         # Deny anything still awaiting a human answer, then let its audit row land.
         if stores is not None:
+            with suppress(Exception):  # first: a server's call may be awaiting the kernel
+                await stores.mcp.aclose()
             with suppress(Exception):
                 await stores.kernel.aclose()
             with suppress(Exception):
@@ -246,6 +250,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(rag_router)
     app.include_router(capabilities_router)
     app.include_router(connected_router)
+    app.include_router(mcp_router)
     app.include_router(audit_router)
     app.include_router(recovery_router)
     app.include_router(persona_router)
